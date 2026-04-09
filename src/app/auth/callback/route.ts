@@ -8,9 +8,13 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { error, data } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      // 新規登録からのメール認証 → 完了ページへ
+      // ログイン済みセッションからのリンク → next先へ
+      const isNewUser = data.user?.created_at === data.user?.last_sign_in_at
+      const redirectTo = isNewUser ? '/auth/confirmed' : next
+      return NextResponse.redirect(`${origin}${redirectTo}`)
     }
   }
 

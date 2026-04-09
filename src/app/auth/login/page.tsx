@@ -31,7 +31,7 @@ export default function LoginPage() {
           options: { emailRedirectTo: `${location.origin}/auth/callback` },
         })
         if (error) throw error
-        setMessage('確認メールを送信しました。メールをご確認ください。')
+        setMessage('📩 確認メールを送信しました。\n届いたメール内の「メールアドレスを確認する」ボタンをタップしてください。\n（迷惑メールフォルダも確認してみてください）')
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
@@ -139,7 +139,7 @@ export default function LoginPage() {
               </div>
             )}
             {message && (
-              <div style={{ background: '#ECFDF5', color: '#059669', border: '1px solid #A7F3D0', borderRadius: 12, padding: '12px 14px', fontSize: 14, fontWeight: 500 }}>
+              <div style={{ background: '#ECFDF5', color: '#059669', border: '1px solid #A7F3D0', borderRadius: 12, padding: '16px', fontSize: 14, fontWeight: 500, lineHeight: 1.8, whiteSpace: 'pre-line' }}>
                 {message}
               </div>
             )}
