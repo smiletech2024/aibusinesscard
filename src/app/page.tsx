@@ -32,21 +32,13 @@ export default function HomePage() {
 
         {/* Heading */}
         <h1
-          className="text-5xl sm:text-6xl font-black mb-4 leading-tight tracking-tight"
+          className="text-4xl sm:text-5xl font-black mb-6 leading-tight tracking-tight"
           style={{ color: '#FFFFFF' }}
         >
-          名刺を渡した瞬間から
+          渡した相手が、いつでも
           <br />
-          <span style={{ color: '#C4B5FD' }}>AIが動き出す</span>
+          <span style={{ color: '#C4B5FD' }}>AIのあなた</span>と話せる名刺
         </h1>
-
-        {/* Subtitle */}
-        <p
-          className="text-xl sm:text-2xl font-bold mb-6"
-          style={{ color: 'rgba(255,255,255,0.95)', letterSpacing: '-0.01em' }}
-        >
-          渡した相手が、いつでも<span style={{ color: '#A5B4FC' }}>AIのあなた</span>と話せる名刺
-        </p>
 
         {/* Subtext */}
         <p
