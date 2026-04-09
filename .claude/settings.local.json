@@ -16,7 +16,10 @@
       "Bash(grep -n \"onKeyDown\" /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/chat/[sessionId]/page.tsx /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/owner/chat/[sessionId]/page.tsx)",
       "Bash(python3 -c ':*)",
       "Bash(ls /Users/tsuyoshigoto/Desktop/aibusinesscard/.env*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)",
+      "Bash(npx web-push:*)"
     ]
   }
 }

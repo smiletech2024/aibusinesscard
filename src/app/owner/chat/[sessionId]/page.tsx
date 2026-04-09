@@ -6,6 +6,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { CustomerSession, ConversationSummary, HumanChat } from '@/types'
+import { subscribePush } from '@/lib/push'
 
 export default function OwnerChatPage() {
   const params = useParams()
@@ -19,6 +20,7 @@ export default function OwnerChatPage() {
   const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null)
   const [senderRole, setSenderRole] = useState<'owner' | 'customer'>('customer')
   const [showSummary, setShowSummary] = useState(true)
+  const [pushEnabled, setPushEnabled] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
@@ -56,7 +58,15 @@ export default function OwnerChatPage() {
     if (sessionData) {
       setSession(sessionData as CustomerSession)
       const personaUserId = (sessionData as CustomerSession & { personas?: { user_id?: string } }).personas?.user_id
-      if (user && personaUserId === user.id) setSenderRole('owner')
+      const isOwner = user && personaUserId === user.id
+      if (isOwner) {
+        setSenderRole('owner')
+        // オーナーも通知購読（お客様からのメッセージを受け取る）
+        subscribePush(sessionId, 'owner').then(ok => setPushEnabled(ok))
+      } else {
+        // お客様として開いている場合も購読
+        subscribePush(sessionId, 'customer').then(ok => setPushEnabled(ok))
+      }
     }
     const { data: summaryData } = await supabase
       .from('conversation_summaries').select('*').eq('session_id', sessionId)
@@ -83,6 +93,20 @@ export default function OwnerChatPage() {
       })
       const { chat } = await res.json()
       if (chat) setChats(prev => [...prev, chat])
+
+      // 相手へプッシュ通知
+      const targetRole = senderRole === 'owner' ? 'customer' : 'owner'
+      const senderName = senderRole === 'owner' ? ownerName : customerName
+      fetch('/api/push/send', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          targetRole,
+          title: `💬 ${senderName}からメッセージ`,
+          body: content.length > 60 ? content.slice(0, 60) + '…' : content,
+          url: `${window.location.origin}/owner/chat/${sessionId}`,
+        }),
+      })
     } finally { setLoading(false) }
   }
 

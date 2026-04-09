@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { CustomerSession, AiConversation } from '@/types'
+import { subscribePush } from '@/lib/push'
 
 interface Message { role: 'user' | 'assistant'; content: string; saved?: boolean }
 
@@ -20,6 +21,8 @@ export default function ChatPage() {
   const [summarizing, setSummarizing] = useState(false)
   const [turnCount, setTurnCount] = useState(0)
   const [showSummaryPrompt, setShowSummaryPrompt] = useState(false)
+  const [pushEnabled, setPushEnabled] = useState(false)
+  const [pushAsked, setPushAsked] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
@@ -95,6 +98,8 @@ export default function ChatPage() {
         })
       }
       if (newTurnCount >= 8) setShowSummaryPrompt(true)
+      // 3往復目で通知許可を提案
+      if (newTurnCount === 3 && !pushAsked) setPushAsked(true)
     } finally { setLoading(false) }
   }
 
@@ -169,6 +174,36 @@ export default function ChatPage() {
         ))}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* 通知許可バナー */}
+      {pushAsked && !pushEnabled && (
+        <div className="px-4 py-3 border-t" style={{ background: '#EFF6FF', borderColor: '#BFDBFE' }}>
+          <div className="max-w-2xl mx-auto flex items-center gap-3">
+            <span style={{ fontSize: 20 }}>🔔</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold" style={{ color: '#1D4ED8' }}>本人から返信が来たら通知しますか？</p>
+              <p className="text-xs" style={{ color: '#3B82F6' }}>ページを閉じていても届きます</p>
+            </div>
+            <div className="flex gap-2 flex-shrink-0">
+              <button
+                onClick={async () => {
+                  const ok = await subscribePush(sessionId, 'customer')
+                  setPushEnabled(ok)
+                  setPushAsked(false)
+                }}
+                className="text-xs font-bold px-3 py-1.5 rounded-full"
+                style={{ background: '#2563EB', color: 'white' }}>
+                受け取る
+              </button>
+              <button onClick={() => setPushAsked(false)}
+                className="text-xs px-3 py-1.5 rounded-full"
+                style={{ background: 'rgba(0,0,0,0.06)', color: '#6B7280' }}>
+                あとで
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* サマリー提案バナー */}
       {showSummaryPrompt && !summarizing && (
