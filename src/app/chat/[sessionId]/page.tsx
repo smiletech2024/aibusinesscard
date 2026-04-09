@@ -122,7 +122,7 @@ export default function ChatPage() {
             {ownerName[0]}
           </div>
           <div className="flex-1 min-w-0">
-            <h1 className="font-bold text-white text-sm leading-tight">{ownerName}のAI分身</h1>
+            <h1 className="font-bold text-white text-sm leading-tight">{ownerName}の分身AI</h1>
             <div className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0"></span>
               <p className="text-white/60 text-xs truncate">本人監修 · 会話は後でオーナーに共有されます</p>

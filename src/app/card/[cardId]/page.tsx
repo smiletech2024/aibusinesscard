@@ -82,7 +82,7 @@ export default function CardPage() {
             <div className="absolute top-3 right-4 flex items-center gap-1.5 px-2.5 py-1 rounded-full"
               style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)' }}>
               <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-              <span className="text-white text-xs font-bold">AI分身 オンライン</span>
+              <span className="text-white text-xs font-bold">分身AI オンライン</span>
             </div>
 
             {/* アバター */}
@@ -167,7 +167,7 @@ export default function CardPage() {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
-              AI分身に相談する
+              分身AIに相談する
             </button>
             <div className="grid grid-cols-3 gap-2">
               {['仕事を依頼したい', '相性を確認したい', '実績を知りたい'].map(text => (

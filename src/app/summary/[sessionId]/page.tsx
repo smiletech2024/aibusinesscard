@@ -117,7 +117,7 @@ export default function SummaryPage() {
           <div className="flex items-center gap-3 flex-1 min-w-0 justify-end">
             <div className="text-right min-w-0">
               <p className="font-bold text-sm truncate" style={{ color: "#1E1B4B" }}>{ownerName}</p>
-              <p className="text-xs" style={{ color: "#9896B8" }}>本人（AI分身）</p>
+              <p className="text-xs" style={{ color: "#9896B8" }}>本人（分身AI）</p>
             </div>
             <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-sm"
               style={{ background: 'linear-gradient(135deg, #7C3AED, #4F46E5)' }}>
@@ -167,7 +167,7 @@ export default function SummaryPage() {
           </button>
           <button onClick={() => router.push(`/chat/${sessionId}`)}
             className="btn-ghost w-full py-3" style={{ borderRadius: 'var(--radius-lg)' }}>
-            ← AI分身との会話に戻る
+            ← 分身AIとの会話に戻る
           </button>
         </div>
 

@@ -95,7 +95,7 @@ export default function OwnerChatPage() {
           <div className="flex-1 min-w-0">
             <h1 className="font-bold text-white text-sm truncate">{ownerName} × {customerName}</h1>
             <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              本会話 · AI分身が事前整理済み
+              本会話 · 分身AIが事前整理済み
               {senderRole === 'owner' ? ' · オーナーとして参加' : ' · 顧客として参加'}
             </p>
           </div>
@@ -169,7 +169,7 @@ export default function OwnerChatPage() {
               </svg>
             </div>
             <p className="font-bold mb-1" style={{ color: "#1E1B4B" }}>会話を始めましょう</p>
-            <p className="text-sm" style={{ color: "#9896B8" }}>AI分身が事前に整理してくれています</p>
+            <p className="text-sm" style={{ color: "#9896B8" }}>分身AIが事前に整理してくれています</p>
           </div>
         )}
         {chats.map(chat => {

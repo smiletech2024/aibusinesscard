@@ -51,7 +51,7 @@ export default function ConfirmedPage() {
         </h1>
         <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 32, lineHeight: 1.7 }}>
           AI名刺へようこそ。<br />
-          さっそくあなたのAI分身名刺を作りましょう。
+          さっそくあなたの分身AI名刺を作りましょう。
         </p>
 
         {/* ステップ案内 */}

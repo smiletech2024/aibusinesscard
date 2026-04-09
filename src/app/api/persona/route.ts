@@ -4,7 +4,7 @@ import { deepseek, MODEL } from '@/lib/anthropic'
 
 function getExtractionPrompt(conversations: Array<{ role: string; content: string }>): string {
   const text = conversations.map(c => `${c.role === 'user' ? 'ユーザー' : 'AI'}: ${c.content}`).join('\n')
-  return `以下のヒアリング会話から、AI分身用のデータをJSON形式で抽出してください。
+  return `以下のヒアリング会話から、分身AI用のデータをJSON形式で抽出してください。
 
 【会話】
 ${text}

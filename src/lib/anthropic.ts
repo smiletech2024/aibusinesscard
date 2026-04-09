@@ -10,7 +10,7 @@ export const MODEL = 'deepseek-chat'
 // ヒアリングAIのシステムプロンプト
 export function getHearingSystemPrompt(): string {
   return `あなたはプロフェッショナルなインタビュアーです。
-ユーザーのAI分身（デジタルクローン）を作成するために、以下の情報を引き出してください。
+ユーザーの分身AI（デジタルクローン）を作成するために、以下の情報を引き出してください。
 
 【収集する情報】
 1. 仕事の内容と専門領域
@@ -52,7 +52,7 @@ export function getAvatarSystemPrompt(persona: {
     ? persona.forbidden_rules_json.join('\n・')
     : '（NG事項未設定）'
 
-  return `あなたは${ownerName}（${ownerTitle}）のAI分身です。
+  return `あなたは${ownerName}（${ownerTitle}）の分身AIです。
 本人の許可のもと、顧客との初回対話を担当しています。
 
 【本人について】
@@ -81,7 +81,7 @@ ${achievementsText}
 5. 10〜15回のやり取りを目安に、本人へのバトンタッチを判断する
 
 【重要】
-あなたはAI分身であることを隠しません。必要に応じて「私は${ownerName}のAI分身です」と説明できます。
+あなたは分身AIであることを隠しません。必要に応じて「私は${ownerName}の分身AIです」と説明できます。
 最終的な契約や詳細な価格相談は、必ず本人に引き継いでください。
 
 まず自己紹介して、顧客の来訪目的を聞いてください。`
@@ -90,10 +90,10 @@ ${achievementsText}
 // 会話要約のプロンプト
 export function getSummaryPrompt(conversations: Array<{ role: string; content: string }>, ownerName: string): string {
   const conversationText = conversations
-    .map(c => `${c.role === 'user' ? '顧客' : 'AI分身'}: ${c.content}`)
+    .map(c => `${c.role === 'user' ? '顧客' : '分身AI'}: ${c.content}`)
     .join('\n')
 
-  return `以下は${ownerName}のAI分身と顧客の会話です。
+  return `以下は${ownerName}の分身AIと顧客の会話です。
 この会話を分析して、以下の形式でJSON形式で出力してください。
 
 【会話内容】

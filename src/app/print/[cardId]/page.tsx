@@ -376,7 +376,7 @@ function VividFront({ card, qr }: { card: BusinessCard; qr: string }) {
       {/* Bottom left: online badge のみ */}
       <div style={{ position: 'absolute', bottom: 14, left: 20, display: 'flex', alignItems: 'center', gap: 5 }}>
         <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#4ADE80', flexShrink: 0 }} />
-        <span style={{ fontSize: 7, color: 'rgba(255,255,255,0.5)', fontWeight: 600, whiteSpace: 'nowrap' }}>AI分身 オンライン</span>
+        <span style={{ fontSize: 7, color: 'rgba(255,255,255,0.5)', fontWeight: 600, whiteSpace: 'nowrap' }}>分身AI オンライン</span>
       </div>
     </div>
   )
@@ -718,7 +718,7 @@ export default function PrintCardPage() {
               {/* テキスト */}
               <div style={{ textAlign: 'center' }}>
                 <p style={{ fontSize: 7.5, fontWeight: 700, color: '#6366F1', margin: '0 0 2px', whiteSpace: 'nowrap' }}>QRをスキャン</p>
-                <p style={{ fontSize: 7, color: '#9896B8', margin: 0, whiteSpace: 'nowrap' }}>AI分身に直接相談できます</p>
+                <p style={{ fontSize: 7, color: '#9896B8', margin: 0, whiteSpace: 'nowrap' }}>分身AIに直接相談できます</p>
               </div>
             </div>
             <p style={{ fontSize: 10, color: '#9896B8' }}>← このサイズで出力されます（3倍解像度）</p>
