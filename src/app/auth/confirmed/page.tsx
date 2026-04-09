@@ -52,11 +52,11 @@ export default function ConfirmedPage() {
 
         {/* メッセージ */}
         <h1 style={{ fontSize: 22, fontWeight: 900, color: '#EDEEFF', marginBottom: 8, lineHeight: 1.3 }}>
-          メール認証が完了しました！
+          準備ができました。
         </h1>
         <p style={{ fontSize: 14, color: '#9896C4', marginBottom: 32, lineHeight: 1.7 }}>
-          AI名刺へようこそ。<br />
-          さっそくあなたの分身AI名刺を作りましょう。
+          あなたの分身AIを、今すぐ作りましょう。<br />
+          約10分で、24時間働くAIが完成します。
         </p>
 
         {/* ステップ案内 */}
@@ -71,12 +71,12 @@ export default function ConfirmedPage() {
           }}
         >
           <p style={{ fontSize: 11, fontWeight: 800, color: '#5A587E', letterSpacing: '0.1em', marginBottom: 14, textTransform: 'uppercase' }}>
-            これからの流れ
+            3ステップで完成
           </p>
           {[
             { num: '1', text: 'ログインしてダッシュボードへ' },
-            { num: '2', text: 'AIとの会話であなたの情報を登録（約5分）' },
-            { num: '3', text: 'QRコード付き名刺が完成！共有・印刷できます' },
+            { num: '2', text: 'AIと会話しながら、あなたの思考を学習させる（約10分）' },
+            { num: '3', text: 'QRコード付きのAI名刺が完成。すぐに渡せます' },
           ].map(({ num, text }) => (
             <div key={num} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
               <div
@@ -114,12 +114,13 @@ export default function ConfirmedPage() {
             marginBottom: 12,
           }}
         >
-          ログインして始める →
+          分身AIを作り始める →
         </Link>
 
         <p style={{ fontSize: 12, color: '#5A587E' }}>
           登録したメールアドレスとパスワードでログインできます
         </p>
+
       </div>
     </div>
   )

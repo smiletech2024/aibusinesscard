@@ -238,11 +238,11 @@ export default function CardPage() {
                 </svg>
               </div>
               <div>
-                <p className="font-bold text-sm" style={{ color: '#EDEEFF' }}>前回の会話があります</p>
+                <p className="font-bold text-sm" style={{ color: '#EDEEFF' }}>会話の続きがあります</p>
                 <p className="text-xs" style={{ color: '#5A587E' }}>
                   {existingSession.status === 'summarized' || existingSession.status === 'owner_chat'
-                    ? '分身AIとの会話が完了 · 本人とチャット可能'
-                    : '分身AIとの会話が途中です'}
+                    ? 'AIとの対話が完了 · 本人への引き継ぎ準備ができています'
+                    : 'AIとの対話が途中で終わっています'}
                 </p>
               </div>
             </div>
@@ -258,15 +258,15 @@ export default function CardPage() {
               }}
             >
               {existingSession.status === 'summarized' || existingSession.status === 'owner_chat'
-                ? '本人とのチャットへ進む →'
-                : '会話を続ける →'}
+                ? '本人に直接話しかける →'
+                : '続きから話す →'}
             </button>
             <button
               onClick={resetSession}
               className="w-full text-center text-xs py-2 transition"
               style={{ color: '#5A587E', background: 'transparent', border: 'none', cursor: 'pointer' }}
             >
-              最初からやり直す
+              最初から相談する
             </button>
           </div>
         ) : !showNameInput ? (
@@ -284,10 +284,10 @@ export default function CardPage() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
-              分身AIに話しかける
+              AIに相談する
             </button>
             <div className="grid grid-cols-3 gap-2">
-              {['仕事を依頼したい', '相性を確認したい', '実績を知りたい'].map(text => (
+              {['仕事を頼みたい', '話を聞いてみたい', '実績を知りたい'].map(text => (
                 <button
                   key={text}
                   onClick={() => setShowNameInput(true)}
@@ -313,7 +313,7 @@ export default function CardPage() {
             }}
           >
             <h3 className="font-bold mb-1" style={{ color: '#EDEEFF' }}>お名前を教えてください</h3>
-            <p className="text-xs mb-4" style={{ color: '#5A587E' }}>任意です。入力しなくても相談できます</p>
+            <p className="text-xs mb-4" style={{ color: '#5A587E' }}>入力しなくても話せます。呼びかけてもらえると会話が自然になります</p>
             <input
               type="text"
               value={customerName}
@@ -345,7 +345,7 @@ export default function CardPage() {
                 cursor: 'pointer',
               }}
             >
-              チャットを開始する →
+              話しかける →
             </button>
             <button
               onClick={() => setShowNameInput(false)}

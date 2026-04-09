@@ -165,7 +165,7 @@ export default function OwnerChatPage() {
             <p className="text-xs" style={{ color: '#5A587E' }}>
               {senderRole === 'owner'
                 ? '本会話 · 分身AIが事前整理済み · オーナーとして参加'
-                : '📩 送って閉じてOK · 返信が来たら通知します'}
+                : '送信したらページを閉じてOK · 返信が届いたら通知します'}
             </p>
           </div>
           <button
@@ -193,7 +193,7 @@ export default function OwnerChatPage() {
           }}
         >
           <div className="max-w-2xl mx-auto">
-            <p className="text-xs font-black mb-3" style={{ color: '#7B6EF5' }}>AI事前整理サマリー</p>
+            <p className="text-xs font-black mb-3" style={{ color: '#7B6EF5' }}>AIによる事前整理</p>
             <div className="grid grid-cols-2 gap-2">
               {[
                 { key: 'purpose', label: '目的' },
@@ -278,15 +278,15 @@ export default function OwnerChatPage() {
                     {ownerName[0]}
                   </div>
                   <div>
-                    <p className="font-black text-sm" style={{ color: '#EDEEFF' }}>{ownerName}へ直接メッセージ</p>
-                    <p className="text-xs" style={{ color: '#5A587E' }}>分身AIが整理した内容をもとに対応します</p>
+                    <p className="font-black text-sm" style={{ color: '#EDEEFF' }}>{ownerName}本人へ届きます</p>
+                    <p className="text-xs" style={{ color: '#5A587E' }}>AIが整理した内容をもとに、本人が返信します</p>
                   </div>
                 </div>
                 <div className="space-y-3">
                   {[
                     { icon: '📩', text: 'メッセージを送ったら、このページを閉じてOK' },
                     { icon: '🔔', text: '返信が届いたらスマホに通知が来ます' },
-                    { icon: '⏱️', text: '通常24時間以内に返信します' },
+                    { icon: '⏱️', text: 'たいてい24時間以内に返信します' },
                   ].map(({ icon, text }) => (
                     <div key={text} className="flex items-center gap-3">
                       <span style={{ fontSize: 16, flexShrink: 0 }}>{icon}</span>
@@ -307,8 +307,8 @@ export default function OwnerChatPage() {
                 >
                   <span style={{ fontSize: 22, flexShrink: 0 }}>🔔</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold" style={{ color: '#93C5FD' }}>返信通知をオンにする</p>
-                    <p className="text-xs" style={{ color: '#60A5FA' }}>ページを閉じても返信が届きます</p>
+                    <p className="text-sm font-bold" style={{ color: '#93C5FD' }}>返信が来たら通知で受け取る</p>
+                    <p className="text-xs" style={{ color: '#60A5FA' }}>ページを閉じていても大丈夫です</p>
                   </div>
                   <button
                     onClick={async () => {
@@ -351,8 +351,8 @@ export default function OwnerChatPage() {
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
               </div>
-              <p className="font-bold mb-1" style={{ color: '#EDEEFF' }}>会話を始めましょう</p>
-              <p className="text-sm" style={{ color: '#5A587E' }}>分身AIが事前に整理してくれています</p>
+              <p className="font-bold mb-1" style={{ color: '#EDEEFF' }}>準備が整っています</p>
+              <p className="text-sm" style={{ color: '#5A587E' }}>AIが会話を整理済み。すぐに本題に入れます</p>
             </div>
           )
         )}
@@ -412,7 +412,7 @@ export default function OwnerChatPage() {
           <div className="max-w-2xl mx-auto flex items-center gap-2">
             <span style={{ fontSize: 16 }}>✅</span>
             <p className="text-sm font-medium" style={{ color: '#34D399' }}>
-              送信しました。このページを閉じても、返信が来たら通知でお知らせします。
+              送りました。あとは返信を待つだけ。通知でお知らせします。
             </p>
           </div>
         </div>
@@ -474,7 +474,7 @@ export default function OwnerChatPage() {
           </button>
         </div>
         <p className="text-xs text-center mt-2" style={{ color: '#5A587E' }}>
-          {myName}として送信 · {otherName}がリアルタイムで確認できます
+          {myName}として送信 · {otherName}に届きます
         </p>
       </div>
     </div>

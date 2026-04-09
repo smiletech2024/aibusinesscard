@@ -250,7 +250,7 @@ export default function DashboardPage() {
                   {n.customerName}が本会話を希望しています
                 </p>
                 <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>
-                  分身AIとの会話まとめが準備できました
+                  AIが整理済み · すぐに本題から話せます
                 </p>
               </div>
               <div className="flex gap-2 flex-shrink-0">
@@ -262,7 +262,7 @@ export default function DashboardPage() {
                     textDecoration: 'none', display: 'block', whiteSpace: 'nowrap',
                   }}
                 >
-                  今すぐ対応 →
+                  話しかける →
                 </Link>
                 <button
                   onClick={() => setNotifications(prev => prev.filter(x => x.id !== n.id))}
@@ -288,7 +288,7 @@ export default function DashboardPage() {
             {[
               { label: 'AI名刺', value: cards.length, unit: '枚', color: '#6366F1', borderColor: '#6366F1' },
               { label: 'AI対話中', value: aiChatCount, unit: '件', color: '#8B5CF6', borderColor: '#8B5CF6' },
-              { label: '引き継ぎ待ち', value: summaryCount, unit: '件', color: '#059669', borderColor: '#059669' },
+              { label: '返事を待っています', value: summaryCount, unit: '件', color: '#059669', borderColor: '#059669' },
             ].map(({ label, value, unit, color, borderColor }) => (
               <div
                 key={label}
@@ -337,13 +337,13 @@ export default function DashboardPage() {
                   <circle cx="12" cy="14" r="2" />
                 </svg>
               </div>
-              <h3 className="font-black text-lg mb-2" style={{ color: '#1E1B4B' }}>AI名刺を作成しましょう</h3>
+              <h3 className="font-black text-lg mb-2" style={{ color: '#1E1B4B' }}>分身AIを作りましょう</h3>
               <p className="text-sm mb-6" style={{ color: '#9896B8' }}>
-                ヒアリングAIがあなたの思考と実績を学習し、<br />
-                24時間動く分身AIを作成します
+                約10分のヒアリングで、あなたらしく話すAIが完成。<br />
+                QRコードを渡すだけで、24時間対応が始まります
               </p>
               <Link href="/setup" className="btn-primary text-sm px-7 py-3" style={{ borderRadius: 14 }}>
-                ヒアリングを始める →
+                分身AIを作り始める →
               </Link>
             </div>
           ) : (
@@ -396,7 +396,7 @@ export default function DashboardPage() {
                         </button>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs mb-2.5" style={{ color: '#9896B8' }}>QRを共有 or URLをコピー</p>
+                        <p className="text-xs mb-2.5" style={{ color: '#9896B8' }}>QRを見せる · URLをシェアする</p>
                         <div className="flex flex-wrap gap-2">
                           <a
                             href={cardUrl}
@@ -429,7 +429,7 @@ export default function DashboardPage() {
           <div>
             <div className="mb-5">
               <p className="section-label mb-1">顧客管理</p>
-              <h2 className="text-lg font-black" style={{ color: '#1E1B4B' }}>顧客との接点</h2>
+              <h2 className="text-lg font-black" style={{ color: '#1E1B4B' }}>AIが受けた相談</h2>
             </div>
             <div className="space-y-2">
               {sessions.map(session => {
@@ -472,7 +472,7 @@ export default function DashboardPage() {
                             fontSize: 11, fontWeight: 700, color: '#7C3AED',
                             background: '#EDE9FE', borderRadius: 6, padding: '2px 6px',
                           }}>
-                            対応待ち
+                            あなたを待っています
                           </span>
                         )}
                       </div>

@@ -98,9 +98,9 @@ export default function SummaryPage() {
               <line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" />
             </svg>
           </div>
-          <h1 className="text-2xl font-black mb-2" style={{ color: '#EDEEFF' }}>会話のすべてを整理しました</h1>
+          <h1 className="text-2xl font-black mb-2" style={{ color: '#EDEEFF' }}>AIがすべて整理しました</h1>
           <p className="text-sm mb-6" style={{ color: '#9896C4' }}>
-            {ownerName}との本会話へ進む前に確認してください
+            {ownerName}本人に話しかける前に、確認しておきましょう
           </p>
 
           {/* Participants */}
@@ -178,7 +178,7 @@ export default function SummaryPage() {
             style={{ background: '#0F0E20', border: '1px solid rgba(139,92,246,0.1)' }}
           >
             <div className="text-4xl mb-3">📝</div>
-            <p className="font-bold mb-1" style={{ color: '#EDEEFF' }}>まとめはまだありません</p>
+            <p className="font-bold mb-1" style={{ color: '#EDEEFF' }}>まだ整理が完了していません</p>
             <button
               onClick={() => router.push(`/chat/${sessionId}`)}
               className="text-sm font-medium mt-2"
@@ -208,7 +208,7 @@ export default function SummaryPage() {
               cursor: 'pointer',
             }}
           >
-            本人とチャットを始める →
+            {ownerName}本人に話しかける →
           </button>
           <button
             onClick={() => router.push(`/chat/${sessionId}`)}
@@ -220,12 +220,12 @@ export default function SummaryPage() {
               cursor: 'pointer',
             }}
           >
-            ← 分身AIとの会話に戻る
+            ← もう少しAIと話す
           </button>
         </div>
 
         <p className="text-xs text-center" style={{ color: '#5A587E' }}>
-          このまとめは{ownerName}と共有されます
+          このまとめは{ownerName}にも届いています
         </p>
       </div>
     </div>

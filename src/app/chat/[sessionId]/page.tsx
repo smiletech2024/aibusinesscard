@@ -146,7 +146,7 @@ export default function ChatPage() {
             <div className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#34D399' }} />
               <p className="text-xs truncate" style={{ color: '#5A587E' }}>
-                本人監修 · 会話は後で確認されます
+                本人監修のAI · 会話は後で本人に届きます
               </p>
             </div>
           </div>
@@ -162,7 +162,7 @@ export default function ChatPage() {
                 cursor: 'pointer',
               }}
             >
-              {summarizing ? '要約中...' : '引き継ぎ →'}
+              {summarizing ? '整理中...' : '本人へ橋渡し →'}
             </button>
           )}
         </div>
@@ -177,7 +177,7 @@ export default function ChatPage() {
         }}
       >
         <p className="text-xs font-medium" style={{ color: '#9896C4' }}>
-          このAIは{ownerName}の分身です。契約・価格の確定は本人に引き継ぎます
+          このAIは{ownerName}本人が学習させた分身です。具体的な契約・金額は本人が対応します
         </p>
       </div>
 
@@ -222,8 +222,8 @@ export default function ChatPage() {
           <div className="max-w-2xl mx-auto flex items-center gap-3">
             <span style={{ fontSize: 20, flexShrink: 0 }}>🔔</span>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold" style={{ color: '#93C5FD' }}>本人から返信が来たら通知しますか？</p>
-              <p className="text-xs" style={{ color: '#60A5FA' }}>ページを閉じていても届きます</p>
+              <p className="text-sm font-bold" style={{ color: '#93C5FD' }}>本人からの返信を通知で受け取る</p>
+              <p className="text-xs" style={{ color: '#60A5FA' }}>このページを閉じていても届きます</p>
             </div>
             <div className="flex gap-2 flex-shrink-0">
               <button
@@ -260,9 +260,9 @@ export default function ChatPage() {
         >
           <div className="max-w-2xl mx-auto flex items-center gap-3">
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold" style={{ color: '#EDEEFF' }}>十分な会話ができました</p>
+              <p className="text-sm font-bold" style={{ color: '#EDEEFF' }}>本人に引き継ぐ準備ができました</p>
               <p className="text-xs mt-0.5" style={{ color: '#9896C4' }}>
-                会話をまとめて{ownerName}本人に引き継ぎますか？
+                会話をまとめて{ownerName}へ橋渡しします
               </p>
             </div>
             <button

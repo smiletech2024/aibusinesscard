@@ -34,13 +34,13 @@ export default function HomePage() {
           style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.85)', border: '1px solid rgba(255,255,255,0.1)' }}
         >
           <span className="w-2 h-2 rounded-full bg-green-400 inline-block" style={{ boxShadow: '0 0 6px #34D399' }} />
-          ベータ公開中
+          先行体験・無料公開中
         </div>
 
         {/* Heading */}
         <h1 className="font-black mb-6 leading-tight tracking-tight" style={{ fontSize: 'clamp(40px, 7vw, 72px)' }}>
-          <span style={{ color: '#EDEEFF', display: 'block' }}>眠っている間も、</span>
-          <span className="text-gradient" style={{ display: 'block' }}>商談は進む。</span>
+          <span style={{ color: '#EDEEFF', display: 'block' }}>あなたの名刺が、</span>
+          <span className="text-gradient" style={{ display: 'block' }}>24時間話し続ける。</span>
         </h1>
 
         {/* Subtext */}
@@ -48,7 +48,7 @@ export default function HomePage() {
           className="text-base max-w-lg mb-12 leading-relaxed"
           style={{ color: '#9896C4', whiteSpace: 'pre-line' }}
         >
-          {`分身AIが24時間、あなたの代わりに顧客と対話する。\nAIが整理した要約つきで、本当に必要な商談だけを届ける。`}
+          {`QRコードを渡すだけ。あなたの分身AIが顧客の相談に応え、\n本当に会うべき人だけを、整理された状態で届けてくれる。`}
         </p>
 
         {/* CTA Buttons */}
@@ -62,7 +62,7 @@ export default function HomePage() {
               boxShadow: '0 4px 24px rgba(0,0,0,0.35)',
             }}
           >
-            無料で始める →
+            自分の分身AIを作る →
           </Link>
           <Link
             href="/auth/login"
@@ -80,9 +80,9 @@ export default function HomePage() {
         {/* Feature Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl w-full">
           {[
-            { step: '01', title: 'あなたを学ぶ', desc: 'AIがヒアリングを通じてあなたの思考・実績・価値観を深く学習する' },
-            { step: '02', title: '代わりに話す', desc: 'QRコードから24時間。顧客の質問に、あなたらしく答え続ける' },
-            { step: '03', title: '整理して届ける', desc: '会話の要約・相性評価つきで、本当に動くべき商談だけをあなたに届ける' },
+            { step: '01', title: 'あなたを深く知る', desc: '約10分のヒアリング。思考・実績・価値観をAIが学習し、あなたらしい答え方を身につける。' },
+            { step: '02', title: '代わりに、話す', desc: 'QRを渡せばあとは全自動。深夜でも、移動中でも、顧客の質問にあなたとして答え続ける。' },
+            { step: '03', title: '要約して、届ける', desc: '相性・課題・未解決点を整理した状態で通知。本当に動くべき商談だけが手元に届く。' },
           ].map(({ step, title, desc }) => (
             <div
               key={step}

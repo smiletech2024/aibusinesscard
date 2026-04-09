@@ -31,7 +31,7 @@ export default function LoginPage() {
           options: { emailRedirectTo: `${location.origin}/auth/callback` },
         })
         if (error) throw error
-        setMessage('📩 確認メールを送信しました。\n届いたメール内の「メールアドレスを確認する」ボタンをタップしてください。\n（迷惑メールフォルダも確認してみてください）')
+        setMessage('📩 確認メールをお送りしました。\nメール内の「メールアドレスを確認する」をタップすると、あなたの分身AI作成が始まります。\n（届かない場合は迷惑メールフォルダもご確認ください）')
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
@@ -59,14 +59,14 @@ export default function LoginPage() {
             className="font-black leading-tight mb-8"
             style={{ color: '#EDEEFF', fontSize: 36 }}
           >
-            あなたの熱量を、<br />
-            <span style={{ color: '#7B6EF5' }}>24時間届ける名刺。</span>
+            名刺を渡した瞬間から、<br />
+            <span style={{ color: '#7B6EF5' }}>商談が動き始める。</span>
           </h2>
           <div className="space-y-5">
             {[
-              'ヒアリングAIがあなたの人格を学習',
-              'QRコードで顧客と即つながる',
-              '会話サマリー付きで本会話へ移行',
+              '約10分で、あなたらしいAIが完成する',
+              'QRコード一枚で、24時間対応が始まる',
+              '要約＋相性スコアつきで、本物の商談へ',
             ].map((text) => (
               <div key={text} className="flex items-center gap-3">
                 <div
@@ -91,9 +91,9 @@ export default function LoginPage() {
             }}
           >
             <p className="text-sm italic mb-3 leading-relaxed" style={{ color: '#9896C4' }}>
-              「眠っている間も、商談は進む。」
+              「寝ている間に3件の問い合わせが来ていた。<br />全部、AIが整理してくれていた。」
             </p>
-            <p className="text-xs" style={{ color: '#5A587E' }}>— AI名刺のコンセプト</p>
+            <p className="text-xs" style={{ color: '#5A587E' }}>— AI名刺ユーザーの声</p>
           </div>
         </div>
 
@@ -113,10 +113,10 @@ export default function LoginPage() {
 
           <div className="mb-8">
             <h1 className="font-black mb-1" style={{ color: '#1E1B4B', fontSize: 26 }}>
-              {isSignUp ? 'アカウントを作成' : 'おかえりなさい'}
+              {isSignUp ? '分身AIを作成する' : 'おかえりなさい'}
             </h1>
             <p className="text-sm" style={{ color: '#9896B8' }}>
-              {isSignUp ? '無料で始められます' : 'アカウントにログイン'}
+              {isSignUp ? '無料・約10分で完成します' : 'あなたのAIが待っています'}
             </p>
           </div>
 
@@ -186,7 +186,7 @@ export default function LoginPage() {
                 transition: 'all 0.2s',
               }}
             >
-              {loading ? '処理中...' : isSignUp ? 'アカウントを作成する' : 'ログイン'}
+              {loading ? '準備中...' : isSignUp ? '分身AIを作り始める →' : 'ログイン'}
             </button>
           </form>
 
@@ -195,7 +195,7 @@ export default function LoginPage() {
               onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage('') }}
               style={{ fontSize: 14, fontWeight: 600, color: '#6366F1', background: 'none', border: 'none', cursor: 'pointer' }}
             >
-              {isSignUp ? 'すでにアカウントをお持ちの方 →' : 'アカウントを作成する →'}
+              {isSignUp ? 'すでにアカウントをお持ちの方はこちら →' : 'アカウントをお持ちでない方 →'}
             </button>
           </div>
         </div>

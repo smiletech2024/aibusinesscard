@@ -137,8 +137,8 @@ export default function SetupPage() {
                 <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
               </svg>
             </div>
-            <h1 className="text-2xl font-black mb-1" style={{ color: "#1E1B4B" }}>名刺情報を入力</h1>
-            <p className="text-sm" style={{ color: "#9896B8" }}>QRコードに表示される情報です</p>
+            <h1 className="text-2xl font-black mb-1" style={{ color: "#1E1B4B" }}>名刺に載せる情報</h1>
+            <p className="text-sm" style={{ color: "#9896B8" }}>QRコードから開いたとき、お客様が最初に見る情報です</p>
           </div>
 
           <div className="card p-6 space-y-4">
@@ -176,7 +176,7 @@ export default function SetupPage() {
                 boxShadow: '0 4px 14px rgba(99,102,241,0.35)', marginTop: 8,
               }}
             >
-              分身AIを作成する →
+              この内容で分身AIを完成させる →
             </button>
           </div>
         </div>
@@ -190,8 +190,8 @@ export default function SetupPage() {
         <div className="text-center">
           <div className="w-16 h-16 border-4 rounded-full spin mx-auto mb-5"
             style={{ border: '4px solid var(--border)', borderTopColor: 'var(--primary)' }} />
-          <h2 className="font-black text-xl mb-2" style={{ color: "#1E1B4B" }}>分身AIを作成中...</h2>
-          <p className="text-sm" style={{ color: "#9896B8" }}>あなたの思考をAIに学習させています</p>
+          <h2 className="font-black text-xl mb-2" style={{ color: "#1E1B4B" }}>あなたの分身を生成中...</h2>
+          <p className="text-sm" style={{ color: "#9896B8" }}>会話の内容からあなたの思考・価値観を学習しています</p>
         </div>
       </div>
     )
@@ -207,8 +207,8 @@ export default function SetupPage() {
               <path d="M20 6L9 17l-5-5" />
             </svg>
           </div>
-          <h2 className="font-black text-2xl mb-2" style={{ color: "#1E1B4B" }}>分身AI完成！</h2>
-          <p className="text-sm" style={{ color: "#9896B8" }}>ダッシュボードへ移動します...</p>
+          <h2 className="font-black text-2xl mb-2" style={{ color: "#1E1B4B" }}>あなたの分身AIが生まれました</h2>
+          <p className="text-sm" style={{ color: "#9896B8" }}>今この瞬間から、24時間働き始めます</p>
         </div>
       </div>
     )
@@ -228,13 +228,13 @@ export default function SetupPage() {
               </svg>
             </div>
             <div>
-              <h1 className="font-black text-white text-sm leading-tight">ヒアリングAI</h1>
-              <p className="text-white/60 text-xs">分身AIを作成中 — 約10〜15問</p>
+              <h1 className="font-black text-white text-sm leading-tight">あなたを学ぶAI</h1>
+              <p className="text-white/60 text-xs">思考・価値観・実績を学習中 — 約10〜15問</p>
             </div>
             {turnCount >= 8 && (
               <button onClick={() => setStep('card')}
                 className="ml-auto text-xs font-bold px-3 py-1.5 rounded-full text-white transition" style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)" }}>
-                完了して名刺作成へ →
+                十分です。名刺を作る →
               </button>
             )}
           </div>
