@@ -3,7 +3,19 @@
     "allow": [
       "Skill(claude-api)",
       "Skill(claude-api:*)",
-      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git --yes)"
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git --yes)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(curl -s 'https://ukmlcyajjsvvyzajvnew.supabase.co/rest/v1/profiles?limit=1' -H 'apikey: sb_publishable_V5hQIxknj_VHEVB5JBV-cg_YkWurnbm' -H 'Authorization: Bearer sb_publishable_V5hQIxknj_VHEVB5JBV-cg_YkWurnbm')",
+      "Bash(open /Users/tsuyoshigoto/Desktop/aibusinesscard/)",
+      "Bash(curl -s 'https://ukmlcyajjsvvyzajvnew.supabase.co/rest/v1/__TRACKED_VAR__?limit=1' -H 'apikey: sb_publishable_V5hQIxknj_VHEVB5JBV-cg_YkWurnbm' -H 'Authorization: Bearer sb_publishable_V5hQIxknj_VHEVB5JBV-cg_YkWurnbm')",
+      "Bash(npx tsc:*)",
+      "Bash(xargs sed:*)",
+      "Bash(grep -n \"AI名刺\\\\|次世代の営業OS\" /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/print/[cardId]/page.tsx)",
+      "Bash(grep -n \"onKeyDown\" /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/chat/[sessionId]/page.tsx /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/owner/chat/[sessionId]/page.tsx)",
+      "Bash(python3 -c ':*)",
+      "Bash(ls /Users/tsuyoshigoto/Desktop/aibusinesscard/.env*)"
     ]
   }
 }
