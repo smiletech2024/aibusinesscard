@@ -37,7 +37,7 @@ export default function HomePage() {
         >
           渡した相手が、いつでも
           <br />
-          <span style={{ color: '#C4B5FD' }}>AIのあなた</span>と話せる名刺
+          <span style={{ color: '#C4B5FD' }}>あなたの分身AI</span>と話せる名刺
         </h1>
 
         {/* Subtext */}
