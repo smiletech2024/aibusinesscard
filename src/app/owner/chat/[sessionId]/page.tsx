@@ -62,18 +62,14 @@ export default function OwnerChatPage() {
     if (sessionData) {
       setSession(sessionData as CustomerSession)
 
-      // persona_id からオーナーのuser_idを直接取得（確実な判定）
-      const personaId = sessionData.persona_id
-      if (personaId) {
-        const { data: personaData } = await supabase
-          .from('personas').select('user_id').eq('id', personaId).single()
-        const isOwner = user && personaData?.user_id === user.id
-        if (isOwner) {
-          setSenderRole('owner')
-          subscribePush(sessionId, 'owner').then(ok => setPushEnabled(ok))
-        } else {
-          subscribePush(sessionId, 'customer').then(ok => setPushEnabled(ok))
-        }
+      // business_cards.user_id で判定（JOINで取得済み・RLS問題なし）
+      const cardOwnerId = (sessionData as CustomerSession & { business_cards?: { user_id?: string } }).business_cards?.user_id
+      const isOwner = user && cardOwnerId && cardOwnerId === user.id
+      if (isOwner) {
+        setSenderRole('owner')
+        subscribePush(sessionId, 'owner').then(ok => setPushEnabled(ok))
+      } else {
+        subscribePush(sessionId, 'customer').then(ok => setPushEnabled(ok))
       }
     }
     setInitializing(false)
