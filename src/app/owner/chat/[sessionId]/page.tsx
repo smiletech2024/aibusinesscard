@@ -21,6 +21,7 @@ export default function OwnerChatPage() {
   const [senderRole, setSenderRole] = useState<'owner' | 'customer'>('customer')
   const [showSummary, setShowSummary] = useState(true)
   const [pushEnabled, setPushEnabled] = useState(false)
+  const [sentOnce, setSentOnce] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
@@ -92,7 +93,10 @@ export default function OwnerChatPage() {
         body: JSON.stringify({ sessionId, senderRole, content }),
       })
       const { chat } = await res.json()
-      if (chat) setChats(prev => [...prev, chat])
+      if (chat) {
+        setChats(prev => [...prev, chat])
+        setSentOnce(true)
+      }
 
       // 相手へプッシュ通知
       const targetRole = senderRole === 'owner' ? 'customer' : 'owner'
@@ -134,8 +138,9 @@ export default function OwnerChatPage() {
           <div className="flex-1 min-w-0">
             <h1 className="font-bold text-white text-sm truncate">{ownerName} × {customerName}</h1>
             <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              本会話 · 分身AIが事前整理済み
-              {senderRole === 'owner' ? ' · オーナーとして参加' : ' · 顧客として参加'}
+              {senderRole === 'owner'
+                ? '本会話 · 分身AIが事前整理済み · オーナーとして参加'
+                : '📩 送って閉じてOK · 返信が来たら通知します'}
             </p>
           </div>
           <button onClick={() => setShowSummary(!showSummary)}
@@ -200,16 +205,81 @@ export default function OwnerChatPage() {
       {/* メッセージ */}
       <div className="flex-1 overflow-y-auto px-4 py-5 space-y-4 max-w-2xl mx-auto w-full">
         {chats.length === 0 && (
-          <div className="text-center py-12 fade-in">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-              style={{ background: "#EEF2FF" }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-              </svg>
+          senderRole === 'customer' ? (
+            /* お客様向け：非同期メッセージであることを明示 */
+            <div className="fade-in py-8 px-2 space-y-4">
+              {/* メインカード */}
+              <div className="rounded-2xl p-5" style={{ background: 'white', border: '1.5px solid #E8E6F5' }}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center font-black text-white"
+                    style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', fontSize: 18 }}>
+                    {ownerName[0]}
+                  </div>
+                  <div>
+                    <p className="font-black text-sm" style={{ color: '#1E1B4B' }}>{ownerName}へ直接メッセージ</p>
+                    <p className="text-xs" style={{ color: '#9896B8' }}>分身AIが整理した内容をもとに対応します</p>
+                  </div>
+                </div>
+                <div className="space-y-2.5">
+                  {[
+                    { icon: '📩', text: 'メッセージを送ったら、このページを閉じてOK' },
+                    { icon: '🔔', text: '返信が届いたらスマホに通知が来ます' },
+                    { icon: '⏱️', text: '通常24時間以内に返信します' },
+                  ].map(({ icon, text }) => (
+                    <div key={text} className="flex items-center gap-3">
+                      <span style={{ fontSize: 16, flexShrink: 0 }}>{icon}</span>
+                      <p className="text-sm" style={{ color: '#4A4870' }}>{text}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 通知許可 */}
+              {!pushEnabled && (
+                <div className="rounded-2xl p-4 flex items-center gap-3"
+                  style={{ background: '#EFF6FF', border: '1.5px solid #BFDBFE' }}>
+                  <span style={{ fontSize: 22, flexShrink: 0 }}>🔔</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold" style={{ color: '#1D4ED8' }}>返信通知をオンにする</p>
+                    <p className="text-xs" style={{ color: '#3B82F6' }}>ページを閉じても返信が届きます</p>
+                  </div>
+                  <button
+                    onClick={async () => {
+                      const ok = await subscribePush(sessionId, 'customer')
+                      setPushEnabled(ok)
+                    }}
+                    style={{
+                      background: '#2563EB', color: 'white', fontWeight: 700,
+                      fontSize: 12, padding: '8px 14px', borderRadius: 20,
+                      border: 'none', cursor: 'pointer', flexShrink: 0,
+                    }}>
+                    通知をオン
+                  </button>
+                </div>
+              )}
+              {pushEnabled && (
+                <div className="rounded-2xl p-3.5 flex items-center gap-2.5"
+                  style={{ background: '#ECFDF5', border: '1.5px solid #A7F3D0' }}>
+                  <span style={{ fontSize: 18 }}>✅</span>
+                  <p className="text-sm font-medium" style={{ color: '#059669' }}>
+                    通知オン · 返信が来たらお知らせします
+                  </p>
+                </div>
+              )}
             </div>
-            <p className="font-bold mb-1" style={{ color: "#1E1B4B" }}>会話を始めましょう</p>
-            <p className="text-sm" style={{ color: "#9896B8" }}>分身AIが事前に整理してくれています</p>
-          </div>
+          ) : (
+            /* オーナー向け */
+            <div className="text-center py-12 fade-in">
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                style={{ background: "#EEF2FF" }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+              </div>
+              <p className="font-bold mb-1" style={{ color: "#1E1B4B" }}>会話を始めましょう</p>
+              <p className="text-sm" style={{ color: "#9896B8" }}>分身AIが事前に整理してくれています</p>
+            </div>
+          )
         )}
         {chats.map(chat => {
           const isMe = chat.sender_role === senderRole
@@ -245,6 +315,18 @@ export default function OwnerChatPage() {
         })}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* 送信後バナー（お客様向け） */}
+      {sentOnce && senderRole === 'customer' && (
+        <div className="px-4 py-2.5 border-t" style={{ background: '#ECFDF5', borderColor: '#A7F3D0' }}>
+          <div className="max-w-2xl mx-auto flex items-center gap-2">
+            <span style={{ fontSize: 16 }}>✅</span>
+            <p className="text-sm font-medium" style={{ color: '#059669' }}>
+              送信しました。このページを閉じても、返信が来たら通知でお知らせします。
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* 入力エリア */}
       <div className="px-4 pb-6 pt-3 max-w-2xl mx-auto w-full">
