@@ -17,6 +17,7 @@ export default function OwnerChatPage() {
   const [chats, setChats] = useState<HumanChat[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [initializing, setInitializing] = useState(true)
   const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null)
   const [senderRole, setSenderRole] = useState<'owner' | 'customer'>('customer')
   const [showSummary, setShowSummary] = useState(true)
@@ -63,10 +64,10 @@ export default function OwnerChatPage() {
 
       // persona_id からオーナーのuser_idを直接取得（確実な判定）
       const personaId = sessionData.persona_id
-      if (user && personaId) {
+      if (personaId) {
         const { data: personaData } = await supabase
           .from('personas').select('user_id').eq('id', personaId).single()
-        const isOwner = personaData?.user_id === user.id
+        const isOwner = user && personaData?.user_id === user.id
         if (isOwner) {
           setSenderRole('owner')
           subscribePush(sessionId, 'owner').then(ok => setPushEnabled(ok))
@@ -75,6 +76,7 @@ export default function OwnerChatPage() {
         }
       }
     }
+    setInitializing(false)
     const { data: summaryData } = await supabase
       .from('conversation_summaries').select('*').eq('session_id', sessionId)
       .order('created_at', { ascending: false }).limit(1).single()
@@ -118,6 +120,15 @@ export default function OwnerChatPage() {
         }),
       })
     } finally { setLoading(false) }
+  }
+
+  if (initializing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#09081A' }}>
+        <div className="w-8 h-8 rounded-full spin"
+          style={{ border: '3px solid rgba(123,110,245,0.3)', borderTopColor: '#7B6EF5' }} />
+      </div>
+    )
   }
 
   const ownerName = session?.business_cards?.full_name || '担当者'
