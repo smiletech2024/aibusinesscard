@@ -32,7 +32,7 @@ export default function HomePage() {
 
         {/* Heading */}
         <h1
-          className="text-5xl sm:text-6xl font-black mb-6 leading-tight tracking-tight"
+          className="text-5xl sm:text-6xl font-black mb-4 leading-tight tracking-tight"
           style={{ color: '#FFFFFF' }}
         >
           名刺を渡した瞬間から
@@ -40,10 +40,18 @@ export default function HomePage() {
           <span style={{ color: '#C4B5FD' }}>AIが動き出す</span>
         </h1>
 
+        {/* Subtitle */}
+        <p
+          className="text-xl sm:text-2xl font-bold mb-6"
+          style={{ color: 'rgba(255,255,255,0.95)', letterSpacing: '-0.01em' }}
+        >
+          渡した相手が、いつでも<span style={{ color: '#A5B4FC' }}>AIのあなた</span>と話せる名刺
+        </p>
+
         {/* Subtext */}
         <p
-          className="text-lg max-w-xl mb-12 leading-relaxed"
-          style={{ color: 'rgba(255,255,255,0.72)' }}
+          className="text-base max-w-xl mb-12 leading-relaxed"
+          style={{ color: 'rgba(255,255,255,0.62)' }}
         >
           あなたの分身AIが24時間、顧客の相談を受け付け、
           <br className="hidden sm:block" />
