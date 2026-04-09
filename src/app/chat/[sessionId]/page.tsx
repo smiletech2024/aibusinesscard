@@ -118,25 +118,50 @@ export default function ChatPage() {
   const ownerName = session?.business_cards?.full_name || '担当者'
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "#F4F3FA" }}>
+    <div className="min-h-screen flex flex-col" style={{ background: '#09081A' }}>
       {/* Header */}
-      <div className="sticky top-0 z-10 shadow-md" style={{ background: "linear-gradient(135deg, #4338CA 0%, #6D28D9 50%, #7C3AED 100%)" }}>
+      <div
+        className="sticky top-0 z-10"
+        style={{
+          background: '#0F0E20',
+          borderBottom: '1px solid rgba(139,92,246,0.1)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+        }}
+      >
         <div className="max-w-2xl mx-auto px-4 py-3.5 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm"
-            style={{ background: 'rgba(255,255,255,0.15)', color: 'white' }}>
-            {ownerName[0]}
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm flex-shrink-0"
+            style={{
+              background: 'linear-gradient(135deg, #6356D4, #7B6EF5)',
+              color: 'white',
+              boxShadow: '0 0 12px rgba(123,110,245,0.3)',
+            }}
+          >
+            AI
           </div>
           <div className="flex-1 min-w-0">
-            <h1 className="font-bold text-white text-sm leading-tight">{ownerName}の分身AI</h1>
+            <h1 className="font-bold text-sm leading-tight" style={{ color: '#EDEEFF' }}>
+              {ownerName}の分身AI
+            </h1>
             <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0"></span>
-              <p className="text-white/60 text-xs truncate">本人監修 · 会話は後でオーナーに共有されます</p>
+              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#34D399' }} />
+              <p className="text-xs truncate" style={{ color: '#5A587E' }}>
+                本人監修 · 会話は後で確認されます
+              </p>
             </div>
           </div>
           {turnCount >= 5 && (
-            <button onClick={createSummary} disabled={summarizing}
+            <button
+              onClick={createSummary}
+              disabled={summarizing}
               className="text-xs font-bold px-3 py-1.5 rounded-full flex-shrink-0 transition"
-              style={{ background: 'rgba(255,255,255,0.15)', color: 'white' }}>
+              style={{
+                background: 'rgba(123,110,245,0.15)',
+                color: '#9B8BF5',
+                border: '1px solid rgba(123,110,245,0.3)',
+                cursor: 'pointer',
+              }}
+            >
               {summarizing ? '要約中...' : '引き継ぎ →'}
             </button>
           )}
@@ -144,8 +169,14 @@ export default function ChatPage() {
       </div>
 
       {/* 注意書き */}
-      <div className="px-4 py-2 text-center" style={{ background: '#FFFBEB', borderBottom: '1px solid #FDE68A' }}>
-        <p className="text-xs font-medium" style={{ color: '#92400E' }}>
+      <div
+        className="px-4 py-2.5 text-center"
+        style={{
+          background: 'rgba(123,110,245,0.08)',
+          borderBottom: '1px solid rgba(139,92,246,0.2)',
+        }}
+      >
+        <p className="text-xs font-medium" style={{ color: '#9896C4' }}>
           このAIは{ownerName}の分身です。契約・価格の確定は本人に引き継ぎます
         </p>
       </div>
@@ -155,18 +186,22 @@ export default function ChatPage() {
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-2.5 fade-up ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-black text-white shadow-sm"
-                style={{ background: 'var(--grad-primary)' }}>
+              <div
+                className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-black text-white shadow-sm"
+                style={{ background: 'linear-gradient(135deg, #6356D4, #7B6EF5)' }}
+              >
                 AI
               </div>
             )}
-            <div className={`max-w-xs sm:max-w-md ${msg.role === 'user' ? 'bubble-user' : 'bubble-ai'}`}
-              style={{ whiteSpace: 'pre-wrap' }}>
+            <div
+              className={`max-w-xs sm:max-w-md ${msg.role === 'user' ? 'bubble-user-dark' : 'bubble-ai-dark'}`}
+              style={{ whiteSpace: 'pre-wrap' }}
+            >
               {msg.content || (
                 <span className="flex items-center gap-1.5 py-0.5">
-                  <span className="dot-pulse"></span>
-                  <span className="dot-pulse"></span>
-                  <span className="dot-pulse"></span>
+                  <span className="dot-pulse" style={{ background: '#9896C4' }} />
+                  <span className="dot-pulse" style={{ background: '#9896C4' }} />
+                  <span className="dot-pulse" style={{ background: '#9896C4' }} />
                 </span>
               )}
             </div>
@@ -177,12 +212,18 @@ export default function ChatPage() {
 
       {/* 通知許可バナー */}
       {pushAsked && !pushEnabled && (
-        <div className="px-4 py-3 border-t" style={{ background: '#EFF6FF', borderColor: '#BFDBFE' }}>
+        <div
+          className="px-4 py-3"
+          style={{
+            background: 'rgba(37,99,235,0.1)',
+            borderTop: '1px solid rgba(37,99,235,0.2)',
+          }}
+        >
           <div className="max-w-2xl mx-auto flex items-center gap-3">
-            <span style={{ fontSize: 20 }}>🔔</span>
+            <span style={{ fontSize: 20, flexShrink: 0 }}>🔔</span>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold" style={{ color: '#1D4ED8' }}>本人から返信が来たら通知しますか？</p>
-              <p className="text-xs" style={{ color: '#3B82F6' }}>ページを閉じていても届きます</p>
+              <p className="text-sm font-bold" style={{ color: '#93C5FD' }}>本人から返信が来たら通知しますか？</p>
+              <p className="text-xs" style={{ color: '#60A5FA' }}>ページを閉じていても届きます</p>
             </div>
             <div className="flex gap-2 flex-shrink-0">
               <button
@@ -192,12 +233,15 @@ export default function ChatPage() {
                   setPushAsked(false)
                 }}
                 className="text-xs font-bold px-3 py-1.5 rounded-full"
-                style={{ background: '#2563EB', color: 'white' }}>
+                style={{ background: '#2563EB', color: 'white', border: 'none', cursor: 'pointer' }}
+              >
                 受け取る
               </button>
-              <button onClick={() => setPushAsked(false)}
+              <button
+                onClick={() => setPushAsked(false)}
                 className="text-xs px-3 py-1.5 rounded-full"
-                style={{ background: 'rgba(0,0,0,0.06)', color: '#6B7280' }}>
+                style={{ background: 'rgba(255,255,255,0.08)', color: '#9896C4', border: 'none', cursor: 'pointer' }}
+              >
                 あとで
               </button>
             </div>
@@ -207,14 +251,30 @@ export default function ChatPage() {
 
       {/* サマリー提案バナー */}
       {showSummaryPrompt && !summarizing && (
-        <div className="px-4 py-3 border-t" style={{ background: '#F5F3FF', borderColor: '#DDD6FE' }}>
+        <div
+          className="px-4 py-4"
+          style={{
+            background: '#161428',
+            borderTop: '1px solid rgba(139,92,246,0.2)',
+          }}
+        >
           <div className="max-w-2xl mx-auto flex items-center gap-3">
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold" style={{ color: '#5B21B6' }}>十分な会話ができました！</p>
-              <p className="text-xs" style={{ color: '#7C3AED' }}>会話をまとめて{ownerName}本人に引き継ぎますか？</p>
+              <p className="text-sm font-bold" style={{ color: '#EDEEFF' }}>十分な会話ができました</p>
+              <p className="text-xs mt-0.5" style={{ color: '#9896C4' }}>
+                会話をまとめて{ownerName}本人に引き継ぎますか？
+              </p>
             </div>
-            <button onClick={createSummary}
-              className="btn-primary text-xs px-4 py-2 flex-shrink-0" style={{ borderRadius: 'var(--radius-sm)' }}>
+            <button
+              onClick={createSummary}
+              className="text-xs font-bold px-4 py-2.5 rounded-xl flex-shrink-0 text-white"
+              style={{
+                background: 'linear-gradient(135deg, #7B6EF5, #9B8BF5)',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(123,110,245,0.35)',
+              }}
+            >
               まとめへ →
             </button>
           </div>
@@ -222,22 +282,50 @@ export default function ChatPage() {
       )}
 
       {/* 入力エリア */}
-      <div className="px-4 pb-6 pt-3 max-w-2xl mx-auto w-full">
-        <div className="flex gap-2 p-2 rounded-2xl shadow-md" style={{ background: "#fff", border: "1.5px solid #E8E6F5" }}>
+      <div
+        className="px-4 pb-6 pt-3 max-w-2xl mx-auto w-full"
+        style={{
+          background: '#0F0E20',
+          boxShadow: '0 -8px 32px rgba(7,6,15,0.8)',
+        }}
+      >
+        <div
+          className="flex gap-2 p-2 rounded-2xl"
+          style={{
+            background: '#161428',
+            border: '1px solid rgba(139,92,246,0.15)',
+          }}
+        >
           <input
             type="text"
             value={input}
             onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && sendMessage()}
             disabled={loading || summarizing}
             placeholder="メッセージを入力..."
             className="flex-1 bg-transparent outline-none px-3 text-sm"
-            style={{ color: "#1E1B4B" }}
+            style={{ color: '#EDEEFF' }}
           />
-          <button onClick={sendMessage}
+          <button
+            onClick={sendMessage}
             disabled={loading || !input.trim() || summarizing}
-            style={{ padding: "10px 16px", background: "linear-gradient(135deg, #6366F1, #8B5CF6)", color: "white", border: "none", borderRadius: 14, cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            style={{
+              padding: '10px 14px',
+              background: 'linear-gradient(135deg, #6356D4, #7B6EF5)',
+              color: 'white',
+              border: 'none',
+              borderRadius: 14,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: loading || !input.trim() || summarizing ? 0.5 : 1,
+            }}
+          >
             {loading ? (
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full spin" />
+              <span className="w-4 h-4 border-2 rounded-full spin"
+                style={{ borderColor: 'rgba(255,255,255,0.3)', borderTopColor: 'white' }}
+              />
             ) : (
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="22" y1="2" x2="11" y2="13" />

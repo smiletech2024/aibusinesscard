@@ -47,34 +47,64 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12" style={{ background: "linear-gradient(135deg, #4338CA 0%, #6D28D9 50%, #7C3AED 100%)" }}>
+      {/* Left panel — dark premium */}
+      <div
+        className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12"
+        style={{ background: '#07060F' }}
+      >
         <Link href="/"><Logo size={32} variant="light" /></Link>
 
         <div className="relative z-10">
-          <h2 className="text-4xl font-black text-white leading-tight mb-6">
-            あなたの分身AIが<br />
-            <span style={{ color: '#C4B5FD' }}>24時間営業</span>します
+          <h2
+            className="font-black leading-tight mb-8"
+            style={{ color: '#EDEEFF', fontSize: 36 }}
+          >
+            あなたの熱量を、<br />
+            <span style={{ color: '#7B6EF5' }}>24時間届ける名刺。</span>
           </h2>
-          <div className="space-y-4">
+          <div className="space-y-5">
             {[
-              { icon: '✦', text: 'ヒアリングAIがあなたの人格を学習' },
-              { icon: '✦', text: 'QRコードで顧客と即つながる' },
-              { icon: '✦', text: '会話サマリー付きで本会話へ移行' },
-            ].map(({ icon, text }) => (
-              <div key={text} className="flex items-center gap-3 text-white/80">
-                <span className="text-purple-300 text-xs">{icon}</span>
-                <span className="text-sm">{text}</span>
+              'ヒアリングAIがあなたの人格を学習',
+              'QRコードで顧客と即つながる',
+              '会話サマリー付きで本会話へ移行',
+            ].map((text) => (
+              <div key={text} className="flex items-center gap-3">
+                <div
+                  className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(123,110,245,0.2)', border: '1px solid rgba(123,110,245,0.4)' }}
+                >
+                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                    <path d="M2 6L5 9L10 3" stroke="#7B6EF5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <span className="text-sm" style={{ color: '#9896C4' }}>{text}</span>
               </div>
             ))}
           </div>
+
+          {/* Quote card */}
+          <div
+            className="mt-10 p-5 rounded-2xl"
+            style={{
+              background: '#0F0E20',
+              border: '1px solid rgba(139,92,246,0.15)',
+            }}
+          >
+            <p className="text-sm italic mb-3 leading-relaxed" style={{ color: '#9896C4' }}>
+              「眠っている間も、商談は進む。」
+            </p>
+            <p className="text-xs" style={{ color: '#5A587E' }}>— AI名刺のコンセプト</p>
+          </div>
         </div>
 
-        <p className="text-white/30 text-xs">© 2026 AI名刺</p>
+        <p style={{ color: '#5A587E', fontSize: 12 }}>© 2026 AI名刺</p>
       </div>
 
-      {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12" style={{ background: 'var(--bg)' }}>
+      {/* Right panel — light clean */}
+      <div
+        className="flex-1 flex items-center justify-center px-6 py-12"
+        style={{ background: '#F5F4FC' }}
+      >
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
@@ -82,10 +112,10 @@ export default function LoginPage() {
           </div>
 
           <div className="mb-8">
-            <h1 className="text-2xl font-black mb-1" style={{ color: 'var(--text)' }}>
+            <h1 className="font-black mb-1" style={{ color: '#1E1B4B', fontSize: 26 }}>
               {isSignUp ? 'アカウントを作成' : 'おかえりなさい'}
             </h1>
-            <p className="text-sm" style={{ color: 'var(--muted)' }}>
+            <p className="text-sm" style={{ color: '#9896B8' }}>
               {isSignUp ? '無料で始められます' : 'アカウントにログイン'}
             </p>
           </div>
@@ -102,10 +132,10 @@ export default function LoginPage() {
                 required
                 placeholder="you@example.com"
                 style={{
-                  width: '100%', padding: '12px 16px', fontSize: 15,
-                  border: '1.5px solid #D1D0E8', borderRadius: 12,
+                  width: '100%', padding: '13px 16px', fontSize: 15,
+                  border: '1.5px solid #D1D0E8', borderRadius: 14,
                   background: '#F4F3FA', color: '#1E1B4B', outline: 'none',
-                  boxSizing: 'border-box',
+                  boxSizing: 'border-box', transition: 'all 0.2s',
                 }}
                 onFocus={e => { e.target.style.borderColor = '#6366F1'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 4px rgba(99,102,241,0.12)' }}
                 onBlur={e => { e.target.style.borderColor = '#D1D0E8'; e.target.style.background = '#F4F3FA'; e.target.style.boxShadow = 'none' }}
@@ -123,10 +153,10 @@ export default function LoginPage() {
                 minLength={6}
                 placeholder="6文字以上"
                 style={{
-                  width: '100%', padding: '12px 16px', fontSize: 15,
-                  border: '1.5px solid #D1D0E8', borderRadius: 12,
+                  width: '100%', padding: '13px 16px', fontSize: 15,
+                  border: '1.5px solid #D1D0E8', borderRadius: 14,
                   background: '#F4F3FA', color: '#1E1B4B', outline: 'none',
-                  boxSizing: 'border-box',
+                  boxSizing: 'border-box', transition: 'all 0.2s',
                 }}
                 onFocus={e => { e.target.style.borderColor = '#6366F1'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 4px rgba(99,102,241,0.12)' }}
                 onBlur={e => { e.target.style.borderColor = '#D1D0E8'; e.target.style.background = '#F4F3FA'; e.target.style.boxShadow = 'none' }}
@@ -148,11 +178,12 @@ export default function LoginPage() {
               type="submit"
               disabled={loading}
               style={{
-                width: '100%', padding: '14px', fontSize: 16, fontWeight: 700,
+                width: '100%', padding: '15px', fontSize: 16, fontWeight: 700,
                 background: loading ? '#A5B4FC' : 'linear-gradient(135deg, #6366F1, #8B5CF6)',
-                color: 'white', border: 'none', borderRadius: 12, cursor: loading ? 'not-allowed' : 'pointer',
-                boxShadow: '0 4px 14px rgba(99,102,241,0.35)', marginTop: 4,
+                color: 'white', border: 'none', borderRadius: 14, cursor: loading ? 'not-allowed' : 'pointer',
+                boxShadow: '0 4px 20px rgba(99,102,241,0.4)', marginTop: 4,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                transition: 'all 0.2s',
               }}
             >
               {loading ? '処理中...' : isSignUp ? 'アカウントを作成する' : 'ログイン'}
@@ -162,7 +193,7 @@ export default function LoginPage() {
           <div style={{ marginTop: 24, textAlign: 'center' }}>
             <button
               onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage('') }}
-              style={{ fontSize: 14, fontWeight: 500, color: '#6366F1', background: 'none', border: 'none', cursor: 'pointer' }}
+              style={{ fontSize: 14, fontWeight: 600, color: '#6366F1', background: 'none', border: 'none', cursor: 'pointer' }}
             >
               {isSignUp ? 'すでにアカウントをお持ちの方 →' : 'アカウントを作成する →'}
             </button>

@@ -5,15 +5,22 @@ export default function HomePage() {
   return (
     <main
       className="min-h-screen flex flex-col"
-      style={{ background: 'linear-gradient(135deg, #3730A3 0%, #5B21B6 50%, #6D28D9 100%)' }}
+      style={{
+        background: '#07060F',
+        backgroundImage: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(123,110,245,0.15) 0%, transparent 100%)',
+      }}
     >
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-5 max-w-5xl mx-auto w-full">
         <Logo size={32} variant="light" />
         <Link
           href="/auth/login"
-          className="text-sm font-semibold px-4 py-2 rounded-full transition hover:bg-white/20"
-          style={{ color: 'rgba(255,255,255,0.85)', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}
+          className="text-sm font-semibold px-5 py-2 rounded-full transition"
+          style={{
+            color: '#EDEEFF',
+            border: '1px solid rgba(255,255,255,0.15)',
+            background: 'transparent',
+          }}
         >
           ログイン
         </Link>
@@ -23,31 +30,25 @@ export default function HomePage() {
       <div className="flex-1 flex flex-col items-center justify-center text-center px-4 py-12">
         {/* Badge */}
         <div
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-8"
-          style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.9)', border: '1px solid rgba(255,255,255,0.25)' }}
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-10"
+          style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.85)', border: '1px solid rgba(255,255,255,0.1)' }}
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
-          新しい営業のかたち
+          <span className="w-2 h-2 rounded-full bg-green-400 inline-block" style={{ boxShadow: '0 0 6px #34D399' }} />
+          ベータ公開中
         </div>
 
         {/* Heading */}
-        <h1
-          className="text-4xl sm:text-5xl font-black mb-6 leading-tight tracking-tight"
-          style={{ color: '#FFFFFF' }}
-        >
-          渡した相手が、いつでも
-          <br />
-          <span style={{ color: '#C4B5FD' }}>あなたの分身AI</span>と話せる名刺
+        <h1 className="font-black mb-6 leading-tight tracking-tight" style={{ fontSize: 'clamp(40px, 7vw, 72px)' }}>
+          <span style={{ color: '#EDEEFF', display: 'block' }}>眠っている間も、</span>
+          <span className="text-gradient" style={{ display: 'block' }}>商談は進む。</span>
         </h1>
 
         {/* Subtext */}
         <p
-          className="text-base max-w-xl mb-12 leading-relaxed"
-          style={{ color: 'rgba(255,255,255,0.62)' }}
+          className="text-base max-w-lg mb-12 leading-relaxed"
+          style={{ color: '#9896C4', whiteSpace: 'pre-line' }}
         >
-          あなたの分身AIが24時間、顧客の相談を受け付け、
-          <br className="hidden sm:block" />
-          会話を整理して本人に橋渡し。次世代名刺がここに。
+          {`分身AIが24時間、あなたの代わりに顧客と対話する。\nAIが整理した要約つきで、本当に必要な商談だけを届ける。`}
         </p>
 
         {/* CTA Buttons */}
@@ -58,17 +59,18 @@ export default function HomePage() {
             style={{
               background: 'white',
               color: '#4F46E5',
-              boxShadow: '0 4px 24px rgba(0,0,0,0.25)',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.35)',
             }}
           >
             無料で始める →
           </Link>
           <Link
             href="/auth/login"
-            className="font-semibold px-8 py-4 rounded-full text-base transition hover:bg-white/10"
+            className="font-semibold px-8 py-4 rounded-full text-base transition"
             style={{
-              color: 'white',
-              border: '2px solid rgba(255,255,255,0.35)',
+              color: '#EDEEFF',
+              border: '1.5px solid rgba(255,255,255,0.2)',
+              background: 'transparent',
             }}
           >
             ログイン
@@ -78,27 +80,26 @@ export default function HomePage() {
         {/* Feature Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl w-full">
           {[
-            { step: '01', title: '分身AI作成', desc: 'ヒアリングAIがあなたの思考・実績・スタイルを学習します' },
-            { step: '02', title: '顧客が相談', desc: 'QRコードから24時間いつでも分身AIと深く対話できます' },
-            { step: '03', title: '本会話へ', desc: 'AIが整理した要約付きで、最高の状態でクロージングへ' },
+            { step: '01', title: 'あなたを学ぶ', desc: 'AIがヒアリングを通じてあなたの思考・実績・価値観を深く学習する' },
+            { step: '02', title: '代わりに話す', desc: 'QRコードから24時間。顧客の質問に、あなたらしく答え続ける' },
+            { step: '03', title: '整理して届ける', desc: '会話の要約・相性評価つきで、本当に動くべき商談だけをあなたに届ける' },
           ].map(({ step, title, desc }) => (
             <div
               key={step}
-              className="text-left p-5 rounded-2xl"
+              className="text-left p-6 rounded-2xl"
               style={{
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                backdropFilter: 'blur(10px)',
+                background: '#0F0E20',
+                border: '1px solid rgba(139,92,246,0.12)',
               }}
             >
               <div
-                className="text-xs font-black mb-3"
-                style={{ color: '#A5B4FC' }}
+                className="text-xs font-black mb-4"
+                style={{ color: '#7B6EF5' }}
               >
-                {step}
+                {step} /
               </div>
-              <h3 className="font-bold text-white mb-1.5">{title}</h3>
-              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+              <h3 className="font-bold mb-2" style={{ color: '#EDEEFF' }}>{title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: '#9896C4' }}>
                 {desc}
               </p>
             </div>
@@ -108,7 +109,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <div className="text-center py-6">
-        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+        <p className="text-xs" style={{ color: '#5A587E' }}>
           © 2026 AI名刺
         </p>
       </div>
