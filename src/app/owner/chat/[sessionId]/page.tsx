@@ -53,20 +53,26 @@ export default function OwnerChatPage() {
   const loadData = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     setCurrentUser(user)
+
     const { data: sessionData } = await supabase
       .from('customer_sessions').select('*, personas(*, profiles:user_id(*)), business_cards(*)')
       .eq('id', sessionId).single()
+
     if (sessionData) {
       setSession(sessionData as CustomerSession)
-      const personaUserId = (sessionData as CustomerSession & { personas?: { user_id?: string } }).personas?.user_id
-      const isOwner = user && personaUserId === user.id
-      if (isOwner) {
-        setSenderRole('owner')
-        // オーナーも通知購読（お客様からのメッセージを受け取る）
-        subscribePush(sessionId, 'owner').then(ok => setPushEnabled(ok))
-      } else {
-        // お客様として開いている場合も購読
-        subscribePush(sessionId, 'customer').then(ok => setPushEnabled(ok))
+
+      // persona_id からオーナーのuser_idを直接取得（確実な判定）
+      const personaId = sessionData.persona_id
+      if (user && personaId) {
+        const { data: personaData } = await supabase
+          .from('personas').select('user_id').eq('id', personaId).single()
+        const isOwner = personaData?.user_id === user.id
+        if (isOwner) {
+          setSenderRole('owner')
+          subscribePush(sessionId, 'owner').then(ok => setPushEnabled(ok))
+        } else {
+          subscribePush(sessionId, 'customer').then(ok => setPushEnabled(ok))
+        }
       }
     }
     const { data: summaryData } = await supabase
