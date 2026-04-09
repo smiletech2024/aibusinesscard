@@ -11,6 +11,8 @@ type CardPageData = BusinessCard & {
   profiles?: { full_name: string | null; avatar_url: string | null }
 }
 
+const SESSION_KEY = (cardId: string) => `aimeishi_session_${cardId}`
+
 export default function CardPage() {
   const params = useParams()
   const router = useRouter()
@@ -19,6 +21,7 @@ export default function CardPage() {
   const [loading, setLoading] = useState(true)
   const [customerName, setCustomerName] = useState('')
   const [showNameInput, setShowNameInput] = useState(false)
+  const [existingSession, setExistingSession] = useState<{ id: string; status: string } | null>(null)
   const supabase = createClient()
 
   useEffect(() => { loadCard() }, [cardId])
@@ -29,6 +32,20 @@ export default function CardPage() {
       .select('*, profiles:user_id(full_name, avatar_url)')
       .eq('id', cardId).eq('is_active', true).single()
     setCard(error || !data ? null : data)
+
+    // 同じ端末の既存セッションを確認
+    const savedId = typeof window !== 'undefined' ? localStorage.getItem(SESSION_KEY(cardId)) : null
+    if (savedId) {
+      const { data: session } = await supabase
+        .from('customer_sessions').select('id, status').eq('id', savedId).single()
+      if (session && session.status !== 'closed') {
+        setExistingSession(session)
+      } else {
+        // セッションが消えた or 完了済みならリセット
+        localStorage.removeItem(SESSION_KEY(cardId))
+      }
+    }
+
     setLoading(false)
   }
 
@@ -39,7 +56,24 @@ export default function CardPage() {
       body: JSON.stringify({ personaId: card.persona_id, cardId: card.id, customerName: customerName || null }),
     })
     const { session } = await res.json()
-    if (session) router.push(`/chat/${session.id}`)
+    if (session) {
+      localStorage.setItem(SESSION_KEY(cardId), session.id)
+      router.push(`/chat/${session.id}`)
+    }
+  }
+
+  const continueSession = () => {
+    if (!existingSession) return
+    if (existingSession.status === 'summarized' || existingSession.status === 'owner_chat') {
+      router.push(`/owner/chat/${existingSession.id}`)
+    } else {
+      router.push(`/chat/${existingSession.id}`)
+    }
+  }
+
+  const resetSession = () => {
+    localStorage.removeItem(SESSION_KEY(cardId))
+    setExistingSession(null)
   }
 
   if (loading) {
@@ -159,7 +193,41 @@ export default function CardPage() {
         </div>
 
         {/* CTAエリア */}
-        {!showNameInput ? (
+        {existingSession ? (
+          /* 同じ端末で再アクセス → 既存セッションへ誘導 */
+          <div className="rounded-2xl p-5 shadow-lg" style={{ background: "#FFFFFF" }}>
+            <div className="flex items-center gap-2 mb-3">
+              <div style={{
+                width: 32, height: 32, borderRadius: '50%',
+                background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+              </div>
+              <div>
+                <p className="font-black text-sm" style={{ color: "#1E1B4B" }}>前回の会話があります</p>
+                <p className="text-xs" style={{ color: "#9896B8" }}>
+                  {existingSession.status === 'summarized' || existingSession.status === 'owner_chat'
+                    ? '分身AIとの会話が完了 · 本人とチャット可能'
+                    : '分身AIとの会話が途中です'}
+                </p>
+              </div>
+            </div>
+            <button onClick={continueSession}
+              className="btn-primary w-full py-3 mb-2" style={{ borderRadius: '14px' }}>
+              {existingSession.status === 'summarized' || existingSession.status === 'owner_chat'
+                ? '本人とのチャットへ進む →'
+                : '会話を続ける →'}
+            </button>
+            <button onClick={resetSession}
+              className="w-full text-center text-xs py-2 transition"
+              style={{ color: "#9896B8" }}>
+              最初からやり直す
+            </button>
+          </div>
+        ) : !showNameInput ? (
           <div className="space-y-3">
             <button onClick={() => setShowNameInput(true)}
               className="btn-primary w-full py-4 text-base"

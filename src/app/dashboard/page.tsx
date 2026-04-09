@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { BusinessCard, CustomerSession } from '@/types'
@@ -41,6 +41,9 @@ export default function DashboardPage() {
   const [sessions, setSessions] = useState<CustomerSession[]>([])
   const [loading, setLoading] = useState(true)
   const [qrDataUrls, setQrDataUrls] = useState<Record<string, string>>({})
+  const [qrModal, setQrModal] = useState<{ url: string; cardUrl: string; name: string } | null>(null)
+  const [notifications, setNotifications] = useState<{ id: string; customerName: string; sessionId: string }[]>([])
+  const personaIdsRef = useRef<string[]>([])
   const supabase = createClient()
 
   useEffect(() => { checkAuth() }, [])
@@ -66,14 +69,61 @@ export default function DashboardPage() {
     }
     const { data: personasData } = await supabase.from('personas').select('id').eq('user_id', userId)
     if (personasData?.length) {
+      const ids = personasData.map(p => p.id)
+      personaIdsRef.current = ids
+
       const { data: sessionsData } = await supabase
         .from('customer_sessions').select('*, business_cards(*)')
-        .in('persona_id', personasData.map(p => p.id))
+        .in('persona_id', ids)
         .order('updated_at', { ascending: false }).limit(20)
       if (sessionsData) setSessions(sessionsData as CustomerSession[])
+      setLoading(false)
+
+      // リアルタイム購読：owner_chat / summarized になったら通知
+      const channel = supabase
+        .channel('dashboard_sessions')
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'customer_sessions' },
+          payload => {
+            const updated = payload.new as CustomerSession
+            if (!personaIdsRef.current.includes(updated.persona_id)) return
+
+            // セッション一覧を更新
+            setSessions(prev =>
+              prev.map(s => s.id === updated.id ? { ...s, ...updated } : s)
+            )
+
+            // owner_chat または summarized になった場合に通知
+            if (updated.status === 'owner_chat' || updated.status === 'summarized') {
+              const customerName = updated.customer_name || 'お客様'
+              setNotifications(prev => {
+                if (prev.some(n => n.sessionId === updated.id)) return prev
+                return [...prev, { id: crypto.randomUUID(), customerName, sessionId: updated.id }]
+              })
+              // ブラウザ通知（許可済みの場合）
+              if (typeof window !== 'undefined' && Notification.permission === 'granted') {
+                new Notification('💬 顧客が本会話を希望しています', {
+                  body: `${customerName}との会話準備が整いました`,
+                  icon: '/favicon.ico',
+                })
+              }
+            }
+          }
+        )
+        .subscribe()
+
+      return () => { supabase.removeChannel(channel) }
     }
     setLoading(false)
   }
+
+  // ブラウザ通知の許可リクエスト
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+  }, [])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -97,6 +147,60 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen" style={{ background: "#F4F3FA" }}>
+
+      {/* QR拡大モーダル */}
+      {qrModal && (
+        <div
+          onClick={() => setQrModal(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 50,
+            background: 'rgba(0,0,0,0.75)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 24,
+          }}>
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: 'white', borderRadius: 24, padding: '28px 24px',
+              maxWidth: 320, width: '100%', textAlign: 'center',
+              boxShadow: '0 32px 80px rgba(0,0,0,0.4)',
+            }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#9896B8', marginBottom: 4 }}>
+              このQRコードを読み取ってください
+            </p>
+            <p style={{ fontSize: 16, fontWeight: 900, color: '#1E1B4B', marginBottom: 20 }}>
+              {qrModal.name}
+            </p>
+            <div style={{
+              display: 'inline-block', padding: 12, borderRadius: 16,
+              background: '#F4F3FA', marginBottom: 20,
+            }}>
+              <img src={qrModal.url} alt="QR" style={{ width: 220, height: 220, display: 'block', borderRadius: 8 }} />
+            </div>
+            <p style={{ fontSize: 11, color: '#9896B8', marginBottom: 20, wordBreak: 'break-all' }}>
+              {qrModal.cardUrl}
+            </p>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <a href={qrModal.cardUrl} target="_blank" rel="noopener noreferrer"
+                style={{
+                  flex: 1, padding: '11px 0', borderRadius: 12, fontSize: 13, fontWeight: 700,
+                  background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', color: 'white',
+                  textDecoration: 'none', display: 'block',
+                }}>
+                名刺を開く →
+              </a>
+              <button onClick={() => setQrModal(null)}
+                style={{
+                  flex: 1, padding: '11px 0', borderRadius: 12, fontSize: 13, fontWeight: 600,
+                  background: '#F4F3FA', color: '#6B7280', border: 'none', cursor: 'pointer',
+                }}>
+                閉じる
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="sticky top-0 z-20 border-b" style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)', borderColor: 'var(--border)' }}>
         <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between">
@@ -107,6 +211,62 @@ export default function DashboardPage() {
           </button>
         </div>
       </header>
+
+      {/* 通知バナー */}
+      {notifications.length > 0 && (
+        <div className="sticky top-14 z-10">
+          {notifications.map(n => (
+            <div key={n.id}
+              style={{
+                background: 'linear-gradient(135deg, #7C3AED, #6366F1)',
+                padding: '14px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                boxShadow: '0 4px 20px rgba(99,102,241,0.4)',
+              }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0, animation: 'pulse 1.5s infinite',
+              }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p style={{ color: 'white', fontWeight: 800, fontSize: 14 }}>
+                  {n.customerName}が本会話を希望しています
+                </p>
+                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>
+                  分身AIとの会話まとめが準備できました
+                </p>
+              </div>
+              <div className="flex gap-2 flex-shrink-0">
+                <Link href={`/owner/chat/${n.sessionId}`}
+                  style={{
+                    background: 'white', color: '#7C3AED', fontWeight: 700,
+                    fontSize: 13, padding: '8px 16px', borderRadius: 20,
+                    textDecoration: 'none', display: 'block', whiteSpace: 'nowrap',
+                  }}>
+                  今すぐ対応 →
+                </Link>
+                <button
+                  onClick={() => setNotifications(prev => prev.filter(x => x.id !== n.id))}
+                  style={{
+                    background: 'rgba(255,255,255,0.15)', color: 'white',
+                    border: 'none', cursor: 'pointer', borderRadius: '50%',
+                    width: 32, height: 32, fontSize: 16, display: 'flex',
+                    alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  }}>
+                  ×
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
         {/* Stats */}
@@ -182,9 +342,19 @@ export default function DashboardPage() {
                     {/* QR + actions */}
                     <div className="px-5 pb-5 flex items-center gap-4">
                       {qrDataUrls[card.id] && (
-                        <div className="p-2 rounded-xl flex-shrink-0" style={{ background: "#F4F3FA" }}>
+                        <button
+                          onClick={() => setQrModal({ url: qrDataUrls[card.id], cardUrl, name: card.full_name })}
+                          className="p-2 rounded-xl flex-shrink-0 block transition hover:opacity-80 active:scale-95 relative"
+                          style={{ background: "#F4F3FA", border: 'none', cursor: 'pointer' }}
+                          title="タップして拡大">
                           <img src={qrDataUrls[card.id]} alt="QR" className="w-14 h-14 rounded-lg" />
-                        </div>
+                          <span style={{
+                            position: 'absolute', bottom: 4, right: 4,
+                            background: 'rgba(99,102,241,0.85)', borderRadius: 4,
+                            padding: '1px 4px', fontSize: 8, color: 'white', fontWeight: 700,
+                            lineHeight: 1.4,
+                          }}>拡大</span>
+                        </button>
                       )}
                       <div className="flex-1 min-w-0">
                         <p className="text-xs mb-2.5" style={{ color: "#9896B8" }}>QRを共有 or URLをコピー</p>
@@ -218,15 +388,37 @@ export default function DashboardPage() {
               {sessions.map(session => {
                 const st = statusConfig[session.status] || statusConfig.ai_chat
                 const name = session.customer_name || '名無し'
+                const needsAttention = session.status === 'summarized' || session.status === 'owner_chat'
                 return (
-                  <div key={session.id} className="card px-4 py-3.5 flex items-center gap-4 hover:shadow-md transition-shadow">
-                    <Avatar name={name} size={38} />
+                  <div key={session.id}
+                    className="card px-4 py-3.5 flex items-center gap-4 hover:shadow-md transition-shadow"
+                    style={needsAttention ? { borderLeft: '3px solid #7C3AED', background: '#FDFAFF' } : {}}>
+                    <div className="relative flex-shrink-0">
+                      <Avatar name={name} size={38} />
+                      {needsAttention && (
+                        <span style={{
+                          position: 'absolute', top: -2, right: -2,
+                          width: 12, height: 12, borderRadius: '50%',
+                          background: '#7C3AED', border: '2px solid white',
+                          animation: 'pulse 1.5s infinite',
+                          display: 'block',
+                        }} />
+                      )}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <p className="font-semibold text-sm truncate" style={{ color: "#1E1B4B" }}>{name}</p>
                         <span className="badge text-xs flex-shrink-0" style={{ background: st.bg, color: st.color }}>
                           {st.label}
                         </span>
+                        {needsAttention && (
+                          <span style={{
+                            fontSize: 11, fontWeight: 700, color: '#7C3AED',
+                            background: '#EDE9FE', borderRadius: 6, padding: '2px 6px',
+                          }}>
+                            対応待ち
+                          </span>
+                        )}
                       </div>
                       <p className="text-xs" style={{ color: "#9896B8" }}>
                         {new Date(session.updated_at).toLocaleDateString('ja-JP', {

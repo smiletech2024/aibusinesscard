@@ -24,8 +24,23 @@ export default function OwnerChatPage() {
 
   useEffect(() => {
     loadData()
-    const interval = setInterval(fetchChats, 3000)
-    return () => clearInterval(interval)
+
+    // リアルタイム購読（3秒ポーリング不要）
+    const channel = supabase
+      .channel(`human_chats_${sessionId}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'human_chats', filter: `session_id=eq.${sessionId}` },
+        payload => {
+          setChats(prev => {
+            const exists = prev.some(c => c.id === (payload.new as HumanChat).id)
+            return exists ? prev : [...prev, payload.new as HumanChat]
+          })
+        }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
   }, [sessionId])
 
   useEffect(() => {

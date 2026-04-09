@@ -15,7 +15,8 @@
       "Bash(grep -n \"AI名刺\\\\|次世代の営業OS\" /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/print/[cardId]/page.tsx)",
       "Bash(grep -n \"onKeyDown\" /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/chat/[sessionId]/page.tsx /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/owner/chat/[sessionId]/page.tsx)",
       "Bash(python3 -c ':*)",
-      "Bash(ls /Users/tsuyoshigoto/Desktop/aibusinesscard/.env*)"
+      "Bash(ls /Users/tsuyoshigoto/Desktop/aibusinesscard/.env*)",
+      "Bash(git add:*)"
     ]
   }
 }
