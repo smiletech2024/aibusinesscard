@@ -91,11 +91,11 @@ export default function OwnerChatPage() {
   const deleteSession = async () => {
     setDeleting(true)
     try {
-      // 子テーブルを順に削除してからセッションを削除
-      await supabase.from('human_chats').delete().eq('session_id', sessionId)
-      await supabase.from('conversation_summaries').delete().eq('session_id', sessionId)
-      await supabase.from('ai_conversations').delete().eq('session_id', sessionId)
-      await supabase.from('customer_sessions').delete().eq('id', sessionId)
+      await fetch('/api/session/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId }),
+      })
       router.push('/dashboard')
     } finally {
       setDeleting(false)

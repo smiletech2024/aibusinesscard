@@ -134,10 +134,11 @@ export default function DashboardPage() {
   }
 
   const handleDeleteSession = async (sessionId: string) => {
-    await supabase.from('human_chats').delete().eq('session_id', sessionId)
-    await supabase.from('conversation_summaries').delete().eq('session_id', sessionId)
-    await supabase.from('ai_conversations').delete().eq('session_id', sessionId)
-    await supabase.from('customer_sessions').delete().eq('id', sessionId)
+    await fetch('/api/session/delete', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId }),
+    })
     setSessions(prev => prev.filter(s => s.id !== sessionId))
     setDeleteSessionConfirm(null)
   }
