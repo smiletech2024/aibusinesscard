@@ -23,6 +23,8 @@ export default function OwnerChatPage() {
   const [showSummary, setShowSummary] = useState(true)
   const [pushEnabled, setPushEnabled] = useState(false)
   const [sentOnce, setSentOnce] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
@@ -86,6 +88,20 @@ export default function OwnerChatPage() {
     if (data) setChats(data)
   }, [sessionId])
 
+  const deleteSession = async () => {
+    setDeleting(true)
+    try {
+      // 子テーブルを順に削除してからセッションを削除
+      await supabase.from('human_chats').delete().eq('session_id', sessionId)
+      await supabase.from('conversation_summaries').delete().eq('session_id', sessionId)
+      await supabase.from('ai_conversations').delete().eq('session_id', sessionId)
+      await supabase.from('customer_sessions').delete().eq('id', sessionId)
+      router.push('/dashboard')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   const sendMessage = async () => {
     if (!input.trim() || loading) return
     const content = input.trim()
@@ -134,6 +150,72 @@ export default function OwnerChatPage() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#09081A' }}>
+      {/* 削除確認モーダル */}
+      {showDeleteConfirm && (
+        <div
+          onClick={() => setShowDeleteConfirm(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 50,
+            background: 'rgba(0,0,0,0.7)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 24,
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: '#0F0E20', borderRadius: 20, padding: '28px 24px',
+              maxWidth: 320, width: '100%', textAlign: 'center',
+              border: '1px solid rgba(139,92,246,0.2)',
+              boxShadow: '0 24px 60px rgba(0,0,0,0.6)',
+            }}
+          >
+            <div style={{
+              width: 52, height: 52, borderRadius: 14,
+              background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 16px',
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                <path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+              </svg>
+            </div>
+            <p style={{ fontWeight: 900, fontSize: 16, color: '#EDEEFF', marginBottom: 8 }}>
+              会話履歴を削除しますか？
+            </p>
+            <p style={{ fontSize: 13, color: '#9896C4', marginBottom: 6 }}>
+              {customerName}との会話
+            </p>
+            <p style={{ fontSize: 12, color: '#5A587E', marginBottom: 24, lineHeight: 1.6 }}>
+              AI会話・まとめ・チャット履歴をすべて削除します。<br />この操作は取り消せません。
+            </p>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={deleteSession}
+                disabled={deleting}
+                style={{
+                  flex: 1, padding: '11px 0', borderRadius: 12, fontSize: 13, fontWeight: 700,
+                  background: '#EF4444', color: 'white', border: 'none',
+                  cursor: deleting ? 'not-allowed' : 'pointer', opacity: deleting ? 0.6 : 1,
+                }}
+              >
+                {deleting ? '削除中...' : '削除する'}
+              </button>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                style={{
+                  flex: 1, padding: '11px 0', borderRadius: 12, fontSize: 13, fontWeight: 600,
+                  background: 'rgba(255,255,255,0.06)', color: '#9896C4',
+                  border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer',
+                }}
+              >
+                キャンセル
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div
         className="sticky top-0 z-10"
@@ -180,6 +262,27 @@ export default function OwnerChatPage() {
           >
             {showSummary ? '要約を閉じる' : '要約を見る'}
           </button>
+          {senderRole === 'owner' && (
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="flex-shrink-0 flex items-center justify-center rounded-full transition"
+              style={{
+                width: 32, height: 32,
+                background: 'rgba(239,68,68,0.08)',
+                border: '1px solid rgba(239,68,68,0.2)',
+                cursor: 'pointer',
+                color: '#F87171',
+              }}
+              title="会話を削除"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                <path d="M10 11v6M14 11v6" />
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
