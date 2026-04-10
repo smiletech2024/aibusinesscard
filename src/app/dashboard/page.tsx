@@ -57,7 +57,7 @@ export default function DashboardPage() {
 
   const loadData = async (userId: string) => {
     const { data: cardsData } = await supabase
-      .from('business_cards').select('*').eq('user_id', userId).order('created_at', { ascending: false })
+      .from('business_cards').select('*').eq('user_id', userId).eq('is_active', true).order('created_at', { ascending: false })
     if (cardsData) {
       setCards(cardsData)
       const qrUrls: Record<string, string> = {}
