@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { deepseek, MODEL, getSummaryPrompt } from '@/lib/anthropic'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
 
 export async function POST(req: NextRequest) {
   try {
     const { sessionId } = await req.json()
     const supabase = await createClient()
+    const admin = createServiceClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
 
-    const { data: conversations, error: convError } = await supabase
+    const { data: conversations, error: convError } = await admin
       .from('ai_conversations')
       .select('role, content')
       .eq('session_id', sessionId)

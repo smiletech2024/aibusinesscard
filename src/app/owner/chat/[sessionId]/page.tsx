@@ -17,6 +17,7 @@ export default function OwnerChatPage() {
   const [chats, setChats] = useState<HumanChat[]>([])
   const [aiConvs, setAiConvs] = useState<AiConversation[]>([])
   const [showAiHistory, setShowAiHistory] = useState(false)
+  const [summarizing, setSummarizing] = useState(false)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [initializing, setInitializing] = useState(true)
@@ -80,12 +81,24 @@ export default function OwnerChatPage() {
     const { data: summaryData } = await supabase
       .from('conversation_summaries').select('*').eq('session_id', sessionId)
       .order('created_at', { ascending: false }).limit(1).single()
-    if (summaryData) setSummary(summaryData)
+    if (summaryData) setSummary(summaryData as ConversationSummary)
     // AI会話履歴取得
     fetch(`/api/conversations?sessionId=${sessionId}`)
       .then(r => r.json())
       .then(d => { if (d.conversations?.length) setAiConvs(d.conversations) })
     fetchChats()
+  }
+
+  const createSummary = async () => {
+    setSummarizing(true)
+    try {
+      const res = await fetch('/api/summarize', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId }),
+      })
+      const data = await res.json()
+      if (data.summary) setSummary(data.summary as ConversationSummary)
+    } finally { setSummarizing(false) }
   }
 
   const fetchChats = useCallback(async () => {
@@ -486,17 +499,29 @@ export default function OwnerChatPage() {
             </div>
           ) : (
             /* オーナー向け */
-            <div className="text-center py-12 fade-in">
-              <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-                style={{ background: 'rgba(123,110,245,0.1)', border: '1px solid rgba(123,110,245,0.2)' }}
-              >
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7B6EF5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
+            <div className="py-8 px-2 space-y-4 fade-in">
+              {!summary && aiConvs.length > 0 && (
+                <div className="rounded-2xl p-5" style={{ background: '#0F0E20', border: '1px solid rgba(123,110,245,0.2)' }}>
+                  <p className="font-bold text-sm mb-1" style={{ color: '#EDEEFF' }}>AI会話をまとめますか？</p>
+                  <p className="text-xs mb-4" style={{ color: '#5A587E' }}>お客様との会話内容を整理して、すぐに本題から話せます</p>
+                  <button
+                    onClick={createSummary}
+                    disabled={summarizing}
+                    className="w-full py-3 font-bold text-white rounded-2xl"
+                    style={{
+                      background: 'linear-gradient(135deg, #7B6EF5, #9B8BF5)',
+                      border: 'none', cursor: summarizing ? 'not-allowed' : 'pointer',
+                      opacity: summarizing ? 0.7 : 1,
+                    }}
+                  >
+                    {summarizing ? '整理中...' : 'AIとの会話をまとめる →'}
+                  </button>
+                </div>
+              )}
+              <div className="text-center py-4">
+                <p className="font-bold mb-1" style={{ color: '#EDEEFF' }}>準備が整っています</p>
+                <p className="text-sm" style={{ color: '#5A587E' }}>下の入力欄からメッセージを送れます</p>
               </div>
-              <p className="font-bold mb-1" style={{ color: '#EDEEFF' }}>準備が整っています</p>
-              <p className="text-sm" style={{ color: '#5A587E' }}>AIが会話を整理済み。すぐに本題に入れます</p>
             </div>
           )
         )}
