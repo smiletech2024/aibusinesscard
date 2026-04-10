@@ -141,6 +141,10 @@ export default function DashboardPage() {
     })
     if (res.ok) {
       setSessions(prev => prev.filter(s => s.id !== sessionId))
+    } else {
+      const data = await res.json().catch(() => ({}))
+      console.error('[delete session] failed:', res.status, data)
+      alert(`削除エラー: ${res.status} ${JSON.stringify(data)}`)
     }
     setDeleteSessionConfirm(null)
   }

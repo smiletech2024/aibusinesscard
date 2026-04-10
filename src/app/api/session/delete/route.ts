@@ -25,13 +25,15 @@ export async function DELETE(req: NextRequest) {
     )
 
     // オーナー確認（persona_id → personas.user_id = user.id）
-    const { data: session } = await admin
+    const { data: session, error: sessionErr } = await admin
       .from('customer_sessions').select('persona_id').eq('id', sessionId).single()
-    if (!session) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-    const { data: persona } = await admin
+    console.log('[delete] session:', session, 'err:', sessionErr)
+    if (!session) return NextResponse.json({ error: 'Not found', detail: String(sessionErr) }, { status: 404 })
+    const { data: persona, error: personaErr } = await admin
       .from('personas').select('user_id').eq('id', session.persona_id).single()
+    console.log('[delete] persona:', persona, 'err:', personaErr, 'userId:', user.id)
     if (!persona || persona.user_id !== user.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden', personaUserId: persona?.user_id, userId: user.id }, { status: 403 })
     }
     await admin.from('human_chats').delete().eq('session_id', sessionId)
     await admin.from('conversation_summaries').delete().eq('session_id', sessionId)
