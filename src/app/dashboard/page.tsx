@@ -44,6 +44,7 @@ export default function DashboardPage() {
   const [qrModal, setQrModal] = useState<{ url: string; cardUrl: string; name: string } | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null)
   const [deleteSessionConfirm, setDeleteSessionConfirm] = useState<{ id: string; name: string } | null>(null)
+  const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null)
   const [notifications, setNotifications] = useState<{ id: string; customerName: string; sessionId: string }[]>([])
   const personaIdsRef = useRef<string[]>([])
   const supabase = createClient()
@@ -134,6 +135,7 @@ export default function DashboardPage() {
   }
 
   const handleDeleteSession = async (sessionId: string) => {
+    setDeletingSessionId(sessionId)
     const res = await fetch('/api/session/delete', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
@@ -141,11 +143,8 @@ export default function DashboardPage() {
     })
     if (res.ok) {
       setSessions(prev => prev.filter(s => s.id !== sessionId))
-    } else {
-      const data = await res.json().catch(() => ({}))
-      console.error('[delete session] failed:', res.status, data)
-      alert(`削除エラー: ${res.status} ${JSON.stringify(data)}`)
     }
+    setDeletingSessionId(null)
     setDeleteSessionConfirm(null)
   }
 
@@ -330,12 +329,15 @@ export default function DashboardPage() {
             <div style={{ display: 'flex', gap: 8 }}>
               <button
                 onClick={() => handleDeleteSession(deleteSessionConfirm.id)}
+                disabled={!!deletingSessionId}
                 style={{
                   flex: 1, padding: '11px 0', borderRadius: 12, fontSize: 13, fontWeight: 700,
-                  background: '#EF4444', color: 'white', border: 'none', cursor: 'pointer',
+                  background: '#EF4444', color: 'white', border: 'none',
+                  cursor: deletingSessionId ? 'not-allowed' : 'pointer',
+                  opacity: deletingSessionId ? 0.7 : 1,
                 }}
               >
-                削除する
+                {deletingSessionId ? '削除中...' : '削除する'}
               </button>
               <button
                 onClick={() => setDeleteSessionConfirm(null)}
