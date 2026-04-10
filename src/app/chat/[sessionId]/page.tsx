@@ -296,15 +296,25 @@ export default function ChatPage() {
             border: '1px solid rgba(139,92,246,0.15)',
           }}
         >
-          <input
-            type="text"
+          <textarea
             value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && sendMessage()}
+            onChange={e => {
+              setInput(e.target.value)
+              e.target.style.height = 'auto'
+              e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'
+            }}
+            onKeyDown={e => {
+              // PCのみEnterで送信（スマホはボタンを使う）
+              if (e.key === 'Enter' && !e.shiftKey && !/iPhone|iPad|Android/i.test(navigator.userAgent)) {
+                e.preventDefault()
+                sendMessage()
+              }
+            }}
             disabled={loading || summarizing}
             placeholder="メッセージを入力..."
-            className="flex-1 bg-transparent outline-none px-3 text-sm"
-            style={{ color: '#EDEEFF' }}
+            rows={1}
+            className="flex-1 bg-transparent outline-none px-3 text-sm resize-none"
+            style={{ color: '#EDEEFF', lineHeight: '1.5', paddingTop: 10, paddingBottom: 10, overflowY: 'hidden' }}
           />
           <button
             onClick={sendMessage}
