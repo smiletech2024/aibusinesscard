@@ -186,30 +186,35 @@ export default function ChatPage() {
 
       {/* メッセージ */}
       <div className="flex-1 overflow-y-auto px-4 py-5 space-y-4 max-w-2xl mx-auto w-full">
-        {messages.map((msg, i) => (
-          <div key={i} className={`flex gap-2.5 fade-up ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {msg.role === 'assistant' && (
-              <div
-                className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-black text-white shadow-sm"
-                style={{ background: 'linear-gradient(135deg, #6356D4, #7B6EF5)' }}
-              >
-                AI
-              </div>
-            )}
-            <div
-              className={`max-w-xs sm:max-w-md ${msg.role === 'user' ? 'bubble-user-dark' : 'bubble-ai-dark'}`}
-              style={{ whiteSpace: 'pre-wrap' }}
-            >
-              {msg.content || (
-                <span className="flex items-center gap-1.5 py-0.5">
-                  <span className="dot-pulse" style={{ background: '#9896C4' }} />
-                  <span className="dot-pulse" style={{ background: '#9896C4' }} />
-                  <span className="dot-pulse" style={{ background: '#9896C4' }} />
-                </span>
+        {messages.map((msg, i) => {
+          // viewOnly（本人閲覧）ではAIが右・お客様が左
+          const isRight = viewOnly ? msg.role === 'assistant' : msg.role === 'user'
+          const isLeft = !isRight
+          return (
+            <div key={i} className={`flex gap-2.5 fade-up ${isRight ? 'justify-end' : 'justify-start'}`}>
+              {isLeft && (
+                <div
+                  className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-black text-white shadow-sm"
+                  style={{ background: msg.role === 'assistant' ? 'linear-gradient(135deg, #6356D4, #7B6EF5)' : 'linear-gradient(135deg, #374151, #6B7280)' }}
+                >
+                  {msg.role === 'assistant' ? 'AI' : (session?.business_cards?.full_name?.[0] || 'お')}
+                </div>
               )}
+              <div
+                className={`max-w-xs sm:max-w-md ${isRight ? 'bubble-user-dark' : 'bubble-ai-dark'}`}
+                style={{ whiteSpace: 'pre-wrap' }}
+              >
+                {msg.content || (
+                  <span className="flex items-center gap-1.5 py-0.5">
+                    <span className="dot-pulse" style={{ background: '#9896C4' }} />
+                    <span className="dot-pulse" style={{ background: '#9896C4' }} />
+                    <span className="dot-pulse" style={{ background: '#9896C4' }} />
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
         <div ref={messagesEndRef} />
       </div>
 
