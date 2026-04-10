@@ -10,11 +10,11 @@ import Link from 'next/link'
 import QRCode from 'qrcode'
 import { Logo } from '@/components/Logo'
 
-const statusConfig: Record<string, { label: string; bg: string; color: string }> = {
-  ai_chat:    { label: 'AI対話中',  bg: 'rgba(99,102,241,0.1)', color: '#818CF8' },
-  summarized: { label: '要約完了',  bg: 'rgba(52,211,153,0.1)', color: '#34D399' },
-  owner_chat: { label: '本会話中',  bg: 'rgba(167,139,250,0.1)', color: '#A78BFA' },
-  closed:     { label: '完了',      bg: 'rgba(156,163,175,0.1)', color: '#9CA3AF' },
+const statusConfig: Record<string, { label: string; bg: string; color: string; step: number }> = {
+  ai_chat:    { label: 'AIと会話中',    bg: 'rgba(99,102,241,0.1)',  color: '#818CF8', step: 2 },
+  summarized: { label: 'まとめ確認中',  bg: 'rgba(52,211,153,0.1)',  color: '#34D399', step: 3 },
+  owner_chat: { label: 'チャット希望',  bg: 'rgba(167,139,250,0.1)', color: '#A78BFA', step: 4 },
+  closed:     { label: '完了',          bg: 'rgba(156,163,175,0.1)', color: '#9CA3AF', step: 0 },
 }
 
 function Avatar({ name, size = 40, gradient = false }: { name: string; size?: number; gradient?: boolean }) {
@@ -430,6 +430,36 @@ export default function DashboardPage() {
             <div className="mb-5">
               <p className="section-label mb-1">顧客管理</p>
               <h2 className="text-lg font-black" style={{ color: '#1E1B4B' }}>AIが受けた相談</h2>
+            </div>
+
+            {/* お客様フロー説明 */}
+            <div
+              className="mb-4 px-4 py-3 rounded-2xl"
+              style={{ background: 'white', border: '1px solid #E8E6F5' }}
+            >
+              <p className="text-xs font-bold mb-2.5" style={{ color: '#9896B8' }}>お客様の流れ</p>
+              <div className="flex items-center gap-1 flex-wrap">
+                {[
+                  { label: 'QRスキャン', color: '#6366F1', bg: 'rgba(99,102,241,0.08)' },
+                  { label: 'AIと会話中', color: '#818CF8', bg: 'rgba(99,102,241,0.08)' },
+                  { label: 'まとめ確認中', color: '#34D399', bg: 'rgba(52,211,153,0.08)' },
+                  { label: 'チャット希望', color: '#A78BFA', bg: 'rgba(167,139,250,0.08)' },
+                ].map((s, i) => (
+                  <div key={s.label} className="flex items-center gap-1">
+                    <span
+                      className="text-xs font-bold px-2.5 py-1 rounded-full"
+                      style={{ background: s.bg, color: s.color }}
+                    >
+                      {s.label}
+                    </span>
+                    {i < 3 && (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C4C2D8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="9 18 15 12 9 6" />
+                      </svg>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="space-y-2">
               {sessions.map(session => {

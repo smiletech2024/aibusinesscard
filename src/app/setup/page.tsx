@@ -198,17 +198,63 @@ export default function SetupPage() {
   }
 
   if (step === 'done') {
+    const journey = [
+      { num: '1', title: 'QRコードを読む', desc: '名刺を渡した相手がここから始めます', color: '#6366F1' },
+      { num: '2', title: 'AIがあなたの代わりに対応', desc: 'あなたの分身が24時間、何でも答えます', color: '#8B5CF6' },
+      { num: '3', title: 'AIが会話を自動整理', desc: '相談内容・悩み・温度感をまとめます', color: '#A78BFA' },
+      { num: '4', title: 'あなたに話しかける', desc: 'ここでダッシュボードに通知が届きます', color: '#059669' },
+    ]
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "#F4F3FA" }}>
-        <div className="text-center fade-in">
-          <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-5"
-            style={{ background: "#EEF2FF" }}>
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 6L9 17l-5-5" />
-            </svg>
+      <div className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: "#F4F3FA" }}>
+        <div className="w-full max-w-lg fade-in">
+          <div className="text-center mb-8">
+            <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-5"
+              style={{ background: "#EEF2FF" }}>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+            <h2 className="font-black text-2xl mb-2" style={{ color: "#1E1B4B" }}>あなたの分身AIが生まれました</h2>
+            <p className="text-sm" style={{ color: "#9896B8" }}>今この瞬間から、24時間働き始めます</p>
           </div>
-          <h2 className="font-black text-2xl mb-2" style={{ color: "#1E1B4B" }}>あなたの分身AIが生まれました</h2>
-          <p className="text-sm" style={{ color: "#9896B8" }}>今この瞬間から、24時間働き始めます</p>
+
+          <div className="card p-6 mb-5">
+            <p className="text-xs font-bold mb-4 uppercase tracking-widest" style={{ color: "#9896B8" }}>お客様はこう使います</p>
+            <div className="space-y-4">
+              {journey.map(({ num, title, desc, color }, i) => (
+                <div key={num} className="flex items-start gap-3">
+                  <div className="flex flex-col items-center flex-shrink-0">
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center font-black text-xs text-white"
+                      style={{ background: color }}
+                    >
+                      {num}
+                    </div>
+                    {i < journey.length - 1 && (
+                      <div style={{ width: 2, height: 24, background: '#E8E6F5', marginTop: 4 }} />
+                    )}
+                  </div>
+                  <div style={{ paddingTop: 2 }}>
+                    <p className="text-sm font-bold" style={{ color: '#1E1B4B' }}>{title}</p>
+                    <p className="text-xs mt-0.5" style={{ color: '#9896B8' }}>{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={() => router.push('/dashboard')}
+            style={{
+              width: '100%', padding: '14px', fontSize: 16, fontWeight: 700,
+              background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+              color: 'white', border: 'none', borderRadius: 12,
+              cursor: 'pointer',
+              boxShadow: '0 4px 14px rgba(99,102,241,0.35)',
+            }}
+          >
+            ダッシュボードへ →
+          </button>
         </div>
       </div>
     )
