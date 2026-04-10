@@ -74,7 +74,6 @@ export default function ChatPage() {
     if (!input.trim() || loading || !session) return
     const userMessage = input.trim()
     setInput('')
-    await supabase.from('ai_conversations').insert({ session_id: sessionId, role: 'user', content: userMessage })
     const newMessages: Message[] = [...messages, { role: 'user', content: userMessage, saved: true }]
     setMessages(newMessages)
     setLoading(true)
@@ -86,6 +85,7 @@ export default function ChatPage() {
         body: JSON.stringify({
           messages: newMessages.map(m => ({ role: m.role, content: m.content })),
           sessionId, personaId: session.persona_id,
+          userMessage,
         }),
       })
       let aiText = ''

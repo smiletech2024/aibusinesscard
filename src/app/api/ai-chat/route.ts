@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { deepseek, MODEL, getAvatarSystemPrompt } from '@/lib/anthropic'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, sessionId, personaId } = await req.json()
+    const { messages, sessionId, personaId, userMessage } = await req.json()
     const supabase = await createClient()
+    const admin = createServiceClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
 
     const { data: persona, error: personaError } = await supabase
       .from('personas')
@@ -27,6 +32,15 @@ export async function POST(req: NextRequest) {
     const ownerTitle = card?.title || ''
 
     const systemPrompt = getAvatarSystemPrompt(persona, ownerName, ownerTitle)
+
+    // ユーザーメッセージをサービスロールで保存
+    if (sessionId && userMessage) {
+      await admin.from('ai_conversations').insert({
+        session_id: sessionId,
+        role: 'user',
+        content: userMessage,
+      })
+    }
 
     const stream = await deepseek.chat.completions.create({
       model: MODEL,
@@ -51,7 +65,7 @@ export async function POST(req: NextRequest) {
         }
 
         if (sessionId && fullText) {
-          await supabase.from('ai_conversations').insert({
+          await admin.from('ai_conversations').insert({
             session_id: sessionId,
             role: 'assistant',
             content: fullText,
