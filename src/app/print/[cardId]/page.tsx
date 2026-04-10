@@ -36,20 +36,27 @@ const IconGlobe = () => (
   </svg>
 )
 
-/* ─── QRコード canvas レンダラー (html-to-image 互換) ─── */
-// QRCode.toCanvas() で直接描画するため、data:URL の img タグを経由しない。
-// html-to-image は canvas をそのままキャプチャできる。
-function QRCodeCanvas({ url, size, style }: { url: string; size: number; style?: React.CSSProperties }) {
-  const ref = useRef<HTMLCanvasElement>(null)
+/* ─── QRコード SVG レンダラー (全デバイス対応) ─── */
+// canvas は iOS Safari で描画失敗するケースがあるため、
+// SVG 文字列をインライン展開する方式を採用。
+// html-to-image はインライン SVG を確実にキャプチャできる。
+function QRCodeSVG({ url, size, style }: { url: string; size: number; style?: React.CSSProperties }) {
+  const [svg, setSvg] = useState('')
   useEffect(() => {
-    if (!ref.current || !url) return
-    QRCode.toCanvas(ref.current, url, {
-      width: size * 3,
+    if (!url) return
+    QRCode.toString(url, {
+      type: 'svg',
+      width: size,
       margin: 1,
       color: { dark: '#1E1B4B', light: '#FFFFFF' },
-    }).catch(() => {})
+    }).then(setSvg).catch(() => {})
   }, [url, size])
-  return <canvas ref={ref} style={{ width: size, height: size, display: 'block', ...style }} />
+  return (
+    <div
+      style={{ width: size, height: size, display: 'block', flexShrink: 0, ...style }}
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
+  )
 }
 
 /* ─── カードサイズ ─── */
@@ -149,7 +156,7 @@ function ExecutiveFront({ card, qrUrl }: { card: BusinessCard; qrUrl: string }) 
             <LogoIcon size={12} />
             <span style={{ fontSize: 7, fontWeight: 800, color: '#6366F1', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
           </div>
-          <QRCodeCanvas url={qrUrl} size={76} style={{ border: '1.5px solid #E0E7FF', borderRadius: 8 }} />
+          <QRCodeSVG url={qrUrl} size={76} style={{ border: '1.5px solid #E0E7FF', borderRadius: 8 }} />
           <p style={{ fontSize: 7, color: '#A5B4FC', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンしてAI相談</p>
         </div>
       )}
@@ -273,7 +280,7 @@ function MidnightFront({ card, qrUrl }: { card: BusinessCard; qrUrl: string }) {
             <span style={{ fontSize: 7, fontWeight: 800, color: '#A78BFA', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
           </div>
           <div style={{ background: 'white', padding: 5, borderRadius: 10, boxShadow: '0 0 20px rgba(139,92,246,0.3)' }}>
-            <QRCodeCanvas url={qrUrl} size={68} style={{ borderRadius: 4 }} />
+            <QRCodeSVG url={qrUrl} size={68} style={{ borderRadius: 4 }} />
           </div>
           <p style={{ fontSize: 7, color: '#818CF8', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンしてAI相談</p>
         </div>
@@ -383,7 +390,7 @@ function VividFront({ card, qrUrl }: { card: BusinessCard; qrUrl: string }) {
             <span style={{ fontSize: 7, fontWeight: 800, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
           </div>
           <div style={{ background: 'white', padding: 5, borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.25)' }}>
-            <QRCodeCanvas url={qrUrl} size={70} style={{ borderRadius: 5 }} />
+            <QRCodeSVG url={qrUrl} size={70} style={{ borderRadius: 5 }} />
           </div>
           <p style={{ fontSize: 7, color: 'rgba(255,255,255,0.6)', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンしてAI相談</p>
         </div>
@@ -725,7 +732,7 @@ export default function PrintCardPage() {
               </div>
               {/* QRコード */}
               {cardQrUrl && (
-                <QRCodeCanvas url={cardQrUrl} size={100} style={{ borderRadius: 8 }} />
+                <QRCodeSVG url={cardQrUrl} size={100} style={{ borderRadius: 8 }} />
               )}
               {/* テキスト */}
               <div style={{ textAlign: 'center' }}>
