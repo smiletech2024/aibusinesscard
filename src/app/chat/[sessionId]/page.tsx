@@ -28,7 +28,10 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
-  useEffect(() => { loadSession() }, [sessionId])
+  useEffect(() => {
+    if (viewOnly) { router.replace(`/owner/chat/${sessionId}`); return }
+    loadSession()
+  }, [sessionId])
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
   const loadSession = async () => {
