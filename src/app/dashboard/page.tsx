@@ -537,7 +537,7 @@ export default function DashboardPage() {
                         </button>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs mb-2.5" style={{ color: '#9896B8' }}>QRを見せる · URLをシェアする</p>
+                        <p className="text-xs mb-2.5" style={{ color: '#9896B8' }}>QRスキャン後にお客様が見る画面</p>
                         <div className="flex flex-wrap gap-2">
                           <a
                             href={cardUrl}
@@ -546,7 +546,7 @@ export default function DashboardPage() {
                             className="btn-primary text-xs px-4 py-2"
                             style={{ borderRadius: 10 }}
                           >
-                            名刺を見る
+                            お客様画面を確認
                           </a>
                           <Link
                             href={`/print/${card.id}`}
