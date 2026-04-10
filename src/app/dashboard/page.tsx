@@ -134,12 +134,14 @@ export default function DashboardPage() {
   }
 
   const handleDeleteSession = async (sessionId: string) => {
-    await fetch('/api/session/delete', {
+    const res = await fetch('/api/session/delete', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sessionId }),
     })
-    setSessions(prev => prev.filter(s => s.id !== sessionId))
+    if (res.ok) {
+      setSessions(prev => prev.filter(s => s.id !== sessionId))
+    }
     setDeleteSessionConfirm(null)
   }
 
