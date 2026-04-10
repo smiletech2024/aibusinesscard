@@ -537,8 +537,8 @@ export default function DashboardPage() {
                         </button>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs" style={{ color: '#9896B8' }}>QRスキャン後にお客様が見る画面</p>
-                        <p className="text-xs mb-1.5" style={{ color: '#C4C2D8' }}>↓</p>
+                        <p className="text-xs" style={{ color: '#9896B8' }}>QRスキャン後にお客様が見る画面 ↓</p>
+                        <div className="mb-1.5" />
                         <div className="flex flex-wrap gap-2">
                           <a
                             href={cardUrl}
