@@ -76,11 +76,7 @@ export default function CardPage() {
 
   const continueSession = () => {
     if (!existingSession) return
-    if (existingSession.status === 'summarized' || existingSession.status === 'owner_chat') {
-      router.push(`/owner/chat/${existingSession.id}`)
-    } else {
-      router.push(`/chat/${existingSession.id}`)
-    }
+    router.push(`/chat/${existingSession.id}`)
   }
 
   const resetSession = () => {
