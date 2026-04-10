@@ -38,9 +38,10 @@ export default function ChatPage() {
       .eq('id', sessionId).single()
     if (!sessionData) return
     setSession(sessionData as CustomerSession)
-    const { data: convs } = await supabase
-      .from('ai_conversations').select('*').eq('session_id', sessionId).order('created_at', { ascending: true })
-    if (convs?.length) {
+    const res = await fetch(`/api/conversations?sessionId=${sessionId}`)
+    const json = await res.json()
+    const convs: AiConversation[] = json.conversations ?? []
+    if (convs.length > 0) {
       setMessages(convs.map((c: AiConversation) => ({ role: c.role, content: c.content, saved: true })))
       setTurnCount(convs.filter((c: AiConversation) => c.role === 'user').length)
     } else if (!viewOnly) {
