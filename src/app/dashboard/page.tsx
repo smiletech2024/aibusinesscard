@@ -546,7 +546,7 @@ export default function DashboardPage() {
                             className="btn-primary text-xs px-4 py-2"
                             style={{ borderRadius: 10 }}
                           >
-                            お客様画面を確認
+                            お客様が見る画面を確認
                           </a>
                           <Link
                             href={`/print/${card.id}`}
