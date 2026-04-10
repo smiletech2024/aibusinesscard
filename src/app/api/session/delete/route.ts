@@ -18,10 +18,16 @@ export async function DELETE(req: NextRequest) {
     const { data: { user } } = await authClient.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!serviceKey) {
+      console.error('[delete] SUPABASE_SERVICE_ROLE_KEY is not set')
+      return NextResponse.json({ error: 'Server misconfiguration: service key missing' }, { status: 500 })
+    }
+
     // サービスロールで確認・削除（RLSをバイパス）
     const admin = createServiceClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      serviceKey
     )
 
     // オーナー確認（persona_id → personas.user_id = user.id）
