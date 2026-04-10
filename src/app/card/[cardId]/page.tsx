@@ -18,6 +18,7 @@ export default function CardPage() {
   const router = useRouter()
   const cardId = params.cardId as string
   const [card, setCard] = useState<CardPageData | null>(null)
+  const [cardDeleted, setCardDeleted] = useState(false)
   const [loading, setLoading] = useState(true)
   const [customerName, setCustomerName] = useState('')
   const [showNameInput, setShowNameInput] = useState(false)
@@ -27,11 +28,15 @@ export default function CardPage() {
   useEffect(() => { loadCard() }, [cardId])
 
   const loadCard = async () => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('business_cards')
       .select('*, profiles:user_id(full_name, avatar_url)')
-      .eq('id', cardId).eq('is_active', true).single()
-    setCard(error || !data ? null : data)
+      .eq('id', cardId).single()
+    if (data && !data.is_active) {
+      setCardDeleted(true)
+    } else {
+      setCard(data ?? null)
+    }
 
     // 同じ端末の既存セッションを確認
     const savedId = typeof window !== 'undefined' ? localStorage.getItem(SESSION_KEY(cardId)) : null
@@ -81,6 +86,32 @@ export default function CardPage() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#07060F' }}>
         <div className="w-10 h-10 border-3 rounded-full spin"
           style={{ border: '3px solid rgba(123,110,245,0.3)', borderTopColor: '#7B6EF5' }} />
+      </div>
+    )
+  }
+
+  if (cardDeleted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#07060F' }}>
+        <div className="text-center max-w-xs">
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5"
+            style={{ background: 'rgba(123,110,245,0.1)', border: '1px solid rgba(123,110,245,0.2)' }}
+          >
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7B6EF5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="3" />
+              <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+              <line x1="4" y1="4" x2="20" y2="20" strokeWidth="2" />
+            </svg>
+          </div>
+          <h2 className="font-black text-lg mb-2" style={{ color: '#EDEEFF' }}>
+            この名刺は現在ご利用いただけません
+          </h2>
+          <p className="text-sm leading-relaxed" style={{ color: '#5A587E' }}>
+            担当者が名刺を削除または停止しました。<br />
+            直接ご連絡いただくか、新しい名刺をお受け取りください。
+          </p>
+        </div>
       </div>
     )
   }

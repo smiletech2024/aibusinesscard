@@ -42,6 +42,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [qrDataUrls, setQrDataUrls] = useState<Record<string, string>>({})
   const [qrModal, setQrModal] = useState<{ url: string; cardUrl: string; name: string } | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null)
   const [notifications, setNotifications] = useState<{ id: string; customerName: string; sessionId: string }[]>([])
   const personaIdsRef = useRef<string[]>([])
   const supabase = createClient()
@@ -125,6 +126,12 @@ export default function DashboardPage() {
     }
   }, [])
 
+  const handleDeleteCard = async (cardId: string) => {
+    await supabase.from('business_cards').update({ is_active: false }).eq('id', cardId)
+    setCards(prev => prev.filter(c => c.id !== cardId))
+    setDeleteConfirm(null)
+  }
+
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.push('/')
@@ -197,6 +204,68 @@ export default function DashboardPage() {
                   background: '#F4F3FA', color: '#6B7280', border: 'none', cursor: 'pointer',
                 }}>
                 閉じる
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 削除確認モーダル */}
+      {deleteConfirm && (
+        <div
+          onClick={() => setDeleteConfirm(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 50,
+            background: 'rgba(0,0,0,0.6)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 24,
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: 'white', borderRadius: 20, padding: '28px 24px',
+              maxWidth: 320, width: '100%', textAlign: 'center',
+              boxShadow: '0 24px 60px rgba(0,0,0,0.3)',
+            }}
+          >
+            <div style={{
+              width: 52, height: 52, borderRadius: 14,
+              background: '#FEF2F2', display: 'flex', alignItems: 'center',
+              justifyContent: 'center', margin: '0 auto 16px',
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                <path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+              </svg>
+            </div>
+            <p style={{ fontWeight: 900, fontSize: 16, color: '#1E1B4B', marginBottom: 8 }}>
+              この名刺を削除しますか？
+            </p>
+            <p style={{ fontSize: 13, color: '#9896B8', marginBottom: 6 }}>
+              「{deleteConfirm.name}」
+            </p>
+            <p style={{ fontSize: 12, color: '#9896B8', marginBottom: 24, lineHeight: 1.6 }}>
+              削除後はQRコードを読み取っても<br />使えなくなります。この操作は取り消せません。
+            </p>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={() => handleDeleteCard(deleteConfirm.id)}
+                style={{
+                  flex: 1, padding: '11px 0', borderRadius: 12, fontSize: 13, fontWeight: 700,
+                  background: '#EF4444', color: 'white', border: 'none', cursor: 'pointer',
+                }}
+              >
+                削除する
+              </button>
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                style={{
+                  flex: 1, padding: '11px 0', borderRadius: 12, fontSize: 13, fontWeight: 600,
+                  background: '#F4F3FA', color: '#6B7280', border: 'none', cursor: 'pointer',
+                }}
+              >
+                キャンセル
               </button>
             </div>
           </div>
@@ -414,6 +483,13 @@ export default function DashboardPage() {
                           >
                             印刷用
                           </Link>
+                          <button
+                            onClick={() => setDeleteConfirm({ id: card.id, name: card.full_name })}
+                            className="text-xs px-3 py-2 rounded-xl transition hover:bg-red-50"
+                            style={{ color: '#EF4444', background: 'transparent', border: '1px solid #FECACA', cursor: 'pointer' }}
+                          >
+                            削除
+                          </button>
                         </div>
                       </div>
                     </div>
