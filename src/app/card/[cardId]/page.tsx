@@ -39,15 +39,18 @@ export default function CardPage() {
       setCard(data ?? null)
     }
 
-    // 同じ端末の既存セッションを確認
+    // 同じ端末の既存セッションを確認（サービスロール経由）
     const savedId = typeof window !== 'undefined' ? localStorage.getItem(SESSION_KEY(cardId)) : null
     if (savedId) {
-      const { data: session } = await supabase
-        .from('customer_sessions').select('id, status').eq('id', savedId).single()
-      if (session && session.status !== 'closed') {
-        setExistingSession(session)
+      const res = await fetch(`/api/session/status?sessionId=${savedId}`)
+      if (res.ok) {
+        const { session } = await res.json()
+        if (session && session.status !== 'closed') {
+          setExistingSession(session)
+        } else {
+          localStorage.removeItem(SESSION_KEY(cardId))
+        }
       } else {
-        // セッションが消えた or 完了済みならリセット
         localStorage.removeItem(SESSION_KEY(cardId))
       }
     }
