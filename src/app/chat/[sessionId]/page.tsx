@@ -289,8 +289,28 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* 入力エリア */}
-      <div
+      {/* 本人閲覧モード：直接チャットボタン */}
+      {viewOnly && (
+        <div
+          className="px-4 pb-6 pt-3 max-w-2xl mx-auto w-full"
+          style={{ background: '#0F0E20', boxShadow: '0 -8px 32px rgba(7,6,15,0.8)' }}
+        >
+          <button
+            onClick={() => router.push(`/owner/chat/${sessionId}`)}
+            className="w-full py-3.5 font-bold text-white rounded-2xl"
+            style={{
+              background: 'linear-gradient(135deg, #7B6EF5, #9B8BF5)',
+              border: 'none', cursor: 'pointer', fontSize: '0.95rem',
+              boxShadow: '0 4px 20px rgba(123,110,245,0.4)',
+            }}
+          >
+            このお客様と直接話す →
+          </button>
+        </div>
+      )}
+
+      {/* 入力エリア（お客様用） */}
+      {!viewOnly && <div
         className="px-4 pb-6 pt-3 max-w-2xl mx-auto w-full"
         style={{
           background: '#0F0E20',
@@ -352,7 +372,7 @@ export default function ChatPage() {
             )}
           </button>
         </div>
-      </div>
+      </div>}
     </div>
   )
 }
