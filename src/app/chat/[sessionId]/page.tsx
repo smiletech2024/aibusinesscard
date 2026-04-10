@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useRef, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { CustomerSession, AiConversation } from '@/types'
 import { subscribePush } from '@/lib/push'
@@ -13,6 +13,8 @@ interface Message { role: 'user' | 'assistant'; content: string; saved?: boolean
 export default function ChatPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const viewOnly = searchParams.get('view') === '1'
   const sessionId = params.sessionId as string
   const [session, setSession] = useState<CustomerSession | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -41,7 +43,7 @@ export default function ChatPage() {
     if (convs?.length) {
       setMessages(convs.map((c: AiConversation) => ({ role: c.role, content: c.content, saved: true })))
       setTurnCount(convs.filter((c: AiConversation) => c.role === 'user').length)
-    } else {
+    } else if (!viewOnly) {
       startConversation(sessionData as CustomerSession)
     }
   }

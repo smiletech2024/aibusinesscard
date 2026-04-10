@@ -682,7 +682,7 @@ export default function DashboardPage() {
                         </>
                       ) : (
                         <Link
-                          href={`/chat/${session.id}`}
+                          href={`/chat/${session.id}?view=1`}
                           className="btn-ghost text-xs px-3 py-1.5"
                           style={{ borderRadius: 10 }}
                         >
