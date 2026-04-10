@@ -37,23 +37,19 @@ const IconGlobe = () => (
 )
 
 /* ─── QRコード canvas レンダラー (html-to-image 互換) ─── */
-// html-to-image は <img src="data:..."> を内部 fetch で再取得する際に失敗することがある。
-// <canvas> に直接描画することで確実にキャプチャできる。
-function QRCodeCanvas({ src, width, style }: { src: string; width: number; style?: React.CSSProperties }) {
+// QRCode.toCanvas() で直接描画するため、data:URL の img タグを経由しない。
+// html-to-image は canvas をそのままキャプチャできる。
+function QRCodeCanvas({ url, size, style }: { url: string; size: number; style?: React.CSSProperties }) {
   const ref = useRef<HTMLCanvasElement>(null)
   useEffect(() => {
-    if (!ref.current || !src) return
-    const canvas = ref.current
-    canvas.width = width * 3
-    canvas.height = width * 3
-    const img = new Image()
-    img.onload = () => {
-      const ctx = canvas.getContext('2d')
-      ctx?.drawImage(img, 0, 0, canvas.width, canvas.height)
-    }
-    img.src = src
-  }, [src, width])
-  return <canvas ref={ref} style={{ width, height: width, display: 'block', ...style }} />
+    if (!ref.current || !url) return
+    QRCode.toCanvas(ref.current, url, {
+      width: size * 3,
+      margin: 1,
+      color: { dark: '#1E1B4B', light: '#FFFFFF' },
+    }).catch(() => {})
+  }, [url, size])
+  return <canvas ref={ref} style={{ width: size, height: size, display: 'block', ...style }} />
 }
 
 /* ─── カードサイズ ─── */
@@ -88,7 +84,7 @@ function BackBrandLogo() {
 /* ══════════════════════════════════════════
    EXECUTIVE — 白 × インディゴ
 ══════════════════════════════════════════ */
-function ExecutiveFront({ card, qr }: { card: BusinessCard; qr: string }) {
+function ExecutiveFront({ card, qrUrl }: { card: BusinessCard; qrUrl: string }) {
   return (
     <div className="print-card" style={{ width: W, height: H, background: '#FFFFFF', position: 'relative', overflow: 'hidden', fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>
       {/* Left accent bar */}
@@ -147,13 +143,13 @@ function ExecutiveFront({ card, qr }: { card: BusinessCard; qr: string }) {
       </div>
 
       {/* QR + ブランド — bottom right */}
-      {qr && (
+      {qrUrl && (
         <div style={{ position: 'absolute', right: 20, bottom: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
             <LogoIcon size={12} />
             <span style={{ fontSize: 7, fontWeight: 800, color: '#6366F1', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
           </div>
-          <QRCodeCanvas src={qr} width={76} style={{ border: '1.5px solid #E0E7FF', borderRadius: 8 }} />
+          <QRCodeCanvas url={qrUrl} size={76} style={{ border: '1.5px solid #E0E7FF', borderRadius: 8 }} />
           <p style={{ fontSize: 7, color: '#A5B4FC', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンしてAI相談</p>
         </div>
       )}
@@ -212,7 +208,7 @@ function ExecutiveBack({ card }: { card: BusinessCard }) {
 /* ══════════════════════════════════════════
    MIDNIGHT — 漆黒 × バイオレットゴールド
 ══════════════════════════════════════════ */
-function MidnightFront({ card, qr }: { card: BusinessCard; qr: string }) {
+function MidnightFront({ card, qrUrl }: { card: BusinessCard; qrUrl: string }) {
   return (
     <div className="print-card" style={{ width: W, height: H, background: '#0D0C2A', position: 'relative', overflow: 'hidden', fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>
       {/* Radial glow */}
@@ -270,14 +266,14 @@ function MidnightFront({ card, qr }: { card: BusinessCard; qr: string }) {
       </div>
 
       {/* QR + ブランド — right */}
-      {qr && (
+      {qrUrl && (
         <div style={{ position: 'absolute', right: 22, bottom: 18, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
             <LogoIcon size={12} />
             <span style={{ fontSize: 7, fontWeight: 800, color: '#A78BFA', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
           </div>
           <div style={{ background: 'white', padding: 5, borderRadius: 10, boxShadow: '0 0 20px rgba(139,92,246,0.3)' }}>
-            <QRCodeCanvas src={qr} width={68} style={{ borderRadius: 4 }} />
+            <QRCodeCanvas url={qrUrl} size={68} style={{ borderRadius: 4 }} />
           </div>
           <p style={{ fontSize: 7, color: '#818CF8', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンしてAI相談</p>
         </div>
@@ -327,7 +323,7 @@ function MidnightBack({ card }: { card: BusinessCard }) {
 /* ══════════════════════════════════════════
    VIVID — フルグラデーション
 ══════════════════════════════════════════ */
-function VividFront({ card, qr }: { card: BusinessCard; qr: string }) {
+function VividFront({ card, qrUrl }: { card: BusinessCard; qrUrl: string }) {
   return (
     <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(135deg, #4338CA 0%, #6366F1 40%, #7C3AED 70%, #9333EA 100%)', position: 'relative', overflow: 'hidden', fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>
       {/* Geometric decorations */}
@@ -380,14 +376,14 @@ function VividFront({ card, qr }: { card: BusinessCard; qr: string }) {
       </div>
 
       {/* QR + ブランド */}
-      {qr && (
+      {qrUrl && (
         <div style={{ position: 'absolute', right: 20, bottom: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
             <LogoIcon size={12} />
             <span style={{ fontSize: 7, fontWeight: 800, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
           </div>
           <div style={{ background: 'white', padding: 5, borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.25)' }}>
-            <QRCodeCanvas src={qr} width={70} style={{ borderRadius: 5 }} />
+            <QRCodeCanvas url={qrUrl} size={70} style={{ borderRadius: 5 }} />
           </div>
           <p style={{ fontSize: 7, color: 'rgba(255,255,255,0.6)', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンしてAI相談</p>
         </div>
@@ -509,7 +505,7 @@ export default function PrintCardPage() {
   const params = useParams()
   const cardId = params.cardId as string
   const [card, setCard] = useState<BusinessCard | null>(null)
-  const [qrDataUrl, setQrDataUrl] = useState('')
+  const [cardQrUrl, setCardQrUrl] = useState('')
   const [loading, setLoading] = useState(true)
   const [design, setDesign] = useState<Design>('executive')
   const [dlState, setDlState] = useState<'idle' | 'front' | 'back' | 'both' | 'qr'>('idle')
@@ -525,7 +521,6 @@ export default function PrintCardPage() {
     if (!ref.current) return
     const dataUrl = await toPng(ref.current, {
       pixelRatio: 3,
-      cacheBust: true,
     })
     const a = document.createElement('a')
     a.download = filename
@@ -556,10 +551,7 @@ export default function PrintCardPage() {
     const { data } = await supabase.from('business_cards').select('*').eq('id', cardId).single()
     if (data) {
       setCard(data)
-      const qr = await QRCode.toDataURL(`${window.location.origin}/card/${cardId}`, {
-        width: 400, margin: 1, color: { dark: '#1E1B4B', light: '#FFFFFF' }
-      })
-      setQrDataUrl(qr)
+      setCardQrUrl(`${window.location.origin}/card/${cardId}`)
     }
     setLoading(false)
   }
@@ -689,7 +681,7 @@ export default function PrintCardPage() {
           btnLabel="表面を保存"
           captureRef={frontRef}
         >
-          <FrontComponent card={card} qr={qrDataUrl} />
+          <FrontComponent card={card} qrUrl={cardQrUrl} />
         </CardPreview>
 
         {/* 裏面 */}
@@ -732,8 +724,8 @@ export default function PrintCardPage() {
                 <span style={{ fontSize: 9, fontWeight: 900, color: '#1E1B4B', letterSpacing: '-0.01em', whiteSpace: 'nowrap' }}>AI名刺</span>
               </div>
               {/* QRコード */}
-              {qrDataUrl && (
-                <QRCodeCanvas src={qrDataUrl} width={100} style={{ borderRadius: 8 }} />
+              {cardQrUrl && (
+                <QRCodeCanvas url={cardQrUrl} size={100} style={{ borderRadius: 8 }} />
               )}
               {/* テキスト */}
               <div style={{ textAlign: 'center' }}>
@@ -746,7 +738,7 @@ export default function PrintCardPage() {
 
           <button
             onClick={() => handleDownload('qr')}
-            disabled={dlState !== 'idle' || !qrDataUrl}
+            disabled={dlState !== 'idle' || !cardQrUrl}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               padding: '12px 28px', borderRadius: 12, fontSize: 13, fontWeight: 700,
@@ -813,7 +805,7 @@ export default function PrintCardPage() {
       {/* ─── 印刷用（実寸） ─── */}
       <div className="print-only" style={{ display: 'none' }}>
         <div className="print-card">
-          <FrontComponent card={card} qr={qrDataUrl} />
+          <FrontComponent card={card} qrUrl={cardQrUrl} />
         </div>
         <div className="print-card">
           <BackComponent card={card} />
