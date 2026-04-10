@@ -49,7 +49,10 @@ function QRCodeSVG({ url, size, style }: { url: string; size: number; style?: Re
       width: size,
       margin: 1,
       color: { dark: '#1E1B4B', light: '#FFFFFF' },
-    }).then(setSvg).catch(() => {})
+    }).then(svgStr => {
+      // SVG固有のwidth/heightをコンテナに合わせる
+      setSvg(svgStr.replace(/(<svg[^>]*)\swidth="[^"]*"\sheight="[^"]*"/, '$1 width="100%" height="100%"'))
+    }).catch(() => {})
   }, [url, size])
   return (
     <div
