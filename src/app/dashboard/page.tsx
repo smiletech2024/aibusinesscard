@@ -328,14 +328,17 @@ export default function DashboardPage() {
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
               <button
-                onClick={() => handleDeleteSession(deleteSessionConfirm.id)}
+                onTouchEnd={(e) => { e.preventDefault(); if (!deletingSessionId) handleDeleteSession(deleteSessionConfirm.id) }}
+                onClick={() => { if (!deletingSessionId) handleDeleteSession(deleteSessionConfirm.id) }}
                 disabled={!!deletingSessionId}
                 style={{
                   flex: 1, padding: '11px 0', borderRadius: 12, fontSize: 13, fontWeight: 700,
                   background: '#EF4444', color: 'white', border: 'none',
                   cursor: deletingSessionId ? 'not-allowed' : 'pointer',
                   opacity: deletingSessionId ? 0.7 : 1,
-                }}
+                  touchAction: 'manipulation',
+                  WebkitTapHighlightColor: 'transparent',
+                } as React.CSSProperties}
               >
                 {deletingSessionId ? '削除中...' : '削除する'}
               </button>
