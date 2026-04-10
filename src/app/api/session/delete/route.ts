@@ -24,11 +24,13 @@ export async function DELETE(req: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    // オーナー確認（business_cards.user_id = user.id）
+    // オーナー確認（persona_id → personas.user_id = user.id）
     const { data: session } = await admin
-      .from('customer_sessions').select('*, business_cards(user_id)').eq('id', sessionId).single()
-    const cardOwnerId = (session as { business_cards?: { user_id?: string } })?.business_cards?.user_id
-    if (!session || cardOwnerId !== user.id) {
+      .from('customer_sessions').select('persona_id').eq('id', sessionId).single()
+    if (!session) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    const { data: persona } = await admin
+      .from('personas').select('user_id').eq('id', session.persona_id).single()
+    if (!persona || persona.user_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
     await admin.from('human_chats').delete().eq('session_id', sessionId)
