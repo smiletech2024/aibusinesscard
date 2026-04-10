@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { CustomerSession, ConversationSummary, HumanChat } from '@/types'
+import { CustomerSession, ConversationSummary, HumanChat, AiConversation } from '@/types'
 import { subscribePush } from '@/lib/push'
 
 export default function OwnerChatPage() {
@@ -15,6 +15,8 @@ export default function OwnerChatPage() {
   const [session, setSession] = useState<CustomerSession | null>(null)
   const [summary, setSummary] = useState<ConversationSummary | null>(null)
   const [chats, setChats] = useState<HumanChat[]>([])
+  const [aiConvs, setAiConvs] = useState<AiConversation[]>([])
+  const [showAiHistory, setShowAiHistory] = useState(false)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [initializing, setInitializing] = useState(true)
@@ -79,6 +81,10 @@ export default function OwnerChatPage() {
       .from('conversation_summaries').select('*').eq('session_id', sessionId)
       .order('created_at', { ascending: false }).limit(1).single()
     if (summaryData) setSummary(summaryData)
+    // AI会話履歴取得
+    fetch(`/api/conversations?sessionId=${sessionId}`)
+      .then(r => r.json())
+      .then(d => { if (d.conversations?.length) setAiConvs(d.conversations) })
     fetchChats()
   }
 
@@ -326,6 +332,41 @@ export default function OwnerChatPage() {
               まとめ全文を見る →
             </button>
           </div>
+        </div>
+      )}
+
+      {/* AI会話履歴 */}
+      {aiConvs.length > 0 && (
+        <div style={{ borderBottom: '1px solid rgba(139,92,246,0.12)' }}>
+          <button
+            onClick={() => setShowAiHistory(v => !v)}
+            className="w-full px-4 py-3 flex items-center justify-between max-w-2xl mx-auto"
+            style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+          >
+            <span className="text-xs font-bold" style={{ color: '#7B6EF5' }}>
+              AIとの会話履歴（{aiConvs.length}件）
+            </span>
+            <span style={{ color: '#5A587E', fontSize: 12 }}>{showAiHistory ? '▲ 閉じる' : '▼ 見る'}</span>
+          </button>
+          {showAiHistory && (
+            <div className="px-4 pb-4 space-y-2 max-w-2xl mx-auto">
+              {aiConvs.map((c, i) => (
+                <div key={i} className={`flex gap-2 ${c.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  {c.role === 'assistant' && (
+                    <div className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black text-white flex-shrink-0"
+                      style={{ background: 'linear-gradient(135deg, #6356D4, #7B6EF5)', fontSize: 9 }}>AI</div>
+                  )}
+                  <div className="max-w-xs text-xs px-3 py-2 rounded-2xl" style={{
+                    background: c.role === 'user' ? 'rgba(99,86,212,0.2)' : '#161428',
+                    color: '#9896C4', whiteSpace: 'pre-wrap',
+                    borderRadius: c.role === 'user' ? '16px 4px 16px 16px' : '4px 16px 16px 16px',
+                  }}>
+                    {c.content}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
