@@ -23,6 +23,7 @@ export default function CardPage() {
   const [customerName, setCustomerName] = useState('')
   const [showNameInput, setShowNameInput] = useState(false)
   const [existingSession, setExistingSession] = useState<{ id: string; status: string } | null>(null)
+  const [proceeding, setProceeding] = useState(false)
   const supabase = createClient()
 
   useEffect(() => { loadCard() }, [cardId])
@@ -55,7 +56,8 @@ export default function CardPage() {
   }
 
   const proceedToChat = async () => {
-    if (!card?.persona_id) return
+    if (!card?.persona_id || proceeding) return
+    setProceeding(true)
     const res = await fetch('/api/session', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ personaId: card.persona_id, cardId: card.id, customerName: customerName || null }),
@@ -64,6 +66,8 @@ export default function CardPage() {
     if (session) {
       localStorage.setItem(SESSION_KEY(cardId), session.id)
       router.push(`/chat/${session.id}`)
+    } else {
+      setProceeding(false)
     }
   }
 
@@ -310,7 +314,8 @@ export default function CardPage() {
                 boxShadow: '0 8px 30px rgba(123,110,245,0.45)',
                 border: 'none',
                 cursor: 'pointer',
-              }}
+                touchAction: 'manipulation',
+              } as React.CSSProperties}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -367,16 +372,20 @@ export default function CardPage() {
               onBlur={e => { e.target.style.borderColor = 'rgba(139,92,246,0.2)'; e.target.style.boxShadow = 'none' }}
             />
             <button
+              onTouchEnd={(e) => { e.preventDefault(); proceedToChat() }}
               onClick={proceedToChat}
+              disabled={proceeding}
               className="w-full py-3 font-bold text-white rounded-2xl"
               style={{
                 background: 'linear-gradient(135deg, #7B6EF5, #9B8BF5)',
                 boxShadow: '0 4px 20px rgba(123,110,245,0.4)',
                 border: 'none',
-                cursor: 'pointer',
-              }}
+                cursor: proceeding ? 'not-allowed' : 'pointer',
+                opacity: proceeding ? 0.7 : 1,
+                touchAction: 'manipulation',
+              } as React.CSSProperties}
             >
-              話しかける →
+              {proceeding ? '接続中...' : '話しかける →'}
             </button>
             <button
               onClick={() => setShowNameInput(false)}
