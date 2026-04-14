@@ -343,6 +343,12 @@ export default function SetupPage() {
             type="text"
             value={input}
             onChange={e => setInput(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                sendMessage()
+              }
+            }}
             disabled={loading}
             placeholder="メッセージを入力..."
             className="flex-1 bg-transparent outline-none px-3 text-sm"

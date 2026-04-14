@@ -337,6 +337,32 @@ export default function OwnerChatPage() {
                 )
               })}
             </div>
+            {/* BANT分析 */}
+            {(() => {
+              try {
+                const raw = summary.raw_summary ? JSON.parse(summary.raw_summary.match(/\{[\s\S]*\}/)?.[0] || '{}') : {}
+                const bant = raw.bant
+                if (!bant) return null
+                return (
+                  <div className="mt-3 rounded-xl p-3" style={{ background: '#161428', border: '1px solid rgba(139,92,246,0.1)' }}>
+                    <p className="text-xs font-bold mb-2" style={{ color: '#7B6EF5' }}>BANT分析</p>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {[
+                        { label: '予算', value: bant.budget },
+                        { label: '決裁権', value: bant.authority },
+                        { label: 'ニーズ', value: bant.need },
+                        { label: '時期', value: bant.timeline },
+                      ].map(({ label, value }) => value && (
+                        <div key={label}>
+                          <span className="text-xs font-bold" style={{ color: '#5A587E' }}>{label}：</span>
+                          <span className="text-xs" style={{ color: '#9896C4' }}>{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              } catch { return null }
+            })()}
             <button
               onClick={() => router.push(`/summary/${sessionId}`)}
               className="text-xs font-medium mt-2.5 transition"

@@ -171,6 +171,52 @@ export default function SummaryPage() {
                 </div>
               )
             })}
+            {/* BANT分析 */}
+            {(() => {
+              try {
+                const raw = summary.raw_summary ? JSON.parse(summary.raw_summary.match(/\{[\s\S]*\}/)?.[0] || '{}') : {}
+                const bant = raw.bant
+                if (!bant) return null
+                return (
+                  <div
+                    className="p-4 rounded-xl"
+                    style={{
+                      background: '#0F0E20',
+                      border: '1px solid rgba(139,92,246,0.1)',
+                      borderLeft: '3px solid #F59E0B',
+                      borderLeftColor: '#F59E0B',
+                    }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                        style={{ background: '#F59E0B18', color: '#F59E0B' }}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+                        </svg>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold mb-2" style={{ color: '#F59E0B' }}>BANT分析</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { label: '予算 (Budget)', value: bant.budget },
+                            { label: '決裁権 (Authority)', value: bant.authority },
+                            { label: 'ニーズ (Need)', value: bant.need },
+                            { label: '時期 (Timeline)', value: bant.timeline },
+                          ].map(({ label, value }) => value && (
+                            <div key={label}>
+                              <p className="text-xs font-bold mb-0.5" style={{ color: '#5A587E' }}>{label}</p>
+                              <p className="text-sm" style={{ color: '#9896C4' }}>{value}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              } catch { return null }
+            })()}
           </div>
         ) : (
           <div
