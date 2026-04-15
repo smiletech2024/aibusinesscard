@@ -23,7 +23,10 @@
       "Bash(gh run:*)",
       "Bash(git commit:*)",
       "Bash(mkdir -p /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/api/persona/\\\\[personaId\\\\])",
-      "Bash(mkdir -p /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/edit-persona/\\\\[cardId\\\\])"
+      "Bash(mkdir -p /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/edit-persona/\\\\[cardId\\\\])",
+      "Bash(vercel --version)",
+      "Bash(vercel ls:*)",
+      "Bash(npx vercel:*)"
     ]
   }
 }

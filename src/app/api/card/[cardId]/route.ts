@@ -4,8 +4,9 @@ import { createClient as createServiceClient } from '@supabase/supabase-js'
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { cardId: string } }
+  { params }: { params: Promise<{ cardId: string }> }
 ) {
+  const { cardId } = await params
   try {
     const authClient = await createClient()
     const { data: { user } } = await authClient.auth.getUser()
@@ -20,7 +21,7 @@ export async function PATCH(
     const { data: card } = await admin
       .from('business_cards')
       .select('user_id')
-      .eq('id', params.cardId)
+      .eq('id', cardId)
       .single()
 
     if (!card || card.user_id !== user.id) {
@@ -41,7 +42,7 @@ export async function PATCH(
         website: website || null,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.cardId)
+      .eq('id', cardId)
       .select()
       .single()
 

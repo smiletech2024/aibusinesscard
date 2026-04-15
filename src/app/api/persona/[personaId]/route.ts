@@ -4,8 +4,9 @@ import { createClient as createServiceClient } from '@supabase/supabase-js'
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { personaId: string } }
+  { params }: { params: Promise<{ personaId: string }> }
 ) {
+  const { personaId } = await params
   try {
     const authClient = await createClient()
     const { data: { user } } = await authClient.auth.getUser()
@@ -20,7 +21,7 @@ export async function PATCH(
     const { data: persona } = await admin
       .from('personas')
       .select('user_id, values_summary, achievements_json')
-      .eq('id', params.personaId)
+      .eq('id', personaId)
       .single()
 
     if (!persona || persona.user_id !== user.id) {
@@ -61,7 +62,7 @@ export async function PATCH(
         achievements_json: newAchievements,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.personaId)
+      .eq('id', personaId)
 
     if (error) return NextResponse.json({ error: 'Update failed' }, { status: 500 })
 
