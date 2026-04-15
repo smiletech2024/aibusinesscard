@@ -599,6 +599,72 @@ export default function DashboardPage() {
           )}
         </div>
 
+        {/* AIを育てる 機能アピールバナー */}
+        {cards.length > 0 && (
+          <div
+            className="rounded-2xl p-5"
+            style={{
+              background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.12) 100%)',
+              border: '1.5px solid rgba(99,102,241,0.2)',
+            }}
+          >
+            <div className="flex items-start gap-4">
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', boxShadow: '0 4px 12px rgba(99,102,241,0.35)' }}
+              >
+                <span style={{ fontSize: 22 }}>🧠</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-black text-sm" style={{ color: '#1E1B4B' }}>AIをあなた本人に近づける</h3>
+                  <span
+                    className="text-xs font-bold px-2 py-0.5 rounded-full"
+                    style={{ background: 'rgba(99,102,241,0.12)', color: '#6366F1' }}
+                  >New</span>
+                </div>
+                <p className="text-xs leading-relaxed mb-3" style={{ color: '#6B7280' }}>
+                  AIが受けた質問に<strong style={{ color: '#1E1B4B' }}>本人の正解を登録</strong>すると、次から同じ質問にあなたらしく答えられます。<br />
+                  お客様との会話履歴を見ながら「惜しい回答」を本人の言葉に直しましょう。
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {cards.map(card => (
+                    <Link
+                      key={card.id}
+                      href={`/edit-persona/${card.id}`}
+                      className="text-xs font-bold px-4 py-2 rounded-xl transition"
+                      style={{
+                        background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+                        color: 'white',
+                        boxShadow: '0 2px 8px rgba(99,102,241,0.3)',
+                      }}
+                    >
+                      {card.full_name}のAIを育てる →
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(99,102,241,0.15)' }}>
+              <p className="text-xs font-bold mb-2" style={{ color: '#9896B8' }}>AIを育てる3つの方法</p>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { icon: '📚', title: 'スキル登録', desc: '専門領域・ツールを登録' },
+                  { icon: '💼', title: '案件事例', desc: '課題・結果を構造化して学習' },
+                  { icon: '✏️', title: '回答修正', desc: '会話履歴から直接フィードバック' },
+                ].map(({ icon, title, desc }) => (
+                  <div key={title} className="rounded-xl p-2.5 text-center"
+                    style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(99,102,241,0.1)' }}>
+                    <div style={{ fontSize: 18, marginBottom: 4 }}>{icon}</div>
+                    <p className="text-xs font-bold" style={{ color: '#1E1B4B' }}>{title}</p>
+                    <p className="text-xs mt-0.5" style={{ color: '#9896B8' }}>{desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* セッション一覧 */}
         {sessions.length > 0 && (
           <div>

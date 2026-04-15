@@ -28,6 +28,7 @@ export default function OwnerChatPage() {
   const [sentOnce, setSentOnce] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [learnModal, setLearnModal] = useState<{ question: string; aiAnswer: string } | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
@@ -169,6 +170,16 @@ export default function OwnerChatPage() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#09081A' }}>
+      {/* 学習モーダル */}
+      {learnModal && (
+        <LearnModal
+          question={learnModal.question}
+          aiAnswer={learnModal.aiAnswer}
+          personaId={session?.persona_id || ''}
+          onClose={() => setLearnModal(null)}
+        />
+      )}
+
       {/* 削除確認モーダル */}
       {showDeleteConfirm && (
         <div
@@ -417,18 +428,48 @@ export default function OwnerChatPage() {
           </button>
           {showAiHistory && (
             <div className="px-4 pb-4 space-y-2 max-w-2xl mx-auto">
+              <div className="rounded-xl px-3 py-2 mb-2 flex items-center gap-2"
+                style={{ background: 'rgba(123,110,245,0.08)', border: '1px solid rgba(123,110,245,0.15)' }}>
+                <span style={{ fontSize: 14 }}>💡</span>
+                <p className="text-xs" style={{ color: '#9896C4' }}>
+                  AIの回答が惜しい場合は <span style={{ color: '#9B8BF5', fontWeight: 700 }}>「学習させる」</span> で本人の正解を登録できます
+                </p>
+              </div>
               {aiConvs.map((c, i) => (
                 <div key={i} className={`flex gap-2 ${c.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   {c.role === 'assistant' && (
                     <div className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black text-white flex-shrink-0"
                       style={{ background: 'linear-gradient(135deg, #6356D4, #7B6EF5)', fontSize: 9 }}>AI</div>
                   )}
-                  <div className="max-w-xs text-xs px-3 py-2 rounded-2xl" style={{
-                    background: c.role === 'user' ? 'rgba(99,86,212,0.2)' : '#161428',
-                    color: '#9896C4', whiteSpace: 'pre-wrap',
-                    borderRadius: c.role === 'user' ? '16px 4px 16px 16px' : '4px 16px 16px 16px',
-                  }}>
-                    {c.content}
+                  <div className="flex flex-col gap-1 max-w-xs">
+                    <div className="text-xs px-3 py-2 rounded-2xl" style={{
+                      background: c.role === 'user' ? 'rgba(99,86,212,0.2)' : '#161428',
+                      color: '#9896C4', whiteSpace: 'pre-wrap',
+                      borderRadius: c.role === 'user' ? '16px 4px 16px 16px' : '4px 16px 16px 16px',
+                    }}>
+                      {c.content}
+                    </div>
+                    {c.role === 'assistant' && senderRole === 'owner' && (
+                      <button
+                        onClick={() => {
+                          const prevUserMsg = aiConvs.slice(0, i).filter(m => m.role === 'user').slice(-1)[0]
+                          setLearnModal({
+                            question: prevUserMsg?.content || '',
+                            aiAnswer: c.content,
+                          })
+                        }}
+                        style={{
+                          alignSelf: 'flex-start', fontSize: 10, fontWeight: 700,
+                          padding: '3px 10px', borderRadius: 8,
+                          background: 'rgba(123,110,245,0.1)',
+                          color: '#9B8BF5',
+                          border: '1px solid rgba(123,110,245,0.2)',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        ✏️ 学習させる
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -708,6 +749,95 @@ export default function OwnerChatPage() {
         <p className="text-xs text-center mt-2" style={{ color: '#5A587E' }}>
           {myName}として送信 · {otherName}に届きます
         </p>
+      </div>
+    </div>
+  )
+}
+
+function LearnModal({ question, aiAnswer, personaId, onClose }: {
+  question: string; aiAnswer: string; personaId: string; onClose: () => void
+}) {
+  const [myAnswer, setMyAnswer] = useState(aiAnswer)
+  const [saving, setSaving] = useState(false)
+  const [done, setDone] = useState(false)
+
+  const handleSave = async () => {
+    if (!myAnswer.trim() || saving) return
+    setSaving(true)
+    try {
+      await fetch('/api/learn', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ personaId, question, answer: myAnswer.trim() }),
+      })
+      setDone(true)
+      setTimeout(onClose, 1200)
+    } finally { setSaving(false) }
+  }
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 60,
+        background: 'rgba(0,0,0,0.75)',
+        display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+        padding: '0 0 env(safe-area-inset-bottom)',
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: '#0F0E20', borderRadius: '20px 20px 0 0',
+          padding: '24px 20px 32px', width: '100%', maxWidth: 600,
+          border: '1px solid rgba(139,92,246,0.2)',
+          boxShadow: '0 -16px 60px rgba(0,0,0,0.6)',
+        }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="font-black text-base" style={{ color: '#EDEEFF' }}>AIの回答を修正して学習させる</p>
+            <p className="text-xs mt-0.5" style={{ color: '#5A587E' }}>次から同じ質問には本人の回答で答えます</p>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5A587E', fontSize: 20 }}>×</button>
+        </div>
+
+        {question && (
+          <div className="rounded-xl p-3 mb-3" style={{ background: '#161428', border: '1px solid rgba(139,92,246,0.1)' }}>
+            <p className="text-xs font-bold mb-1" style={{ color: '#5A587E' }}>お客様の質問</p>
+            <p className="text-sm" style={{ color: '#9896C4' }}>{question}</p>
+          </div>
+        )}
+
+        <div className="mb-4">
+          <p className="text-xs font-bold mb-2" style={{ color: '#9B8BF5' }}>本人の正しい回答（編集してください）</p>
+          <textarea
+            value={myAnswer}
+            onChange={e => setMyAnswer(e.target.value)}
+            rows={5}
+            style={{
+              width: '100%', padding: '12px 14px', fontSize: 13, lineHeight: 1.6,
+              background: '#161428', color: '#EDEEFF',
+              border: '1.5px solid rgba(123,110,245,0.3)', borderRadius: 12,
+              outline: 'none', resize: 'none', boxSizing: 'border-box',
+            }}
+            onFocus={e => { e.target.style.borderColor = '#7B6EF5' }}
+            onBlur={e => { e.target.style.borderColor = 'rgba(123,110,245,0.3)' }}
+          />
+        </div>
+
+        <button
+          onClick={handleSave}
+          disabled={saving || done || !myAnswer.trim()}
+          style={{
+            width: '100%', padding: '14px', fontSize: 15, fontWeight: 700,
+            background: done ? '#34D399' : 'linear-gradient(135deg, #6356D4, #7B6EF5)',
+            color: 'white', border: 'none', borderRadius: 12, cursor: 'pointer',
+            boxShadow: '0 4px 16px rgba(123,110,245,0.35)',
+            opacity: saving ? 0.7 : 1,
+          }}
+        >
+          {done ? '✓ 学習させました！' : saving ? '保存中...' : 'この回答を学習させる →'}
+        </button>
       </div>
     </div>
   )
