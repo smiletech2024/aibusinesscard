@@ -169,7 +169,7 @@ export default function DashboardPage() {
   const summaryCount = sessions.filter(s => s.status === 'summarized' || s.status === 'owner_chat').length
 
   return (
-    <div className="min-h-screen" style={{ background: '#FAF5F0' }}>
+    <div style={{ background: '#FAF5F0' }}>
 
       {/* QR拡大モーダル */}
       {qrModal && (
@@ -375,7 +375,7 @@ export default function DashboardPage() {
 
       {/* 通知バナー */}
       {notifications.length > 0 && (
-        <div className="sticky top-14 z-10">
+        <div className="relative z-10">
           {notifications.map(n => (
             <div
               key={n.id}
