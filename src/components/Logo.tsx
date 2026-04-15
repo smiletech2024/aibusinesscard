@@ -6,17 +6,17 @@ interface LogoIconProps {
 }
 
 /**
- * AI名刺 ロゴアイコン — Luxury Edition
+ * AI名刺 ロゴアイコン — Hermès Edition
  *
- * コンセプト: "Precious Intelligence"
- * ─ 深夜の宝石箱を開けた瞬間の輝き
- * ─ ディープネイビー背景 × ゴールドの4点ダイヤモンドスパーク
- * ─ 極限まで細く絞った腕先で「精密さ・希少性」を表現
- * ─ 名刺の2本ラインをゴールドで抽象化
- * ─ 参照: Cartier / Rolex / Linear の精緻さ
+ * コンセプト: "The Living Card"
+ * ─ エルメスオレンジの炎が名刺から立ち上る瞬間
+ * ─ 深い琥珀のような暗背景 × ピュアオレンジのフレーム
+ * ─ 上部に向かって細く伸びるダイヤモンドスパーク（炎 & 知性）
+ * ─ 下部の3点が「デジタル伝達・データ」を表現
+ * ─ 参照: Hermès / Bottega Veneta / Linear の精緻さ
  */
 export function LogoIcon({ size = 36, className = '' }: LogoIconProps) {
-  const uid = `lx-${size}`
+  const uid = `hm-${size}`
 
   return (
     <svg
@@ -29,94 +29,138 @@ export function LogoIcon({ size = 36, className = '' }: LogoIconProps) {
       aria-label="AI名刺"
     >
       <defs>
-        {/* ── 背景: 深夜ネイビー ── */}
+        {/* ── 背景: 深い琥珀ブラック ── */}
         <linearGradient id={`${uid}-bg`} x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-          <stop offset="0%"   stopColor="#1A1830" />
-          <stop offset="100%" stopColor="#0C0B1C" />
+          <stop offset="0%"   stopColor="#1E0900" />
+          <stop offset="100%" stopColor="#080200" />
         </linearGradient>
 
-        {/* ── ゴールド: リアルな金属光沢 ── */}
-        <linearGradient id={`${uid}-gold`} x1="20" y1="7" x2="20" y2="31" gradientUnits="userSpaceOnUse">
-          <stop offset="0%"   stopColor="#F9EDB0" />   {/* 明るいシャンパンゴールド */}
-          <stop offset="35%"  stopColor="#E8C84A" />   {/* 純金 */}
-          <stop offset="65%"  stopColor="#C8960C" />   {/* 深みのあるゴールド */}
-          <stop offset="100%" stopColor="#A07008" />   {/* アンバーゴールド */}
+        {/* ── エルメスオレンジ: 縦方向（メイン光沢）── */}
+        <linearGradient id={`${uid}-flame`} x1="20" y1="4" x2="20" y2="32" gradientUnits="userSpaceOnUse">
+          <stop offset="0%"   stopColor="#FFDFC0" />  {/* 最輝点: クリームホワイト */}
+          <stop offset="20%"  stopColor="#F9A06A" />  {/* 明るいオレンジ */}
+          <stop offset="50%"  stopColor="#F26722" />  {/* エルメスオレンジ */}
+          <stop offset="80%"  stopColor="#C4511A" />  {/* 深みオレンジ */}
+          <stop offset="100%" stopColor="#7A2800" />  {/* アンバーブラウン */}
         </linearGradient>
 
-        {/* ── ゴールド（横方向）: 左右のハイライト用 ── */}
-        <linearGradient id={`${uid}-goldH`} x1="11" y1="19" x2="29" y2="19" gradientUnits="userSpaceOnUse">
-          <stop offset="0%"   stopColor="#C8960C" />
-          <stop offset="50%"  stopColor="#F9EDB0" />
-          <stop offset="100%" stopColor="#C8960C" />
+        {/* ── エルメスオレンジ: 横方向（クロスライト）── */}
+        <linearGradient id={`${uid}-cross`} x1="10" y1="18" x2="30" y2="18" gradientUnits="userSpaceOnUse">
+          <stop offset="0%"   stopColor="#7A2800" />
+          <stop offset="40%"  stopColor="#F26722" />
+          <stop offset="50%"  stopColor="#FFDFC0" />  {/* 最輝点: 中央 */}
+          <stop offset="60%"  stopColor="#F26722" />
+          <stop offset="100%" stopColor="#7A2800" />
         </linearGradient>
 
-        {/* ── 中心ゴールドグロー ── */}
-        <radialGradient id={`${uid}-glow`} cx="50%" cy="48%" r="40%">
-          <stop offset="0%"   stopColor="rgba(248,210,80,0.22)" />
-          <stop offset="100%" stopColor="rgba(248,210,80,0)"    />
+        {/* ── ドット用: オレンジグロー ── */}
+        <linearGradient id={`${uid}-dots`} x1="10" y1="35" x2="28" y2="35" gradientUnits="userSpaceOnUse">
+          <stop offset="0%"   stopColor="#C4511A" />
+          <stop offset="50%"  stopColor="#F26722" />
+          <stop offset="100%" stopColor="#C4511A" />
+        </linearGradient>
+
+        {/* ── 中心グロー: オレンジ放射 ── */}
+        <radialGradient id={`${uid}-glow`} cx="50%" cy="45%" r="42%">
+          <stop offset="0%"   stopColor="rgba(242,103,34,0.40)" />
+          <stop offset="60%"  stopColor="rgba(242,103,34,0.10)" />
+          <stop offset="100%" stopColor="rgba(242,103,34,0)"    />
         </radialGradient>
 
-        {/* ── 上部内側ハイライト ── */}
-        <radialGradient id={`${uid}-hi`} cx="50%" cy="0%" r="65%">
-          <stop offset="0%"   stopColor="rgba(255,255,255,0.10)" />
+        {/* ── 上部ハイライト: 奥行き感 ── */}
+        <radialGradient id={`${uid}-hi`} cx="40%" cy="0%" r="70%">
+          <stop offset="0%"   stopColor="rgba(255,255,255,0.07)" />
           <stop offset="100%" stopColor="rgba(255,255,255,0)"    />
         </radialGradient>
 
-        {/* ── スパーク用ぼかし（後光） ── */}
-        <filter id={`${uid}-blur`} x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur stdDeviation="2.8" result="b" />
+        {/* ── スパーク後光: ソフトブラー ── */}
+        <filter id={`${uid}-blur`} x="-70%" y="-70%" width="240%" height="240%">
+          <feGaussianBlur stdDeviation="2.4" result="b" />
           <feComposite in="SourceGraphic" in2="b" operator="over" />
         </filter>
-        <filter id={`${uid}-halo`} x="-80%" y="-80%" width="260%" height="260%">
-          <feGaussianBlur stdDeviation="4" />
+
+        {/* ── ハロー: 深いグロー ── */}
+        <filter id={`${uid}-halo`} x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="4.5" />
+        </filter>
+
+        {/* ── ドットグロー ── */}
+        <filter id={`${uid}-dotglow`} x="-200%" y="-200%" width="500%" height="500%">
+          <feGaussianBlur stdDeviation="1.2" />
         </filter>
       </defs>
 
       {/* ── 背景 ── */}
       <rect width="40" height="40" rx="10" fill={`url(#${uid}-bg)`} />
 
-      {/* ── 上部ハイライト（奥行き感） ── */}
+      {/* ── 上部奥行きハイライト ── */}
       <rect width="40" height="40" rx="10" fill={`url(#${uid}-hi)`} />
 
-      {/* ── ゴールドハロー（スパーク後光）── */}
-      <ellipse cx="20" cy="19" rx="8" ry="8" fill="rgba(240,180,40,0.18)" filter={`url(#${uid}-halo)`} />
-
-      {/* ── ゴールドグロー ── */}
+      {/* ── 中心オレンジグロー ── */}
       <rect width="40" height="40" rx="10" fill={`url(#${uid}-glow)`} />
 
       {/*
-        ── 4点ダイヤモンドスパーク（メインマーク）──
-        Quadratic Bézier による極細腕先
-        中心 (20, 19)
-        上点 (20, 7)  下点 (20, 31)
-        右点 (29, 19) 左点 (11, 19)
-        制御点を中心近くに絞ることで razor-sharp な腕先を実現
+        ── メインマーク: Hermès Flame ──
+        非対称ダイヤモンド: 上向きに長く伸ばし「炎」の気配
+        中心 (20, 18)
+        上点 (20, 4)   ← 長め、炎のように
+        下点 (20, 32)  ← やや短め
+        右点 (28, 18)
+        左点 (12, 18)
+        コントロールポイントをタイトに絞り razor-sharp な印象に
       */}
-      {/* ハロー（ぼかし版：後光効果） */}
-      <path
-        d="M20,7 Q21.6,17 29,19 Q21.6,21 20,31 Q18.4,21 11,19 Q18.4,17 20,7 Z"
-        fill={`url(#${uid}-gold)`}
-        filter={`url(#${uid}-blur)`}
-        opacity="0.5"
+
+      {/* ハロー（後光） */}
+      <ellipse
+        cx="20" cy="17" rx="8.5" ry="10"
+        fill="rgba(242,103,34,0.22)"
+        filter={`url(#${uid}-halo)`}
       />
+
+      {/* ブラー版（グロー） */}
+      <path
+        d="M20,4 Q21.4,14.5 28,18 Q21.4,21.5 20,32 Q18.6,21.5 12,18 Q18.6,14.5 20,4 Z"
+        fill={`url(#${uid}-flame)`}
+        filter={`url(#${uid}-blur)`}
+        opacity="0.45"
+      />
+
       {/* 本体 */}
       <path
-        d="M20,7 Q21.6,17 29,19 Q21.6,21 20,31 Q18.4,21 11,19 Q18.4,17 20,7 Z"
-        fill={`url(#${uid}-gold)`}
+        d="M20,4 Q21.4,14.5 28,18 Q21.4,21.5 20,32 Q18.6,21.5 12,18 Q18.6,14.5 20,4 Z"
+        fill={`url(#${uid}-flame)`}
       />
-      {/* 横方向ゴールドオーバーレイ（十字の光沢） */}
+
+      {/* クロスライトオーバーレイ */}
       <path
-        d="M20,7 Q21.6,17 29,19 Q21.6,21 20,31 Q18.4,21 11,19 Q18.4,17 20,7 Z"
-        fill={`url(#${uid}-goldH)`}
-        opacity="0.35"
+        d="M20,4 Q21.4,14.5 28,18 Q21.4,21.5 20,32 Q18.6,21.5 12,18 Q18.6,14.5 20,4 Z"
+        fill={`url(#${uid}-cross)`}
+        opacity="0.28"
       />
 
-      {/* ── 中心の輝点 ── */}
-      <circle cx="20" cy="19" r="1.4" fill="rgba(255,248,220,0.9)" />
+      {/* ── 最輝点: 頂部ハイライト ── */}
+      <circle cx="20" cy="9.5" r="1.8"
+        fill="rgba(255,235,210,0.55)"
+        filter={`url(#${uid}-blur)`}
+      />
 
-      {/* ── 名刺ライン（ゴールド）── */}
-      <rect x="7" y="34" width="15" height="1.4" rx="0.7" fill={`url(#${uid}-goldH)`} opacity="0.65" />
-      <rect x="7" y="36.5" width="9.5" height="1.2" rx="0.6" fill={`url(#${uid}-goldH)`} opacity="0.38" />
+      {/* ── 中心輝点 ── */}
+      <circle cx="20" cy="18" r="1.1" fill="rgba(255,228,200,0.88)" />
+
+      {/*
+        ── デジタル伝達ドット ──
+        3点の円: 「…」→ AIが話し続けることを象徴
+        名刺の下部にデータが流れるイメージ
+      */}
+      {/* ドットグロー（後光） */}
+      <circle cx="13" cy="35.5" r="1.8" fill="rgba(242,103,34,0.5)" filter={`url(#${uid}-dotglow)`} />
+      <circle cx="20" cy="35.5" r="1.8" fill="rgba(242,103,34,0.5)" filter={`url(#${uid}-dotglow)`} />
+      <circle cx="27" cy="35.5" r="1.8" fill="rgba(242,103,34,0.5)" filter={`url(#${uid}-dotglow)`} />
+
+      {/* ドット本体 */}
+      <circle cx="13" cy="35.5" r="1.1" fill={`url(#${uid}-dots)`} />
+      <circle cx="20" cy="35.5" r="1.1" fill={`url(#${uid}-dots)`} />
+      <circle cx="27" cy="35.5" r="1.1" fill={`url(#${uid}-dots)`} />
     </svg>
   )
 }
@@ -171,7 +215,7 @@ export function LogoBrand({ className = '' }: { className?: string }) {
           style={{
             fontSize: 30,
             fontWeight: 900,
-            background: 'linear-gradient(135deg, #C4511A, #D4691E)',
+            background: 'linear-gradient(135deg, #F26722, #F59340)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             letterSpacing: '-0.04em',
