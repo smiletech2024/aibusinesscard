@@ -366,11 +366,23 @@ export default function SetupPage() {
     const updateFaq = (id: string, field: 'question' | 'answer', val: string) =>
       setDraft(d => d ? { ...d, faqs: d.faqs.map(f => f.id === id ? { ...f, [field]: val } : f) } : d)
 
+    const stopTouch = (e: React.TouchEvent | React.MouseEvent) => e.stopPropagation()
+
     const editAreaStyle: React.CSSProperties = {
-      width: '100%', padding: '8px 10px', fontSize: 13, lineHeight: 1.6,
-      border: '1.5px solid #C7D2FE', borderRadius: 8,
-      background: '#F8F7FF', color: '#1E1B4B', outline: 'none',
-      resize: 'none', boxSizing: 'border-box', marginTop: 6,
+      width: '100%', padding: '10px 12px', fontSize: 14, lineHeight: 1.7,
+      border: '2px solid #818CF8', borderRadius: 10,
+      background: 'white', color: '#1E1B4B', outline: 'none',
+      resize: 'vertical', boxSizing: 'border-box', marginTop: 8,
+      boxShadow: '0 0 0 3px rgba(99,102,241,0.1)',
+      touchAction: 'manipulation',
+    }
+    const editInputStyle: React.CSSProperties = {
+      width: '100%', padding: '9px 12px', fontSize: 14, fontWeight: 600,
+      border: '2px solid #818CF8', borderRadius: 10,
+      background: 'white', color: '#1E1B4B', outline: 'none',
+      boxSizing: 'border-box', marginBottom: 6,
+      boxShadow: '0 0 0 3px rgba(99,102,241,0.1)',
+      touchAction: 'manipulation',
     }
 
     return (
@@ -409,17 +421,18 @@ export default function SetupPage() {
                       <p className="font-bold text-sm" style={{ color: sel ? '#4338CA' : '#1E1B4B' }}>{tone.label}</p>
                     </div>
                     {sel ? (
-                      <textarea
-                        value={tone.profile}
-                        onChange={e => updateTone(tone.id, e.target.value)}
-                        rows={3}
-                        style={editAreaStyle}
-                        onClick={e => e.stopPropagation()}
-                      />
+                      <div onClick={stopTouch} onTouchStart={stopTouch} onTouchEnd={stopTouch}>
+                        <p className="text-xs font-bold mb-1 mt-2" style={{ color: '#818CF8' }}>✏️ 内容を編集できます</p>
+                        <textarea
+                          value={tone.profile}
+                          onChange={e => updateTone(tone.id, e.target.value)}
+                          rows={3}
+                          style={editAreaStyle}
+                        />
+                      </div>
                     ) : (
                       <p className="text-xs mt-1.5 leading-relaxed ml-8" style={{ color: '#9896B8' }}>{tone.profile}</p>
                     )}
-                    {sel && <p className="text-xs mt-1 ml-1" style={{ color: '#A5B4FC' }}>✏️ 直接編集できます</p>}
                   </div>
                 )
               })}
@@ -444,23 +457,24 @@ export default function SetupPage() {
                     }}>
                     <div className="flex items-start gap-3 cursor-pointer" onClick={() => setSelValueId(val.id)}>
                       <div style={{
-                        width: 20, height: 20, borderRadius: '50%', flexShrink: 0, marginTop: 2,
+                        width: 20, height: 20, borderRadius: '50%', flexShrink: 0, marginTop: 4,
                         border: sel ? '6px solid #6366F1' : '2px solid #D1D0E8',
                         background: 'white', transition: 'all 0.15s',
                       }} />
                       {sel ? (
-                        <textarea
-                          value={val.text}
-                          onChange={e => updateValue(val.id, e.target.value)}
-                          rows={4}
-                          style={{ ...editAreaStyle, marginTop: 0, flex: 1 }}
-                          onClick={e => e.stopPropagation()}
-                        />
+                        <div className="flex-1" onClick={stopTouch} onTouchStart={stopTouch} onTouchEnd={stopTouch}>
+                          <p className="text-xs font-bold mb-1" style={{ color: '#818CF8' }}>✏️ 内容を編集できます</p>
+                          <textarea
+                            value={val.text}
+                            onChange={e => updateValue(val.id, e.target.value)}
+                            rows={4}
+                            style={{ ...editAreaStyle, marginTop: 0 }}
+                          />
+                        </div>
                       ) : (
                         <p className="text-sm leading-relaxed" style={{ color: '#6B7280' }}>{val.text}</p>
                       )}
                     </div>
-                    {sel && <p className="text-xs mt-1 ml-8" style={{ color: '#A5B4FC' }}>✏️ 直接編集できます</p>}
                   </div>
                 )
               })}
@@ -498,16 +512,12 @@ export default function SetupPage() {
                       </button>
                       <div className="flex-1 min-w-0">
                         {on ? (
-                          <>
+                          <div onClick={stopTouch} onTouchStart={stopTouch} onTouchEnd={stopTouch} style={{ flex: 1 }}>
+                            <p className="text-xs font-bold mb-1.5" style={{ color: '#818CF8' }}>✏️ 質問・回答を編集できます</p>
                             <input
                               value={faq.question}
                               onChange={e => updateFaq(faq.id, 'question', e.target.value)}
-                              style={{
-                                width: '100%', padding: '6px 10px', fontSize: 13, fontWeight: 600,
-                                border: '1.5px solid #C7D2FE', borderRadius: 7,
-                                background: '#F8F7FF', color: '#1E1B4B', outline: 'none',
-                                boxSizing: 'border-box', marginBottom: 6,
-                              }}
+                              style={editInputStyle}
                             />
                             <textarea
                               value={faq.answer}
@@ -515,7 +525,7 @@ export default function SetupPage() {
                               rows={3}
                               style={editAreaStyle}
                             />
-                          </>
+                          </div>
                         ) : (
                           <p className="text-sm font-semibold" style={{ color: '#9896B8' }}>{faq.question}</p>
                         )}
