@@ -935,32 +935,37 @@ export default function PrintCardPage() {
       </div>
 
       {/* ─── 印刷用（実寸） ─── */}
+      {/* 二重ラップ不要: コンポーネント自身が print-card クラスを持つ */}
       <div className="print-only" style={{ display: 'none' }}>
-        <div className="print-card">
-          <FrontComponent card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} />
-        </div>
-        <div className="print-card">
-          <BackComponent card={card} fontFamily={currentFontFamily} />
-        </div>
+        <FrontComponent card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} />
+        <BackComponent card={card} fontFamily={currentFontFamily} />
       </div>
 
       {/* ─── 印刷CSS ─── */}
       <style dangerouslySetInnerHTML={{ __html: `
         @media print {
+          /* 名刺サイズ 91×55mm で印刷 */
           @page { size: 91mm 55mm; margin: 0; }
-          body { margin: 0; padding: 0; background: white !important; }
+          html, body { margin: 0; padding: 0; background: white !important; }
           .no-print { display: none !important; }
           .print-only { display: block !important; }
+
+          /*
+           * カードは 560×338px で設計。CSS印刷の 1px = 0.2645mm なので
+           * 560px = 148.1mm → 91mm に収めるには scale(0.6141)
+           * transform は box を変えないため margin-bottom で補正
+           */
           .print-card {
-            width: 91mm !important;
-            height: 55mm !important;
-            page-break-after: always;
-            overflow: hidden;
-          }
-          .print-card > div {
-            transform: none !important;
-            width: 91mm !important;
-            height: 55mm !important;
+            width: 560px !important;
+            height: 338px !important;
+            overflow: hidden !important;
+            page-break-after: always !important;
+            break-after: page !important;
+            transform: scale(0.6141) !important;
+            transform-origin: top left !important;
+            margin-bottom: -131px !important;
+            margin-right: 0 !important;
+            display: block !important;
           }
         }
         @media screen {
