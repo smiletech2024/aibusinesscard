@@ -27,16 +27,19 @@ export async function PATCH(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { skills, projects } = await req.json()
-    // skills: string[]
-    // projects: Array<{ title: string; challenge: string; approach: string; result: string; tech: string }>
+    const { skills, projects, rawVoice } = await req.json()
 
-    // values_summary にスキルセクションを追加（既存テキストを保持）
-    const baseValues = (persona.values_summary || '').replace(/\n\n【スキルセット・専門領域】[\s\S]*$/, '')
+    // values_summary の各セクションを構築（順序：ベース → スキル → 生の声）
+    const stripped = (persona.values_summary || '')
+      .replace(/\n\n【スキルセット・専門領域】[\s\S]*$/, '')
+      .replace(/\n\n【本人の生の声・文体サンプル】[\s\S]*$/, '')
     const skillsSection = skills?.length > 0
       ? `\n\n【スキルセット・専門領域】\n${skills.map((s: string) => `・${s}`).join('\n')}`
       : ''
-    const newValues = baseValues + skillsSection
+    const rawVoiceSection = rawVoice?.trim()
+      ? `\n\n【本人の生の声・文体サンプル】\n${rawVoice.trim()}`
+      : ''
+    const newValues = stripped + skillsSection + rawVoiceSection
 
     // achievements_json に案件データを格納
     const newAchievements = (projects || []).map((p: {

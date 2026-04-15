@@ -25,6 +25,7 @@ export default function EditPersonaPage() {
   const supabase = createClient()
 
   const [personaId, setPersonaId] = useState('')
+  const [rawVoice, setRawVoice] = useState('')
   const [skills, setSkills] = useState<string[]>([])
   const [kwInput, setKwInput] = useState('')
   const [projects, setProjects] = useState<Project[]>([newProject()])
@@ -48,14 +49,17 @@ export default function EditPersonaPage() {
 
       setPersonaId(card.persona_id)
 
-      // 既存スキルの読み込み
       const persona = card.personas as { values_summary?: string; achievements_json?: Array<{ title: string; description: string }> }
       if (persona?.values_summary) {
-        const match = persona.values_summary.match(/【スキルセット・専門領域】\n([\s\S]*?)(?:\n\n|$)/)
-        if (match) {
-          const existing = match[1].split('\n').map(s => s.replace(/^・/, '').trim()).filter(Boolean)
+        // スキル読み込み
+        const skillMatch = persona.values_summary.match(/【スキルセット・専門領域】\n([\s\S]*?)(?:\n\n|$)/)
+        if (skillMatch) {
+          const existing = skillMatch[1].split('\n').map(s => s.replace(/^・/, '').trim()).filter(Boolean)
           setSkills(existing)
         }
+        // 生の声読み込み
+        const rawMatch = persona.values_summary.match(/【本人の生の声・文体サンプル】\n([\s\S]*)$/)
+        if (rawMatch) setRawVoice(rawMatch[1].trim())
       }
 
       // 既存案件の読み込み
@@ -109,6 +113,7 @@ export default function EditPersonaPage() {
         body: JSON.stringify({
           skills,
           projects: projects.filter(p => p.title.trim()),
+          rawVoice,
         }),
       })
       if (res.ok) {
@@ -156,6 +161,42 @@ export default function EditPersonaPage() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+
+        {/* 生の声 ← 最も重要なセクション */}
+        <div className="rounded-2xl p-5"
+          style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.06), rgba(139,92,246,0.1))', border: '1.5px solid rgba(99,102,241,0.25)' }}>
+          <div className="flex items-start gap-3 mb-3">
+            <span style={{ fontSize: 24, flexShrink: 0 }}>🎤</span>
+            <div>
+              <h2 className="font-black text-sm" style={{ color: '#1E1B4B' }}>
+                あなたの生の言葉を貼り付ける
+                <span className="ml-2 text-xs font-bold px-2 py-0.5 rounded-full"
+                  style={{ background: 'rgba(99,102,241,0.12)', color: '#6366F1' }}>最も効果大</span>
+              </h2>
+              <p className="text-xs mt-1 leading-relaxed" style={{ color: '#6B7280' }}>
+                SNS投稿・メール・ブログ・仕事への想いなど、<strong style={{ color: '#1E1B4B' }}>あなたが実際に書いた文章</strong>をそのまま貼り付けてください。<br />
+                整えなくていいです。文体・語彙・熱量をAIが直接学習します。
+              </p>
+            </div>
+          </div>
+          <textarea
+            value={rawVoice}
+            onChange={e => setRawVoice(e.target.value)}
+            rows={8}
+            placeholder={`例：\n「正直、数字だけ追いかける仕事が好きじゃなくて。お客さんが「あ、なんか変わった気がする」って言ってくれた瞬間が一番うれしいんですよね。\n\n成果を出すことは当たり前だけど、それよりその人の事業が面白くなるかどうかを一番気にしてます。小手先の施策じゃなくて、なぜこれをやるのか、の部分から一緒に考えたい。」\n\n→ あなたが実際に書いた・話した文章をそのままどうぞ`}
+            style={{
+              width: '100%', padding: '14px', fontSize: 13, lineHeight: 1.7,
+              border: '1.5px solid rgba(99,102,241,0.2)', borderRadius: 12,
+              background: 'white', color: '#1E1B4B', outline: 'none',
+              resize: 'vertical', boxSizing: 'border-box',
+            }}
+            onFocus={e => { e.target.style.borderColor = '#6366F1'; e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.1)' }}
+            onBlur={e => { e.target.style.borderColor = 'rgba(99,102,241,0.2)'; e.target.style.boxShadow = 'none' }}
+          />
+          {rawVoice.length > 0 && (
+            <p className="text-xs mt-2" style={{ color: '#9896B8' }}>{rawVoice.length}文字 · 多いほど精度が上がります</p>
+          )}
+        </div>
 
         {/* スキルセット */}
         <div className="card p-5">
