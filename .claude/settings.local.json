@@ -26,7 +26,8 @@
       "Bash(mkdir -p /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/edit-persona/\\\\[cardId\\\\])",
       "Bash(vercel --version)",
       "Bash(vercel ls:*)",
-      "Bash(npx vercel:*)"
+      "Bash(npx vercel:*)",
+      "WebSearch"
     ]
   }
 }

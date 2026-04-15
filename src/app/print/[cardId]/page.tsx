@@ -11,11 +11,18 @@ import QRCode from 'qrcode'
 import { LogoIcon } from '@/components/Logo'
 
 type Design = 'executive' | 'midnight' | 'vivid'
+type Font   = 'sans' | 'serif' | 'rounded'
 
 const designMeta: Record<Design, { label: string; desc: string; preview: string }> = {
   executive: { label: 'エグゼクティブ', desc: '上質な白 × インディゴ', preview: '#FFFFFF' },
   midnight:  { label: 'ミッドナイト',   desc: '漆黒 × バイオレット',   preview: '#0D0C2A' },
   vivid:     { label: 'ビビッド',       desc: 'フルグラデーション',     preview: '#F26722' },
+}
+
+const fontMeta: Record<Font, { label: string; desc: string; family: string }> = {
+  sans:    { label: 'ゴシック',  desc: '現代的・読みやすい',  family: "'Helvetica Neue', 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif" },
+  serif:   { label: '明朝体',    desc: '格調・クラシック',    family: "'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif" },
+  rounded: { label: '丸ゴシック', desc: '親しみやすい・柔らか', family: "'Hiragino Maru Gothic ProN', 'M PLUS Rounded 1c', 'Rounded Mplus 1c', system-ui, sans-serif" },
 }
 
 /* ─── SVGアイコン ─── */
@@ -94,9 +101,9 @@ function BackBrandLogo() {
 /* ══════════════════════════════════════════
    EXECUTIVE — 白 × インディゴ
 ══════════════════════════════════════════ */
-function ExecutiveFront({ card, qrUrl }: { card: BusinessCard; qrUrl: string }) {
+function ExecutiveFront({ card, qrUrl, fontFamily }: { card: BusinessCard; qrUrl: string; fontFamily?: string }) {
   return (
-    <div className="print-card" style={{ width: W, height: H, background: '#FFFFFF', position: 'relative', overflow: 'hidden', fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>
+    <div className="print-card" style={{ width: W, height: H, background: '#FFFFFF', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
       {/* Left accent bar */}
       <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 8, background: 'linear-gradient(180deg, #C4511A 0%, #F26722 100%)' }} />
 
@@ -170,9 +177,9 @@ function ExecutiveFront({ card, qrUrl }: { card: BusinessCard; qrUrl: string }) 
   )
 }
 
-function ExecutiveBack({ card }: { card: BusinessCard }) {
+function ExecutiveBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: string }) {
   return (
-    <div className="print-card" style={{ width: W, height: H, background: '#1C0F05', position: 'relative', overflow: 'hidden', fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>
+    <div className="print-card" style={{ width: W, height: H, background: '#1C0F05', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
       {/* Grid lines decoration */}
       {[...Array(8)].map((_, i) => (
         <div key={i} style={{ position: 'absolute', left: i * 70, top: 0, bottom: 0, width: 1, background: 'rgba(255,255,255,0.03)' }} />
@@ -218,9 +225,9 @@ function ExecutiveBack({ card }: { card: BusinessCard }) {
 /* ══════════════════════════════════════════
    MIDNIGHT — 漆黒 × バイオレットゴールド
 ══════════════════════════════════════════ */
-function MidnightFront({ card, qrUrl }: { card: BusinessCard; qrUrl: string }) {
+function MidnightFront({ card, qrUrl, fontFamily }: { card: BusinessCard; qrUrl: string; fontFamily?: string }) {
   return (
-    <div className="print-card" style={{ width: W, height: H, background: '#0D0C2A', position: 'relative', overflow: 'hidden', fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>
+    <div className="print-card" style={{ width: W, height: H, background: '#0D0C2A', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
       {/* Radial glow */}
       <div style={{ position: 'absolute', top: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(242,103,34,0.18) 0%, transparent 70%)' }} />
       <div style={{ position: 'absolute', bottom: -60, right: -60, width: 220, height: 220, borderRadius: '50%', background: 'radial-gradient(circle, rgba(242,103,34,0.12) 0%, transparent 70%)' }} />
@@ -295,9 +302,9 @@ function MidnightFront({ card, qrUrl }: { card: BusinessCard; qrUrl: string }) {
   )
 }
 
-function MidnightBack({ card }: { card: BusinessCard }) {
+function MidnightBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: string }) {
   return (
-    <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(135deg, #0D0C2A 0%, #150E3A 50%, #0D0C2A 100%)', position: 'relative', overflow: 'hidden', fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>
+    <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(135deg, #0D0C2A 0%, #150E3A 50%, #0D0C2A 100%)', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
       {/* Glow orbs */}
       <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, height: 300, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(242,103,34,0.15) 0%, transparent 70%)' }} />
 
@@ -333,9 +340,9 @@ function MidnightBack({ card }: { card: BusinessCard }) {
 /* ══════════════════════════════════════════
    VIVID — フルグラデーション
 ══════════════════════════════════════════ */
-function VividFront({ card, qrUrl }: { card: BusinessCard; qrUrl: string }) {
+function VividFront({ card, qrUrl, fontFamily }: { card: BusinessCard; qrUrl: string; fontFamily?: string }) {
   return (
-    <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(135deg, #C4511A 0%, #F26722 40%, #D4691E 70%, #F59340 100%)', position: 'relative', overflow: 'hidden', fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>
+    <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(135deg, #C4511A 0%, #F26722 40%, #D4691E 70%, #F59340 100%)', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
       {/* Geometric decorations */}
       <div style={{ position: 'absolute', top: -70, right: -70, width: 220, height: 220, borderRadius: '50%', background: 'rgba(255,255,255,0.08)' }} />
       <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
@@ -408,9 +415,9 @@ function VividFront({ card, qrUrl }: { card: BusinessCard; qrUrl: string }) {
   )
 }
 
-function VividBack({ card }: { card: BusinessCard }) {
+function VividBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: string }) {
   return (
-    <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(225deg, #C4511A 0%, #F26722 30%, #F59340 70%, #F59340 100%)', position: 'relative', overflow: 'hidden', fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>
+    <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(225deg, #C4511A 0%, #F26722 30%, #F59340 70%, #F59340 100%)', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
       {/* White shape */}
       <div style={{ position: 'absolute', top: 0, right: 0, width: '45%', bottom: 0, background: 'rgba(255,255,255,0.07)', clipPath: 'polygon(30% 0%, 100% 0%, 100% 100%, 0% 100%)' }} />
 
@@ -518,6 +525,9 @@ export default function PrintCardPage() {
   const [cardQrUrl, setCardQrUrl] = useState('')
   const [loading, setLoading] = useState(true)
   const [design, setDesign] = useState<Design>('executive')
+  const [font, setFont] = useState<Font>('sans')
+  const [saving, setSaving] = useState(false)
+  const [savedBanner, setSavedBanner] = useState(false)
   const [dlState, setDlState] = useState<'idle' | 'front' | 'back' | 'both' | 'qr'>('idle')
   const frontRef  = useRef<HTMLDivElement>(null)
   const backRef   = useRef<HTMLDivElement>(null)
@@ -562,8 +572,36 @@ export default function PrintCardPage() {
     if (data) {
       setCard(data)
       setCardQrUrl(`${window.location.origin}/card/${cardId}`)
+      // 保存済みスタイル設定を復元
+      if (data.image_url) {
+        try {
+          const cfg = JSON.parse(data.image_url)
+          if (cfg.theme && cfg.theme in designMeta) setDesign(cfg.theme as Design)
+          if (cfg.font  && cfg.font  in fontMeta)   setFont(cfg.font  as Font)
+        } catch {
+          // image_url が JSON でない場合は無視（旧データ互換）
+        }
+      }
     }
     setLoading(false)
+  }
+
+  const handleSaveStyle = async () => {
+    if (saving) return
+    setSaving(true)
+    try {
+      const res = await fetch(`/api/card/${cardId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ style_config: { theme: design, font } }),
+      })
+      if (res.ok) {
+        setSavedBanner(true)
+        setTimeout(() => setSavedBanner(false), 2500)
+      }
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (loading) {
@@ -582,17 +620,33 @@ export default function PrintCardPage() {
     )
   }
 
-  const FrontComponent = design === 'executive' ? ExecutiveFront : design === 'midnight' ? MidnightFront : VividFront
-  const BackComponent  = design === 'executive' ? ExecutiveBack  : design === 'midnight' ? MidnightBack  : VividBack
+  const FrontComponent = (design === 'executive' ? ExecutiveFront : design === 'midnight' ? MidnightFront : VividFront) as React.ComponentType<{ card: BusinessCard; qrUrl: string; fontFamily?: string }>
+  const BackComponent  = (design === 'executive' ? ExecutiveBack  : design === 'midnight' ? MidnightBack  : VividBack)  as React.ComponentType<{ card: BusinessCard; fontFamily?: string }>
+
+  const currentFontFamily = fontMeta[font].family
 
   return (
     <div className="min-h-screen" style={{ background: "#FAF5F0" }}>
+
+      {/* ─── 保存完了バナー ─── */}
+      {savedBanner && (
+        <div style={{
+          position: 'fixed', top: 70, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 100, background: '#1C0F05', color: 'white',
+          padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 700,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+          display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+          <span style={{ color: '#4ADE80' }}>✓</span> デザインを保存しました
+        </div>
+      )}
+
       {/* ─── コントロールパネル ─── */}
       <div className="no-print border-b sticky top-0 z-10" style={{ background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(20px)', borderColor: '#EDD9C8' }}>
         <div style={{ maxWidth: 900, margin: '0 auto', padding: '10px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
 
-          {/* 行1: 戻るボタン + タイトル + 印刷ボタン */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* 行1: 戻るボタン + タイトル + PDFで保存 + 印刷 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <a href="/dashboard" style={{
               display: 'inline-flex', alignItems: 'center', gap: 4,
               fontSize: 12, fontWeight: 600, padding: '6px 12px', borderRadius: 20,
@@ -605,17 +659,34 @@ export default function PrintCardPage() {
               戻る
             </a>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 13, fontWeight: 900, color: '#1C0F05', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>名刺デザイン印刷</p>
-              <p style={{ fontSize: 11, color: '#A08068', margin: 0 }}>91×55mm · 表面・裏面</p>
+              <p style={{ fontSize: 13, fontWeight: 900, color: '#1C0F05', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>名刺デザイン</p>
+              <p style={{ fontSize: 10, color: '#A08068', margin: 0 }}>91×55mm · 表面・裏面</p>
             </div>
+            {/* PDFで保存ボタン */}
+            <button onClick={() => {
+              alert('印刷ダイアログが開きます。\n「送信先」を「PDFに保存」に変更して保存してください。')
+              window.print()
+            }} style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5,
+              fontSize: 11, fontWeight: 700, padding: '7px 12px', borderRadius: 10,
+              background: '#1C0F05', color: '#F0C040',
+              border: 'none', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+            }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                <line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
+              </svg>
+              PDFで保存
+            </button>
             <button onClick={() => window.print()} style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              fontSize: 12, fontWeight: 700, padding: '8px 14px', borderRadius: 10,
+              display: 'inline-flex', alignItems: 'center', gap: 5,
+              fontSize: 11, fontWeight: 700, padding: '7px 12px', borderRadius: 10,
               background: 'linear-gradient(135deg, #F26722, #F59340)', color: 'white',
               border: 'none', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap',
               boxShadow: '0 2px 8px rgba(242,103,34,0.3)',
             }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
                 <rect x="6" y="14" width="12" height="8"/>
               </svg>
@@ -623,33 +694,68 @@ export default function PrintCardPage() {
             </button>
           </div>
 
-          {/* 行2: デザイン選択 + ダウンロードボタン */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            {/* デザイン選択 */}
-            <div style={{ display: 'flex', gap: 6, flex: 1, minWidth: 0, overflowX: 'auto' }}>
-              {(Object.entries(designMeta) as [Design, typeof designMeta[Design]][]).map(([key, meta]) => (
-                <button key={key} onClick={() => setDesign(key)} style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  padding: '6px 12px', borderRadius: 8, fontSize: 11, fontWeight: 700,
-                  background: design === key ? '#F26722' : 'white',
-                  color: design === key ? 'white' : '#4A2C1A',
-                  border: `1.5px solid ${design === key ? 'transparent' : '#EDD9C8'}`,
-                  cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
-                  boxShadow: design === key ? '0 2px 8px rgba(242,103,34,0.3)' : 'none',
-                }}>
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: meta.preview, border: '1.5px solid rgba(0,0,0,0.12)', flexShrink: 0 }} />
-                  {meta.label}
-                </button>
-              ))}
-            </div>
+          {/* 行2: カラー選択 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflowX: 'auto' }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#A08068', whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>カラー</span>
+            {(Object.entries(designMeta) as [Design, typeof designMeta[Design]][]).map(([key, meta]) => (
+              <button key={key} onClick={() => setDesign(key)} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                padding: '5px 11px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+                background: design === key ? '#F26722' : 'white',
+                color: design === key ? 'white' : '#4A2C1A',
+                border: `1.5px solid ${design === key ? 'transparent' : '#EDD9C8'}`,
+                cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+                boxShadow: design === key ? '0 2px 8px rgba(242,103,34,0.3)' : 'none',
+                transition: 'all 0.15s',
+              }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: meta.preview, border: '1.5px solid rgba(0,0,0,0.12)', flexShrink: 0 }} />
+                {meta.label}
+              </button>
+            ))}
 
-            {/* ダウンロードボタン */}
+            <div style={{ width: 1, height: 20, background: '#EDD9C8', flexShrink: 0, margin: '0 2px' }} />
+
+            {/* フォント選択 */}
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#A08068', whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>フォント</span>
+            {(Object.entries(fontMeta) as [Font, typeof fontMeta[Font]][]).map(([key, meta]) => (
+              <button key={key} onClick={() => setFont(key)} style={{
+                padding: '5px 11px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+                background: font === key ? '#1C0F05' : 'white',
+                color: font === key ? 'white' : '#4A2C1A',
+                border: `1.5px solid ${font === key ? 'transparent' : '#EDD9C8'}`,
+                cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+                boxShadow: font === key ? '0 2px 8px rgba(0,0,0,0.2)' : 'none',
+                fontFamily: meta.family,
+                transition: 'all 0.15s',
+              }}>
+                {meta.label}
+              </button>
+            ))}
+
+            <div style={{ flex: 1, minWidth: 8 }} />
+
+            {/* 保存 + ダウンロード */}
+            <button
+              onClick={handleSaveStyle}
+              disabled={saving}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                padding: '5px 12px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+                background: saving ? '#EDD9C8' : '#FFF0E8',
+                color: saving ? '#A08068' : '#C4511A',
+                border: '1.5px solid #FDD5B5',
+                cursor: saving ? 'not-allowed' : 'pointer', flexShrink: 0, whiteSpace: 'nowrap',
+              }}
+            >
+              {saving ? '保存中...' : '✓ デザインを保存'}
+            </button>
+
             <button
               onClick={() => handleDownload('both')}
               disabled={dlState !== 'idle'}
               style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                padding: '6px 14px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                padding: '5px 12px', borderRadius: 8, fontSize: 11, fontWeight: 700,
                 background: dlState !== 'idle' ? '#EDD9C8' : '#0F0E1E',
                 color: dlState !== 'idle' ? '#A08068' : '#F0C040',
                 border: 'none', cursor: dlState !== 'idle' ? 'not-allowed' : 'pointer',
@@ -659,15 +765,15 @@ export default function PrintCardPage() {
             >
               {dlState !== 'idle' ? (
                 <>
-                  <span style={{ width: 10, height: 10, border: '2px solid #A08068', borderTopColor: '#F26722', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.8s linear infinite' }} />
+                  <span style={{ width: 9, height: 9, border: '2px solid #A08068', borderTopColor: '#F26722', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.8s linear infinite' }} />
                   作成中...
                 </>
               ) : (
                 <>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
                   </svg>
-                  印刷データ保存
+                  PNG保存
                 </>
               )}
             </button>
@@ -676,11 +782,15 @@ export default function PrintCardPage() {
       </div>
 
       {/* ─── プレビューエリア ─── */}
-      <div className="no-print" style={{ padding: '32px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 40 }}>
+      <div className="no-print" style={{ padding: '24px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 36 }}>
         {/* デザイン説明 */}
         <div style={{ textAlign: 'center' }}>
-          <p style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: '#A08068', marginBottom: 4 }}>{designMeta[design].label}</p>
-          <p style={{ fontSize: 14, fontWeight: 600, color: '#4A2C1A' }}>{designMeta[design].desc}</p>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: '#A08068' }}>{designMeta[design].label}</span>
+            <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#DEC4AD', display: 'inline-block' }} />
+            <span style={{ fontSize: 10, fontWeight: 700, color: '#A08068', fontFamily: currentFontFamily }}>{fontMeta[font].label}</span>
+          </div>
+          <p style={{ fontSize: 14, fontWeight: 600, color: '#4A2C1A', fontFamily: currentFontFamily }}>{designMeta[design].desc} · {fontMeta[font].desc}</p>
         </div>
 
         {/* 表面 */}
@@ -691,7 +801,7 @@ export default function PrintCardPage() {
           btnLabel="表面を保存"
           captureRef={frontRef}
         >
-          <FrontComponent card={card} qrUrl={cardQrUrl} />
+          <FrontComponent card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} />
         </CardPreview>
 
         {/* 裏面 */}
@@ -702,7 +812,7 @@ export default function PrintCardPage() {
           btnLabel="裏面を保存"
           captureRef={backRef}
         >
-          <BackComponent card={card} />
+          <BackComponent card={card} fontFamily={currentFontFamily} />
         </CardPreview>
 
         {/* ── QRコード素材ダウンロード ── */}
@@ -806,7 +916,7 @@ export default function PrintCardPage() {
           </div>
           <div style={{ marginTop: 16, padding: '12px 14px', background: '#FAF5F0', borderRadius: 10 }}>
             <p style={{ fontSize: 11, color: '#A08068', lineHeight: 1.6, margin: 0 }}>
-              💡 「印刷データ保存」ボタンで表面・裏面を一括ダウンロード。各カードの下の「表面を保存」「裏面を保存」で個別にもダウンロードできます。
+              💡 「PNG保存」ボタンで表面・裏面を一括ダウンロード。「PDFで保存」ボタンは印刷ダイアログで「PDFに保存」を選択してください。
             </p>
           </div>
         </div>
@@ -815,10 +925,10 @@ export default function PrintCardPage() {
       {/* ─── 印刷用（実寸） ─── */}
       <div className="print-only" style={{ display: 'none' }}>
         <div className="print-card">
-          <FrontComponent card={card} qrUrl={cardQrUrl} />
+          <FrontComponent card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} />
         </div>
         <div className="print-card">
-          <BackComponent card={card} />
+          <BackComponent card={card} fontFamily={currentFontFamily} />
         </div>
       </div>
 

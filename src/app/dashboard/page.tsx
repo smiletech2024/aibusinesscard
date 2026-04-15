@@ -577,10 +577,10 @@ export default function DashboardPage() {
                           </Link>
                           <Link
                             href={`/print/${card.id}`}
-                            className="btn-ghost text-xs px-4 py-2"
-                            style={{ borderRadius: 10 }}
+                            className="text-xs px-4 py-2 rounded-xl font-semibold transition"
+                            style={{ background: '#F0F4FF', color: '#3B5BDB', border: '1.5px solid #C5D0F5' }}
                           >
-                            印刷用
+                            🎨 デザイン・印刷
                           </Link>
                           <button
                             onClick={() => setDeleteConfirm({ id: card.id, name: card.full_name })}

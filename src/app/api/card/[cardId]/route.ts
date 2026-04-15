@@ -28,20 +28,32 @@ export async function PATCH(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { full_name, title, company, short_intro, email, phone, website } = await req.json()
+    const body = await req.json()
+    const { full_name, title, company, short_intro, email, phone, website, style_config } = body
+
+    const payload: Record<string, unknown> = {
+      updated_at: new Date().toISOString(),
+    }
+
+    // 名刺情報フィールド（style_configのみ送信する場合は undefined → 更新しない）
+    if (full_name !== undefined) {
+      payload.full_name   = full_name
+      payload.title       = title       || null
+      payload.company     = company     || null
+      payload.short_intro = short_intro || null
+      payload.email       = email       || null
+      payload.phone       = phone       || null
+      payload.website     = website     || null
+    }
+
+    // style_config は image_url に JSON 文字列として保存
+    if (style_config !== undefined) {
+      payload.image_url = typeof style_config === 'string' ? style_config : JSON.stringify(style_config)
+    }
 
     const { data: updated, error } = await admin
       .from('business_cards')
-      .update({
-        full_name,
-        title: title || null,
-        company: company || null,
-        short_intro: short_intro || null,
-        email: email || null,
-        phone: phone || null,
-        website: website || null,
-        updated_at: new Date().toISOString(),
-      })
+      .update(payload)
       .eq('id', cardId)
       .select()
       .single()
