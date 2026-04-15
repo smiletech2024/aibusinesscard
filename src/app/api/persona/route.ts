@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
         title: cardData.title,
         company: cardData.company,
         short_intro: cardData.short_intro,
-        email: cardData.email || user.email,
+        email: cardData.email || '',
         phone: cardData.phone,
         website: cardData.website,
       })
