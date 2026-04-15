@@ -365,6 +365,15 @@ export default function SetupPage() {
       setDraft(d => d ? { ...d, values: d.values.map(v => v.id === id ? { ...v, text } : v) } : d)
     const updateFaq = (id: string, field: 'question' | 'answer', val: string) =>
       setDraft(d => d ? { ...d, faqs: d.faqs.map(f => f.id === id ? { ...f, [field]: val } : f) } : d)
+    const addFaq = () => {
+      const id = crypto.randomUUID()
+      setDraft(d => d ? { ...d, faqs: [...d.faqs, { id, question: '', answer: '' }] } : d)
+      setSelFaqIds(prev => new Set([...prev, id]))
+    }
+    const removeFaq = (id: string) => {
+      setDraft(d => d ? { ...d, faqs: d.faqs.filter(f => f.id !== id) } : d)
+      setSelFaqIds(prev => { const next = new Set(prev); next.delete(id); return next })
+    }
 
     const editAreaStyle: React.CSSProperties = {
       width: '100%', padding: '10px 12px', fontSize: 14, lineHeight: 1.7,
@@ -486,10 +495,19 @@ export default function SetupPage() {
 
           {/* ── よくある質問 ── */}
           <section>
-            <h2 className="text-sm font-black mb-1 flex items-center gap-2" style={{ color: '#1E1B4B' }}>
-              <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black text-white" style={{ background: '#6366F1' }}>3</span>
-              よくある質問
-            </h2>
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="text-sm font-black flex items-center gap-2" style={{ color: '#1E1B4B' }}>
+                <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black text-white" style={{ background: '#6366F1' }}>3</span>
+                よくある質問
+              </h2>
+              <button
+                onClick={addFaq}
+                style={{
+                  fontSize: 12, fontWeight: 700, padding: '5px 12px', borderRadius: 8,
+                  background: '#EEF2FF', color: '#4338CA', border: '1.5px solid #C7D2FE', cursor: 'pointer',
+                }}
+              >＋ 追加</button>
+            </div>
             <p className="text-xs mb-3 ml-8" style={{ color: '#9896B8' }}>使うものをオンにして、内容も直接編集できます</p>
             <div className="space-y-2">
               {draft.faqs.map(faq => {
@@ -504,7 +522,7 @@ export default function SetupPage() {
                       <button
                         onClick={() => toggleFaq(faq.id)}
                         style={{
-                          width: 20, height: 20, borderRadius: 6, flexShrink: 0, marginTop: 2,
+                          width: 22, height: 22, borderRadius: 6, flexShrink: 0, marginTop: 1,
                           background: on ? '#6366F1' : 'white',
                           border: on ? 'none' : '2px solid #D1D0E8',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -513,24 +531,45 @@ export default function SetupPage() {
                       >
                         {on && <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>}
                       </button>
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1" style={{ minWidth: 0 }}>
                         {on ? (
                           <div>
-                            <p className="text-xs font-bold mb-1.5" style={{ color: '#818CF8' }}>✏️ 質問・回答を編集できます</p>
+                            <div className="flex items-center justify-between mb-1.5">
+                              <p className="text-xs font-bold" style={{ color: '#818CF8' }}>✏️ 編集できます</p>
+                              <button
+                                onClick={() => removeFaq(faq.id)}
+                                style={{ fontSize: 11, color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+                              >削除</button>
+                            </div>
                             <input
                               value={faq.question}
                               onChange={e => updateFaq(faq.id, 'question', e.target.value)}
+                              placeholder="例：料金はどのくらいですか？"
                               style={editInputStyle}
                             />
                             <textarea
                               value={faq.answer}
                               onChange={e => updateFaq(faq.id, 'answer', e.target.value)}
                               rows={3}
+                              placeholder="回答を入力..."
                               style={editAreaStyle}
                             />
                           </div>
                         ) : (
-                          <p className="text-sm font-semibold" style={{ color: '#9896B8' }}>{faq.question}</p>
+                          <div>
+                            <p className="text-sm font-semibold" style={{ color: '#4A4870', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                              {faq.question || '（質問未入力）'}
+                            </p>
+                            {faq.answer && (
+                              <p className="text-xs mt-0.5 leading-relaxed" style={{
+                                color: '#9896B8', wordBreak: 'break-word', overflowWrap: 'break-word',
+                                display: '-webkit-box', WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                              }}>
+                                {faq.answer}
+                              </p>
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>

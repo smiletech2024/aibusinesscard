@@ -28,7 +28,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { skills, projects, rawVoice } = await req.json()
+    const { skills, projects, rawVoice, faqs } = await req.json()
 
     // values_summary の各セクションを構築（順序：ベース → スキル → 生の声）
     const stripped = (persona.values_summary || '')
@@ -55,13 +55,21 @@ export async function PATCH(
       ].filter(Boolean).join('\n'),
     }))
 
+    const updatePayload: Record<string, unknown> = {
+      values_summary: newValues,
+      achievements_json: newAchievements,
+      updated_at: new Date().toISOString(),
+    }
+    if (Array.isArray(faqs)) {
+      updatePayload.faq_json = faqs.map((f: { question: string; answer: string }) => ({
+        question: f.question,
+        answer: f.answer,
+      }))
+    }
+
     const { error } = await admin
       .from('personas')
-      .update({
-        values_summary: newValues,
-        achievements_json: newAchievements,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updatePayload)
       .eq('id', personaId)
 
     if (error) return NextResponse.json({ error: 'Update failed' }, { status: 500 })

@@ -15,6 +15,12 @@ interface Project {
   tech: string
 }
 
+interface FaqItem {
+  id: string
+  question: string
+  answer: string
+}
+
 function newProject(): Project {
   return { id: crypto.randomUUID(), title: '', challenge: '', approach: '', result: '', tech: '' }
 }
@@ -29,6 +35,7 @@ export default function EditPersonaPage() {
   const [skills, setSkills] = useState<string[]>([])
   const [kwInput, setKwInput] = useState('')
   const [projects, setProjects] = useState<Project[]>([newProject()])
+  const [faqs, setFaqs] = useState<FaqItem[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -62,6 +69,12 @@ export default function EditPersonaPage() {
         if (rawMatch) setRawVoice(rawMatch[1].trim())
       }
 
+      // 既存FAQの読み込み
+      const p = card.personas as { values_summary?: string; achievements_json?: Array<{ title: string; description: string }>; faq_json?: Array<{ question: string; answer: string }> }
+      if (p?.faq_json?.length) {
+        setFaqs(p.faq_json.map(f => ({ id: crypto.randomUUID(), question: f.question, answer: f.answer })))
+      }
+
       // 既存案件の読み込み
       if (persona?.achievements_json?.length) {
         const loaded = persona.achievements_json.map(a => {
@@ -85,6 +98,11 @@ export default function EditPersonaPage() {
     }
     load()
   }, [cardId])
+
+  const addFaq = () => setFaqs(p => [...p, { id: crypto.randomUUID(), question: '', answer: '' }])
+  const removeFaq = (id: string) => setFaqs(p => p.filter(f => f.id !== id))
+  const updateFaq = (id: string, field: 'question' | 'answer', val: string) =>
+    setFaqs(p => p.map(f => f.id === id ? { ...f, [field]: val } : f))
 
   const addSkill = (kw: string) => {
     const t = kw.replace(/,/g, '').trim()
@@ -114,6 +132,7 @@ export default function EditPersonaPage() {
           skills,
           projects: projects.filter(p => p.title.trim()),
           rawVoice,
+          faqs: faqs.filter(f => f.question.trim()),
         }),
       })
       if (res.ok) {
@@ -237,6 +256,77 @@ export default function EditPersonaPage() {
           {skills.length > 0 && (
             <p className="text-xs mt-2" style={{ color: '#9896B8' }}>{skills.length}個登録済み</p>
           )}
+        </div>
+
+        {/* よくある質問 */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h2 className="font-black text-sm" style={{ color: '#1E1B4B' }}>よくある質問（FAQ）</h2>
+              <p className="text-xs mt-0.5" style={{ color: '#9896B8' }}>お客様がよく聞く質問と回答を登録しておくと精度が上がります</p>
+            </div>
+            <button
+              onClick={addFaq}
+              style={{
+                fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 10,
+                background: '#EEF2FF', color: '#4338CA', border: '1.5px solid #C7D2FE', cursor: 'pointer',
+              }}
+            >＋ 追加</button>
+          </div>
+          <div className="space-y-3">
+            {faqs.length === 0 && (
+              <div className="rounded-xl p-4 text-center" style={{ background: 'rgba(255,255,255,0.5)', border: '1.5px dashed #D1D0E8' }}>
+                <p className="text-sm" style={{ color: '#9896B8' }}>＋ 追加ボタンでFAQを登録できます</p>
+              </div>
+            )}
+            {faqs.map((faq, idx) => (
+              <div key={faq.id} className="card p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black" style={{ color: '#6366F1' }}>FAQ {idx + 1}</span>
+                  <button
+                    onClick={() => removeFaq(faq.id)}
+                    style={{ color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
+                  >削除</button>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold mb-1" style={{ color: '#4A4870' }}>
+                    質問 <span style={{ color: '#EF4444' }}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={faq.question}
+                    onChange={e => updateFaq(faq.id, 'question', e.target.value)}
+                    placeholder="例：料金はどのくらいですか？"
+                    style={{
+                      width: '100%', padding: '9px 12px', fontSize: 13,
+                      border: '1.5px solid #D1D0E8', borderRadius: 8,
+                      background: '#F4F3FA', color: '#1E1B4B', outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                    onFocus={e => { e.target.style.borderColor = '#6366F1'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.1)' }}
+                    onBlur={e => { e.target.style.borderColor = '#D1D0E8'; e.target.style.background = '#F4F3FA'; e.target.style.boxShadow = 'none' }}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold mb-1" style={{ color: '#4A4870' }}>回答</label>
+                  <textarea
+                    value={faq.answer}
+                    onChange={e => updateFaq(faq.id, 'answer', e.target.value)}
+                    rows={3}
+                    placeholder="例：プロジェクト規模によりますが、月10〜30万円が目安です。まずはご相談ください。"
+                    style={{
+                      width: '100%', padding: '9px 12px', fontSize: 13, lineHeight: 1.6,
+                      border: '1.5px solid #D1D0E8', borderRadius: 8,
+                      background: '#F4F3FA', color: '#1E1B4B', outline: 'none',
+                      resize: 'vertical', boxSizing: 'border-box',
+                    }}
+                    onFocus={e => { e.target.style.borderColor = '#6366F1'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.1)' }}
+                    onBlur={e => { e.target.style.borderColor = '#D1D0E8'; e.target.style.background = '#F4F3FA'; e.target.style.boxShadow = 'none' }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* 過去案件 */}
