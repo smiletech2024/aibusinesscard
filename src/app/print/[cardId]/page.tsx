@@ -579,6 +579,39 @@ export default function PrintCardPage() {
     }
   }, [card, design])
 
+  // 印刷: カードを PNG キャプチャ → 印刷専用ウィンドウで確実に印刷
+  const handlePrint = useCallback(async () => {
+    if (!frontRef.current || !backRef.current) return
+    setDlState('pdf') // スピナー流用
+    try {
+      const [frontUrl, backUrl] = await Promise.all([
+        toPng(frontRef.current, { pixelRatio: 3 }),
+        toPng(backRef.current,  { pixelRatio: 3 }),
+      ])
+      const win = window.open('', '_blank')
+      if (!win) { alert('ポップアップをブロックされています。ブラウザのポップアップ許可を設定してください。'); return }
+      win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+        <style>
+          @page { size: 91mm 55mm; margin: 0; }
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { background: white; }
+          img { width: 91mm; height: 55mm; display: block; page-break-after: always; break-after: page; }
+        </style>
+      </head><body>
+        <img src="${frontUrl}" />
+        <img src="${backUrl}" />
+        <script>
+          window.onload = function() {
+            setTimeout(function() { window.print(); }, 300);
+          };
+        </script>
+      </body></html>`)
+      win.document.close()
+    } finally {
+      setDlState('idle')
+    }
+  }, [frontRef, backRef])
+
   const handleDownload = useCallback(async (side: 'front' | 'back' | 'both' | 'qr') => {
     if (!card) return
     const base = card.full_name.replace(/\s/g, '_')
@@ -718,13 +751,20 @@ export default function PrintCardPage() {
               )}
               {dlState === 'pdf' ? '作成中...' : 'PDF保存'}
             </button>
-            <button onClick={() => window.print()} title="印刷する" style={{
-              display: 'inline-flex', alignItems: 'center', gap: 4,
-              fontSize: 11, fontWeight: 700, padding: '7px 10px', borderRadius: 10,
-              background: 'linear-gradient(135deg, #F26722, #F59340)', color: 'white',
-              border: 'none', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap',
-              boxShadow: '0 2px 8px rgba(242,103,34,0.3)',
-            }}>
+            <button
+              onClick={handlePrint}
+              disabled={dlState !== 'idle'}
+              title="表面・裏面を印刷"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                fontSize: 11, fontWeight: 700, padding: '7px 10px', borderRadius: 10,
+                background: dlState !== 'idle' ? '#EDD9C8' : 'linear-gradient(135deg, #F26722, #F59340)',
+                color: dlState !== 'idle' ? '#A08068' : 'white',
+                border: 'none', cursor: dlState !== 'idle' ? 'not-allowed' : 'pointer',
+                flexShrink: 0, whiteSpace: 'nowrap',
+                boxShadow: dlState !== 'idle' ? 'none' : '0 2px 8px rgba(242,103,34,0.3)',
+              }}
+            >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
                 <rect x="6" y="14" width="12" height="8"/>
@@ -934,44 +974,6 @@ export default function PrintCardPage() {
         </div>
       </div>
 
-      {/* ─── 印刷用（実寸） ─── */}
-      {/* 二重ラップ不要: コンポーネント自身が print-card クラスを持つ */}
-      <div className="print-only" style={{ display: 'none' }}>
-        <FrontComponent card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} />
-        <BackComponent card={card} fontFamily={currentFontFamily} />
-      </div>
-
-      {/* ─── 印刷CSS ─── */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        @media print {
-          /* 名刺サイズ 91×55mm で印刷 */
-          @page { size: 91mm 55mm; margin: 0; }
-          html, body { margin: 0; padding: 0; background: white !important; }
-          .no-print { display: none !important; }
-          .print-only { display: block !important; }
-
-          /*
-           * カードは 560×338px で設計。CSS印刷の 1px = 0.2645mm なので
-           * 560px = 148.1mm → 91mm に収めるには scale(0.6141)
-           * transform は box を変えないため margin-bottom で補正
-           */
-          .print-card {
-            width: 560px !important;
-            height: 338px !important;
-            overflow: hidden !important;
-            page-break-after: always !important;
-            break-after: page !important;
-            transform: scale(0.6141) !important;
-            transform-origin: top left !important;
-            margin-bottom: -131px !important;
-            margin-right: 0 !important;
-            display: block !important;
-          }
-        }
-        @media screen {
-          .print-only { display: none !important; }
-        }
-      ` }} />
     </div>
   )
 }
