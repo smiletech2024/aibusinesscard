@@ -366,8 +366,6 @@ export default function SetupPage() {
     const updateFaq = (id: string, field: 'question' | 'answer', val: string) =>
       setDraft(d => d ? { ...d, faqs: d.faqs.map(f => f.id === id ? { ...f, [field]: val } : f) } : d)
 
-    const stopTouch = (e: React.TouchEvent | React.MouseEvent) => e.stopPropagation()
-
     const editAreaStyle: React.CSSProperties = {
       width: '100%', padding: '10px 12px', fontSize: 14, lineHeight: 1.7,
       border: '2px solid #818CF8', borderRadius: 10,
@@ -412,6 +410,7 @@ export default function SetupPage() {
                       border: sel ? '2px solid #6366F1' : '2px solid transparent',
                       boxShadow: sel ? '0 4px 16px rgba(99,102,241,0.15)' : 'none',
                     }}>
+                    {/* 選択行 — ここだけ onClick */}
                     <div className="flex items-center gap-3 cursor-pointer" onClick={() => setSelToneId(tone.id)}>
                       <div style={{
                         width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
@@ -420,9 +419,10 @@ export default function SetupPage() {
                       }} />
                       <p className="font-bold text-sm" style={{ color: sel ? '#4338CA' : '#1E1B4B' }}>{tone.label}</p>
                     </div>
+                    {/* 説明 or 編集エリア — 選択行の兄弟要素 */}
                     {sel ? (
-                      <div onClick={stopTouch} onTouchStart={stopTouch} onTouchEnd={stopTouch}>
-                        <p className="text-xs font-bold mb-1 mt-2" style={{ color: '#818CF8' }}>✏️ 内容を編集できます</p>
+                      <div style={{ marginTop: 10, marginLeft: 32 }}>
+                        <p className="text-xs font-bold mb-1" style={{ color: '#818CF8' }}>✏️ 内容を編集できます</p>
                         <textarea
                           value={tone.profile}
                           onChange={e => updateTone(tone.id, e.target.value)}
@@ -455,26 +455,29 @@ export default function SetupPage() {
                       border: sel ? '2px solid #6366F1' : '2px solid transparent',
                       boxShadow: sel ? '0 4px 16px rgba(99,102,241,0.15)' : 'none',
                     }}>
+                    {/* 選択行 — ここだけ onClick */}
                     <div className="flex items-start gap-3 cursor-pointer" onClick={() => setSelValueId(val.id)}>
                       <div style={{
                         width: 20, height: 20, borderRadius: '50%', flexShrink: 0, marginTop: 4,
                         border: sel ? '6px solid #6366F1' : '2px solid #D1D0E8',
                         background: 'white', transition: 'all 0.15s',
                       }} />
-                      {sel ? (
-                        <div className="flex-1" onClick={stopTouch} onTouchStart={stopTouch} onTouchEnd={stopTouch}>
-                          <p className="text-xs font-bold mb-1" style={{ color: '#818CF8' }}>✏️ 内容を編集できます</p>
-                          <textarea
-                            value={val.text}
-                            onChange={e => updateValue(val.id, e.target.value)}
-                            rows={4}
-                            style={{ ...editAreaStyle, marginTop: 0 }}
-                          />
-                        </div>
-                      ) : (
-                        <p className="text-sm leading-relaxed" style={{ color: '#6B7280' }}>{val.text}</p>
-                      )}
+                      <p className="text-sm leading-relaxed" style={{ color: sel ? '#4338CA' : '#6B7280' }}>
+                        {sel ? '✓ 選択中 — 下のテキストを編集できます' : val.text}
+                      </p>
                     </div>
+                    {/* 編集エリア — 選択行の兄弟要素（親に onClick なし）*/}
+                    {sel && (
+                      <div style={{ marginTop: 10, marginLeft: 32 }}>
+                        <p className="text-xs font-bold mb-1" style={{ color: '#818CF8' }}>✏️ 内容を編集できます</p>
+                        <textarea
+                          value={val.text}
+                          onChange={e => updateValue(val.id, e.target.value)}
+                          rows={4}
+                          style={{ ...editAreaStyle, marginTop: 0 }}
+                        />
+                      </div>
+                    )}
                   </div>
                 )
               })}
@@ -512,7 +515,7 @@ export default function SetupPage() {
                       </button>
                       <div className="flex-1 min-w-0">
                         {on ? (
-                          <div onClick={stopTouch} onTouchStart={stopTouch} onTouchEnd={stopTouch} style={{ flex: 1 }}>
+                          <div>
                             <p className="text-xs font-bold mb-1.5" style={{ color: '#818CF8' }}>✏️ 質問・回答を編集できます</p>
                             <input
                               value={faq.question}
