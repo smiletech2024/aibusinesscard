@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState, useEffect, KeyboardEvent } from 'react'
+import { useState, useEffect, useRef, KeyboardEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -39,7 +39,8 @@ const INDUSTRIES = [
 
 export default function SetupPage() {
   const router = useRouter()
-  const supabase = createClient()
+  const supabaseRef = useRef(createClient())
+  const supabase = supabaseRef.current
   const [step, setStep] = useState<Step>('quick')
 
   // Quick form
@@ -140,7 +141,7 @@ export default function SetupPage() {
   if (step === 'quick') {
     const canGenerate = qName && qTitle && qIndustry && keywords.length > 0
     return (
-      <div className="min-h-screen px-4 py-10" style={{ background: '#F4F3FA' }}>
+      <div style={{ background: '#F4F3FA', padding: '40px 16px 80px' }}>
         <div className="w-full max-w-lg mx-auto">
           <div className="text-center mb-8">
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: '#EEF2FF' }}>
@@ -602,7 +603,7 @@ export default function SetupPage() {
   ════════════════════════════════ */
   if (step === 'card') {
     return (
-      <div className="min-h-screen px-4 py-10" style={{ background: '#F4F3FA' }}>
+      <div style={{ background: '#F4F3FA', padding: '40px 16px 80px' }}>
         <div className="w-full max-w-lg mx-auto">
           <div className="text-center mb-8">
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: '#EEF2FF' }}>
