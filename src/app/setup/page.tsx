@@ -2,25 +2,24 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect, KeyboardEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-
-interface Message { role: 'user' | 'assistant'; content: string }
-
-function parseChoices(content: string): { text: string; choices: string[] } {
-  const match = content.match(/《選択肢》(.+?)《\/選択肢》/s)
-  if (!match) return { text: content, choices: [] }
-  const choices = match[1].split('｜').map((c: string) => c.trim()).filter(Boolean)
-  const text = content.replace(/《選択肢》.+?《\/選択肢》/s, '').trim()
-  return { text, choices }
-}
 
 interface CardData {
   full_name: string; title: string; company: string
   short_intro: string; email: string; phone: string; website: string
 }
-type Step = 'hearing' | 'card' | 'saving' | 'done'
+interface ToneOption { id: string; label: string; profile: string }
+interface ValueOption { id: string; text: string }
+interface FaqItem { id: string; question: string; answer: string }
+interface DraftData {
+  tones: ToneOption[]
+  values: ValueOption[]
+  faqs: FaqItem[]
+  forbidden: string[]
+}
+type Step = 'quick' | 'generating' | 'select' | 'card' | 'saving' | 'done'
 
 const cardFields = [
   { key: 'full_name',   label: '氏名',     placeholder: '山田 太郎',                  required: true },
@@ -32,147 +31,441 @@ const cardFields = [
   { key: 'website',     label: 'Web',      placeholder: 'https://yoursite.com',        required: false },
 ]
 
+const INDUSTRIES = [
+  'マーケティング・広告', 'IT・SaaS・開発', 'コンサルティング', '営業・BizDev',
+  '人材・採用', 'デザイン・クリエイティブ', '会計・税務・法務', '不動産',
+  '医療・ヘルスケア', '教育・コーチング', '製造・建設', 'その他',
+]
+
 export default function SetupPage() {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [step, setStep] = useState<Step>('hearing')
+  const router = useRouter()
+  const supabase = createClient()
+  const [step, setStep] = useState<Step>('quick')
+
+  // Quick form
+  const [qName, setQName] = useState('')
+  const [qTitle, setQTitle] = useState('')
+  const [qIndustry, setQIndustry] = useState('')
+  const [keywords, setKeywords] = useState<string[]>([])
+  const [kwInput, setKwInput] = useState('')
+
+  // Draft & selections
+  const [draft, setDraft] = useState<DraftData | null>(null)
+  const [selToneId, setSelToneId] = useState('')
+  const [selValueId, setSelValueId] = useState('')
+  const [selFaqIds, setSelFaqIds] = useState<Set<string>>(new Set())
+
+  // Card
   const [cardData, setCardData] = useState<CardData>({
     full_name: '', title: '', company: '', short_intro: '', email: '', phone: '', website: '',
   })
-  const [turnCount, setTurnCount] = useState(0)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const router = useRouter()
-  const supabase = createClient()
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) router.push('/auth/login')
     })
-    startHearing()
   }, [])
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
-
-  const readStream = async (res: Response): Promise<string> => {
-    const reader = res.body!.getReader()
-    const decoder = new TextDecoder()
-    let text = ''
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      text += decoder.decode(value)
-    }
-    return text
+  /* ── キーワードタグ操作 ── */
+  const addKeyword = (kw: string) => {
+    const t = kw.replace(/,/g, '').trim()
+    if (t && !keywords.includes(t) && keywords.length < 6) setKeywords(p => [...p, t])
+    setKwInput('')
+  }
+  const handleKwKey = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addKeyword(kwInput) }
+    else if (e.key === 'Backspace' && !kwInput && keywords.length > 0) setKeywords(p => p.slice(0, -1))
   }
 
-  const startHearing = async () => {
-    setLoading(true)
+  /* ── ドラフト生成 ── */
+  const generateDraft = async () => {
+    if (!qName || !qTitle || !qIndustry || keywords.length === 0) return
+    setStep('generating')
     try {
-      const res = await fetch('/api/hearing', {
+      const res = await fetch('/api/generate-persona-draft', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [] }),
+        body: JSON.stringify({ name: qName, title: qTitle, industry: qIndustry, keywords }),
       })
-      const text = await readStream(res)
-      setMessages([{ role: 'assistant', content: text }])
-    } finally { setLoading(false) }
+      const data = await res.json()
+      if (data.draft) {
+        setDraft(data.draft)
+        setSelToneId(data.draft.tones?.[0]?.id ?? '')
+        setSelValueId(data.draft.values?.[0]?.id ?? '')
+        setSelFaqIds(new Set(data.draft.faqs?.map((f: FaqItem) => f.id) ?? []))
+        setCardData(p => ({ ...p, full_name: qName, title: qTitle }))
+        setStep('select')
+      } else {
+        setStep('quick')
+      }
+    } catch { setStep('quick') }
   }
 
-  const sendMessage = async (overrideMessage?: string) => {
-    const userMessage = overrideMessage ?? input.trim()
-    if (!userMessage || loading) return
-    if (!overrideMessage) setInput('')
-    const newMessages: Message[] = [...messages, { role: 'user', content: userMessage }]
-    setMessages(newMessages)
-    setLoading(true)
-    setTurnCount(prev => prev + 1)
-
-    try {
-      const res = await fetch('/api/hearing', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMessages }),
-      })
-      let aiText = ''
-      const reader = res.body!.getReader()
-      const decoder = new TextDecoder()
-      const updated: Message[] = [...newMessages, { role: 'assistant', content: '' }]
-      setMessages(updated)
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        aiText += decoder.decode(value)
-        setMessages(prev => {
-          const arr = [...prev]
-          arr[arr.length - 1] = { role: 'assistant', content: aiText }
-          return arr
-        })
-      }
-      if (turnCount >= 9 || aiText.includes('分身AIを作成できます')) {
-        setTimeout(() => setStep('card'), 1500)
-      }
-    } finally { setLoading(false) }
-  }
-
+  /* ── 保存 ── */
   const savePersona = async () => {
-    if (!cardData.full_name) return
+    if (!cardData.full_name || !draft) return
     setStep('saving')
+    const tone = draft.tones.find(t => t.id === selToneId)
+    const value = draft.values.find(v => v.id === selValueId)
+    const faqs = draft.faqs.filter(f => selFaqIds.has(f.id)).map(f => ({ question: f.question, answer: f.answer }))
     try {
       const res = await fetch('/api/persona', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ conversations: messages, cardData }),
+        body: JSON.stringify({
+          cardData,
+          draftSelections: {
+            tone: tone?.profile ?? '',
+            values: value?.text ?? '',
+            faqs,
+            forbidden: draft.forbidden ?? [],
+          },
+        }),
       })
       const data = await res.json()
-      if (data.personaId) {
-        setStep('done')
-        setTimeout(() => router.push('/dashboard'), 2000)
-      }
-    } catch { setStep('card') }
+      if (data.personaId) { setStep('done'); setTimeout(() => router.push('/dashboard'), 2000) }
+      else setStep('select')
+    } catch { setStep('select') }
   }
 
-  const progress = Math.min((turnCount / 12) * 100, 100)
-
-  /* ─── 名刺入力ステップ ─── */
-  if (step === 'card') {
+  /* ════════════════════════════════
+     STEP: quick
+  ════════════════════════════════ */
+  if (step === 'quick') {
+    const canGenerate = qName && qTitle && qIndustry && keywords.length > 0
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: "#F4F3FA" }}>
+      <div className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: '#F4F3FA' }}>
         <div className="w-full max-w-lg">
           <div className="text-center mb-8">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
-              style={{ background: "#EEF2FF" }}>
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: '#EEF2FF' }}>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2a5 5 0 1 1 0 10A5 5 0 0 1 12 2z" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-black mb-1" style={{ color: '#1E1B4B' }}>あなたを教えてください</h1>
+            <p className="text-sm" style={{ color: '#9896B8' }}>30秒で入力 → AIが分身を自動生成します</p>
+          </div>
+
+          <div className="card p-6 space-y-5">
+            {/* 氏名 */}
+            <div>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: '#4A4870' }}>
+                氏名 <span style={{ color: '#EF4444' }}>*</span>
+              </label>
+              <input
+                type="text" value={qName} onChange={e => setQName(e.target.value)}
+                placeholder="山田 太郎"
+                style={inputStyle}
+                onFocus={focusStyle} onBlur={blurStyle}
+              />
+            </div>
+
+            {/* 肩書き */}
+            <div>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: '#4A4870' }}>
+                肩書き・職種 <span style={{ color: '#EF4444' }}>*</span>
+              </label>
+              <input
+                type="text" value={qTitle} onChange={e => setQTitle(e.target.value)}
+                placeholder="マーケティングコンサルタント"
+                style={inputStyle}
+                onFocus={focusStyle} onBlur={blurStyle}
+              />
+            </div>
+
+            {/* 業種 */}
+            <div>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: '#4A4870' }}>
+                業種・分野 <span style={{ color: '#EF4444' }}>*</span>
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {INDUSTRIES.map(ind => (
+                  <button
+                    key={ind}
+                    onClick={() => setQIndustry(ind)}
+                    style={{
+                      padding: '6px 14px', fontSize: 13, borderRadius: 20, cursor: 'pointer',
+                      fontWeight: qIndustry === ind ? 700 : 500,
+                      background: qIndustry === ind ? 'linear-gradient(135deg, #6366F1, #8B5CF6)' : '#F4F3FA',
+                      color: qIndustry === ind ? 'white' : '#4A4870',
+                      border: qIndustry === ind ? 'none' : '1.5px solid #D1D0E8',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {ind}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* キーワード */}
+            <div>
+              <label className="block text-sm font-semibold mb-1" style={{ color: '#4A4870' }}>
+                得意分野・キーワード <span style={{ color: '#EF4444' }}>*</span>
+              </label>
+              <p className="text-xs mb-2" style={{ color: '#9896B8' }}>Enterで追加（最大6個）例：SNS運用、BtoB、スタートアップ支援</p>
+              <div
+                className="flex flex-wrap gap-2 p-2 rounded-xl"
+                style={{ background: '#F4F3FA', border: '1.5px solid #D1D0E8', minHeight: 46 }}
+              >
+                {keywords.map(kw => (
+                  <span
+                    key={kw}
+                    className="flex items-center gap-1 text-sm font-semibold px-3 py-1 rounded-full"
+                    style={{ background: '#EEF2FF', color: '#4338CA' }}
+                  >
+                    {kw}
+                    <button onClick={() => setKeywords(p => p.filter(k => k !== kw))} style={{ color: '#818CF8', fontWeight: 700, lineHeight: 1, background: 'none', border: 'none', cursor: 'pointer' }}>×</button>
+                  </span>
+                ))}
+                {keywords.length < 6 && (
+                  <input
+                    type="text" value={kwInput}
+                    onChange={e => setKwInput(e.target.value)}
+                    onKeyDown={handleKwKey}
+                    onBlur={() => kwInput && addKeyword(kwInput)}
+                    placeholder={keywords.length === 0 ? 'キーワードを入力してEnter' : '追加...'}
+                    className="outline-none bg-transparent text-sm flex-1"
+                    style={{ minWidth: 120, color: '#1E1B4B' }}
+                  />
+                )}
+              </div>
+            </div>
+
+            <button
+              onClick={generateDraft}
+              disabled={!canGenerate}
+              style={{
+                width: '100%', padding: '14px', fontSize: 16, fontWeight: 700,
+                background: canGenerate ? 'linear-gradient(135deg, #6366F1, #8B5CF6)' : '#D1D0E8',
+                color: canGenerate ? 'white' : '#9896B8',
+                border: 'none', borderRadius: 12, cursor: canGenerate ? 'pointer' : 'not-allowed',
+                boxShadow: canGenerate ? '0 4px 14px rgba(99,102,241,0.35)' : 'none',
+                marginTop: 8, transition: 'all 0.2s',
+              }}
+            >
+              AIに分身を生成させる →
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  /* ════════════════════════════════
+     STEP: generating
+  ════════════════════════════════ */
+  if (step === 'generating') {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#F4F3FA' }}>
+        <div className="text-center">
+          <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6"
+            style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', boxShadow: '0 8px 32px rgba(99,102,241,0.4)' }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+            </svg>
+          </div>
+          <h2 className="font-black text-xl mb-2" style={{ color: '#1E1B4B' }}>あなたの分身を生成中...</h2>
+          <p className="text-sm mb-6" style={{ color: '#9896B8' }}>話し方・価値観・よくある質問を自動作成しています</p>
+          <div className="flex justify-center gap-2">
+            {['話し方を設計中', '価値観を整理中', 'FAQを生成中'].map((label, i) => (
+              <span key={i} className="text-xs px-3 py-1.5 rounded-full font-medium"
+                style={{ background: '#EEF2FF', color: '#6366F1' }}>
+                {label}
+              </span>
+            ))}
+          </div>
+          <div className="mt-8 flex justify-center">
+            <div className="w-8 h-8 border-4 rounded-full spin"
+              style={{ borderColor: '#E8E6F5', borderTopColor: '#6366F1' }} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  /* ════════════════════════════════
+     STEP: select
+  ════════════════════════════════ */
+  if (step === 'select' && draft) {
+    const toggleFaq = (id: string) => {
+      setSelFaqIds(prev => {
+        const next = new Set(prev)
+        next.has(id) ? next.delete(id) : next.add(id)
+        return next
+      })
+    }
+
+    return (
+      <div className="min-h-screen" style={{ background: '#F4F3FA' }}>
+        {/* Header */}
+        <div className="sticky top-0 z-10" style={{ background: 'linear-gradient(135deg, #4338CA, #6D28D9)', padding: '16px 16px 14px' }}>
+          <div className="max-w-2xl mx-auto">
+            <h1 className="font-black text-white text-base">あなたの分身を選んで確定</h1>
+            <p className="text-white/60 text-xs mt-0.5">各セクションの内容を選ぶだけで完成します</p>
+          </div>
+        </div>
+
+        <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+
+          {/* ── 話し方スタイル ── */}
+          <section>
+            <h2 className="text-sm font-black mb-3 flex items-center gap-2" style={{ color: '#1E1B4B' }}>
+              <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black text-white" style={{ background: '#6366F1' }}>1</span>
+              話し方スタイル
+            </h2>
+            <div className="space-y-2.5">
+              {draft.tones.map(tone => (
+                <button
+                  key={tone.id}
+                  onClick={() => setSelToneId(tone.id)}
+                  className="w-full text-left p-4 rounded-2xl transition-all"
+                  style={{
+                    background: selToneId === tone.id ? 'white' : 'rgba(255,255,255,0.6)',
+                    border: selToneId === tone.id ? '2px solid #6366F1' : '2px solid transparent',
+                    boxShadow: selToneId === tone.id ? '0 4px 16px rgba(99,102,241,0.15)' : 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div style={{
+                      width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
+                      border: selToneId === tone.id ? '6px solid #6366F1' : '2px solid #D1D0E8',
+                      background: 'white', transition: 'all 0.15s',
+                    }} />
+                    <div>
+                      <p className="font-bold text-sm" style={{ color: selToneId === tone.id ? '#4338CA' : '#1E1B4B' }}>{tone.label}</p>
+                      <p className="text-xs mt-0.5 leading-relaxed" style={{ color: '#6B7280' }}>{tone.profile}</p>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* ── 価値観・強み ── */}
+          <section>
+            <h2 className="text-sm font-black mb-3 flex items-center gap-2" style={{ color: '#1E1B4B' }}>
+              <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black text-white" style={{ background: '#6366F1' }}>2</span>
+              価値観・強みの紹介文
+            </h2>
+            <div className="space-y-2.5">
+              {draft.values.map(val => (
+                <button
+                  key={val.id}
+                  onClick={() => setSelValueId(val.id)}
+                  className="w-full text-left p-4 rounded-2xl transition-all"
+                  style={{
+                    background: selValueId === val.id ? 'white' : 'rgba(255,255,255,0.6)',
+                    border: selValueId === val.id ? '2px solid #6366F1' : '2px solid transparent',
+                    boxShadow: selValueId === val.id ? '0 4px 16px rgba(99,102,241,0.15)' : 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <div className="flex items-start gap-3">
+                    <div style={{
+                      width: 20, height: 20, borderRadius: '50%', flexShrink: 0, marginTop: 2,
+                      border: selValueId === val.id ? '6px solid #6366F1' : '2px solid #D1D0E8',
+                      background: 'white', transition: 'all 0.15s',
+                    }} />
+                    <p className="text-sm leading-relaxed" style={{ color: selValueId === val.id ? '#1E1B4B' : '#6B7280' }}>{val.text}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* ── よくある質問 ── */}
+          <section>
+            <h2 className="text-sm font-black mb-1 flex items-center gap-2" style={{ color: '#1E1B4B' }}>
+              <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black text-white" style={{ background: '#6366F1' }}>3</span>
+              よくある質問（使うものだけオンに）
+            </h2>
+            <p className="text-xs mb-3 ml-8" style={{ color: '#9896B8' }}>分身AIが自動で答えられる質問です</p>
+            <div className="space-y-2">
+              {draft.faqs.map(faq => {
+                const on = selFaqIds.has(faq.id)
+                return (
+                  <button
+                    key={faq.id}
+                    onClick={() => toggleFaq(faq.id)}
+                    className="w-full text-left p-3.5 rounded-xl transition-all"
+                    style={{
+                      background: on ? 'white' : 'rgba(255,255,255,0.45)',
+                      border: on ? '1.5px solid #C7D2FE' : '1.5px solid transparent',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div style={{
+                        width: 20, height: 20, borderRadius: 6, flexShrink: 0, marginTop: 1,
+                        background: on ? '#6366F1' : 'white',
+                        border: on ? 'none' : '2px solid #D1D0E8',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'all 0.15s',
+                      }}>
+                        {on && <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold" style={{ color: on ? '#1E1B4B' : '#9896B8' }}>{faq.question}</p>
+                        {on && <p className="text-xs mt-1 leading-relaxed" style={{ color: '#6B7280' }}>{faq.answer}</p>}
+                      </div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          </section>
+
+          {/* ── 確定ボタン ── */}
+          <button
+            onClick={() => setStep('card')}
+            disabled={!selToneId || !selValueId || selFaqIds.size === 0}
+            style={{
+              width: '100%', padding: '15px', fontSize: 16, fontWeight: 700,
+              background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+              color: 'white', border: 'none', borderRadius: 14, cursor: 'pointer',
+              boxShadow: '0 4px 16px rgba(99,102,241,0.35)', marginTop: 8,
+            }}
+          >
+            この内容で名刺情報を入力する →
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  /* ════════════════════════════════
+     STEP: card
+  ════════════════════════════════ */
+  if (step === 'card') {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: '#F4F3FA' }}>
+        <div className="w-full max-w-lg">
+          <div className="text-center mb-8">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: '#EEF2FF' }}>
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2" y="7" width="20" height="14" rx="3" />
                 <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
               </svg>
             </div>
-            <h1 className="text-2xl font-black mb-1" style={{ color: "#1E1B4B" }}>名刺に載せる情報</h1>
-            <p className="text-sm" style={{ color: "#9896B8" }}>QRコードから開いたとき、お客様が最初に見る情報です</p>
+            <h1 className="text-2xl font-black mb-1" style={{ color: '#1E1B4B' }}>名刺に載せる情報</h1>
+            <p className="text-sm" style={{ color: '#9896B8' }}>QRコードから開いたとき、お客様が最初に見る情報です</p>
           </div>
-
           <div className="card p-6 space-y-4">
             {cardFields.map(({ key, label, placeholder, required }) => (
               <div key={key}>
-                <label className="block text-sm font-semibold mb-1.5" style={{ color: "#4A4870" }}>
-                  {label}{required && <span className="text-red-400 ml-1">*</span>}
+                <label className="block text-sm font-semibold mb-1.5" style={{ color: '#4A4870' }}>
+                  {label}{required && <span style={{ color: '#EF4444', marginLeft: 4 }}>*</span>}
                 </label>
                 <input
                   type={key === 'email' ? 'email' : 'text'}
                   value={cardData[key as keyof CardData]}
-                  onChange={e => setCardData(prev => ({ ...prev, [key]: e.target.value }))}
+                  onChange={e => setCardData(p => ({ ...p, [key]: e.target.value }))}
                   placeholder={placeholder}
-                  style={{
-                    width: '100%', padding: '11px 14px', fontSize: 14,
-                    border: '1.5px solid #D1D0E8', borderRadius: 10,
-                    background: '#F4F3FA', color: '#1E1B4B', outline: 'none',
-                    boxSizing: 'border-box',
-                  }}
-                  onFocus={e => { e.target.style.borderColor = '#6366F1'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.12)' }}
-                  onBlur={e => { e.target.style.borderColor = '#D1D0E8'; e.target.style.background = '#F4F3FA'; e.target.style.boxShadow = 'none' }}
+                  style={{ ...inputStyle, width: '100%', boxSizing: 'border-box' }}
+                  onFocus={focusStyle} onBlur={blurStyle}
                 />
               </div>
             ))}
-
             <button
               onClick={savePersona}
               disabled={!cardData.full_name}
@@ -193,230 +486,89 @@ export default function SetupPage() {
     )
   }
 
+  /* ════════════════════════════════
+     STEP: saving
+  ════════════════════════════════ */
   if (step === 'saving') {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "#F4F3FA" }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#F4F3FA' }}>
         <div className="text-center">
           <div className="w-16 h-16 border-4 rounded-full spin mx-auto mb-5"
-            style={{ border: '4px solid var(--border)', borderTopColor: 'var(--primary)' }} />
-          <h2 className="font-black text-xl mb-2" style={{ color: "#1E1B4B" }}>あなたの分身を生成中...</h2>
-          <p className="text-sm" style={{ color: "#9896B8" }}>会話の内容からあなたの思考・価値観を学習しています</p>
+            style={{ border: '4px solid #E8E6F5', borderTopColor: '#6366F1' }} />
+          <h2 className="font-black text-xl mb-2" style={{ color: '#1E1B4B' }}>あなたの分身を生成中...</h2>
+          <p className="text-sm" style={{ color: '#9896B8' }}>選択した内容からAIを構築しています</p>
         </div>
       </div>
     )
   }
 
-  if (step === 'done') {
-    const journey = [
-      { num: '1', title: 'QRコードを読む', desc: '名刺を渡した相手がここから始めます', color: '#6366F1' },
-      { num: '2', title: 'AIがあなたの代わりに対応', desc: 'あなたの分身が24時間、何でも答えます', color: '#8B5CF6' },
-      { num: '3', title: 'AIが会話を自動整理', desc: '相談内容・悩み・温度感をまとめます', color: '#A78BFA' },
-      { num: '4', title: 'あなたに話しかける', desc: 'ここでダッシュボードに通知が届きます', color: '#059669' },
-    ]
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: "#F4F3FA" }}>
-        <div className="w-full max-w-lg fade-in">
-          <div className="text-center mb-8">
-            <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-5"
-              style={{ background: "#EEF2FF" }}>
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 6L9 17l-5-5" />
-              </svg>
-            </div>
-            <h2 className="font-black text-2xl mb-2" style={{ color: "#1E1B4B" }}>あなたの分身AIが生まれました</h2>
-            <p className="text-sm" style={{ color: "#9896B8" }}>今この瞬間から、24時間働き始めます</p>
-          </div>
-
-          <div className="card p-6 mb-5">
-            <p className="text-xs font-bold mb-4 uppercase tracking-widest" style={{ color: "#9896B8" }}>お客様はこう使います</p>
-            <div className="space-y-4">
-              {journey.map(({ num, title, desc, color }, i) => (
-                <div key={num} className="flex items-start gap-3">
-                  <div className="flex flex-col items-center flex-shrink-0">
-                    <div
-                      className="w-7 h-7 rounded-full flex items-center justify-center font-black text-xs text-white"
-                      style={{ background: color }}
-                    >
-                      {num}
-                    </div>
-                    {i < journey.length - 1 && (
-                      <div style={{ width: 2, height: 24, background: '#E8E6F5', marginTop: 4 }} />
-                    )}
-                  </div>
-                  <div style={{ paddingTop: 2 }}>
-                    <p className="text-sm font-bold" style={{ color: '#1E1B4B' }}>{title}</p>
-                    <p className="text-xs mt-0.5" style={{ color: '#9896B8' }}>{desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <button
-            onClick={() => router.push('/dashboard')}
-            style={{
-              width: '100%', padding: '14px', fontSize: 16, fontWeight: 700,
-              background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
-              color: 'white', border: 'none', borderRadius: 12,
-              cursor: 'pointer',
-              boxShadow: '0 4px 14px rgba(99,102,241,0.35)',
-            }}
-          >
-            ダッシュボードへ →
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  /* ─── ヒアリングチャット ─── */
+  /* ════════════════════════════════
+     STEP: done
+  ════════════════════════════════ */
+  const journey = [
+    { num: '1', title: 'QRコードを読む', desc: '名刺を渡した相手がここから始めます', color: '#6366F1' },
+    { num: '2', title: 'AIがあなたの代わりに対応', desc: 'あなたの分身が24時間、何でも答えます', color: '#8B5CF6' },
+    { num: '3', title: 'AIが会話を自動整理', desc: '相談内容・悩み・温度感をまとめます', color: '#A78BFA' },
+    { num: '4', title: 'あなたに話しかける', desc: 'ここでダッシュボードに通知が届きます', color: '#059669' },
+  ]
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "#F4F3FA" }}>
-      {/* ヘッダー */}
-      <div className="sticky top-0 z-10" style={{ background: "linear-gradient(135deg, #4338CA 0%, #6D28D9 50%, #7C3AED 100%)" }}>
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(30,27,75,0.5)", border: "1px solid rgba(255,255,255,0.15)" }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="8" r="4" />
-                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="font-black text-white text-sm leading-tight">あなたを学ぶAI</h1>
-              <p className="text-white/60 text-xs">思考・価値観・実績を学習中 — 約10〜15問</p>
-            </div>
-            {turnCount >= 8 && (
-              <button onClick={() => setStep('card')}
-                className="ml-auto text-xs font-bold px-3 py-1.5 rounded-full text-white transition" style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)" }}>
-                十分です。名刺を作る →
-              </button>
-            )}
+    <div className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: '#F4F3FA' }}>
+      <div className="w-full max-w-lg fade-in">
+        <div className="text-center mb-8">
+          <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-5" style={{ background: '#EEF2FF' }}>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
           </div>
-          {/* Progress bar */}
-          <div className="h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.15)' }}>
-            <div className="h-1 rounded-full transition-all duration-500"
-              style={{ width: `${progress}%`, background: 'rgba(255,255,255,0.7)' }} />
-          </div>
-          <div className="flex justify-between mt-1">
-            <span className="text-xs text-white/40">0</span>
-            <span className="text-xs text-white/60 font-medium">{turnCount} / 12</span>
-            <span className="text-xs text-white/40">12</span>
-          </div>
+          <h2 className="font-black text-2xl mb-2" style={{ color: '#1E1B4B' }}>あなたの分身AIが生まれました</h2>
+          <p className="text-sm" style={{ color: '#9896B8' }}>今この瞬間から、24時間働き始めます</p>
         </div>
-      </div>
-
-      {/* メッセージ */}
-      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-4 max-w-2xl mx-auto w-full">
-        {messages.map((msg, i) => {
-          const isLastAssistant = msg.role === 'assistant' && i === messages.length - 1 && !loading
-          const { text, choices } = msg.role === 'assistant' ? parseChoices(msg.content) : { text: msg.content, choices: [] }
-          return (
-            <div key={i} className={`fade-up ${msg.role === 'user' ? 'flex justify-end' : 'flex flex-col gap-2'}`}>
-              <div className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                {msg.role === 'assistant' && (
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
-                    style={{ background: 'var(--grad-primary)' }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="8" r="4" />
-                      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-                    </svg>
-                  </div>
-                )}
-                <div className={`max-w-xs sm:max-w-md ${msg.role === 'user' ? 'bubble-user' : 'bubble-ai'}`}
-                  style={{ whiteSpace: 'pre-wrap' }}>
-                  {text || msg.content}
+        <div className="card p-6 mb-5">
+          <p className="text-xs font-bold mb-4 uppercase tracking-widest" style={{ color: '#9896B8' }}>お客様はこう使います</p>
+          <div className="space-y-4">
+            {journey.map(({ num, title, desc, color }, i) => (
+              <div key={num} className="flex items-start gap-3">
+                <div className="flex flex-col items-center flex-shrink-0">
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center font-black text-xs text-white" style={{ background: color }}>{num}</div>
+                  {i < journey.length - 1 && <div style={{ width: 2, height: 24, background: '#E8E6F5', marginTop: 4 }} />}
+                </div>
+                <div style={{ paddingTop: 2 }}>
+                  <p className="text-sm font-bold" style={{ color: '#1E1B4B' }}>{title}</p>
+                  <p className="text-xs mt-0.5" style={{ color: '#9896B8' }}>{desc}</p>
                 </div>
               </div>
-              {isLastAssistant && choices.length > 0 && (
-                <div className="flex flex-wrap gap-2 pl-11">
-                  {choices.map((choice, ci) => (
-                    <button
-                      key={ci}
-                      onClick={() => sendMessage(choice)}
-                      style={{
-                        padding: '8px 16px',
-                        background: 'white',
-                        color: '#4338CA',
-                        border: '1.5px solid #C7D2FE',
-                        borderRadius: 20,
-                        fontSize: 13,
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        transition: 'all 0.15s',
-                        boxShadow: '0 1px 4px rgba(99,102,241,0.1)',
-                      }}
-                      onMouseEnter={e => {
-                        (e.target as HTMLButtonElement).style.background = '#EEF2FF'
-                        ;(e.target as HTMLButtonElement).style.borderColor = '#818CF8'
-                      }}
-                      onMouseLeave={e => {
-                        (e.target as HTMLButtonElement).style.background = 'white'
-                        ;(e.target as HTMLButtonElement).style.borderColor = '#C7D2FE'
-                      }}
-                    >
-                      {choice}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )
-        })}
-
-        {loading && messages.length === 0 && (
-          <div className="flex gap-3 justify-start fade-in">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{ background: 'var(--grad-primary)' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="8" r="4" />
-                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-              </svg>
-            </div>
-            <div className="bubble-ai flex items-center gap-1.5 px-5 py-3.5">
-              <span className="dot-pulse"></span>
-              <span className="dot-pulse"></span>
-              <span className="dot-pulse"></span>
-            </div>
+            ))}
           </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* 入力エリア */}
-      <div className="px-4 pb-6 pt-3 max-w-2xl mx-auto w-full">
-        <div className="flex gap-2 p-2 rounded-2xl shadow-md" style={{ background: "#fff", border: "1.5px solid #E8E6F5" }}>
-          <input
-            type="text"
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault()
-                sendMessage()
-              }
-            }}
-            disabled={loading}
-            placeholder="メッセージを入力..."
-            className="flex-1 bg-transparent outline-none px-3 text-sm"
-            style={{ color: "#1E1B4B" }}
-          />
-          <button
-            onClick={sendMessage}
-            disabled={loading || !input.trim()}
-            style={{ padding: "10px 20px", background: "linear-gradient(135deg, #6366F1, #8B5CF6)", color: "white", border: "none", borderRadius: 14, cursor: "pointer", fontWeight: 700, boxShadow: "0 2px 8px rgba(99,102,241,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}
-          >
-            {loading ? (
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full spin" />
-            ) : (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13" />
-                <polygon points="22 2 15 22 11 13 2 9 22 2" />
-              </svg>
-            )}
-          </button>
         </div>
+        <button
+          onClick={() => router.push('/dashboard')}
+          style={{
+            width: '100%', padding: '14px', fontSize: 16, fontWeight: 700,
+            background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+            color: 'white', border: 'none', borderRadius: 12, cursor: 'pointer',
+            boxShadow: '0 4px 14px rgba(99,102,241,0.35)',
+          }}
+        >
+          ダッシュボードへ →
+        </button>
       </div>
     </div>
   )
+}
+
+/* ── スタイルユーティリティ ── */
+const inputStyle: React.CSSProperties = {
+  padding: '11px 14px', fontSize: 14,
+  border: '1.5px solid #D1D0E8', borderRadius: 10,
+  background: '#F4F3FA', color: '#1E1B4B', outline: 'none',
+}
+const focusStyle = (e: React.FocusEvent<HTMLInputElement>) => {
+  e.target.style.borderColor = '#6366F1'
+  e.target.style.background = '#fff'
+  e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.12)'
+}
+const blurStyle = (e: React.FocusEvent<HTMLInputElement>) => {
+  e.target.style.borderColor = '#D1D0E8'
+  e.target.style.background = '#F4F3FA'
+  e.target.style.boxShadow = 'none'
 }

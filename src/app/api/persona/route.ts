@@ -31,22 +31,33 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { conversations, cardData } = await req.json()
-
-    const response = await deepseek.chat.completions.create({
-      model: MODEL,
-      max_tokens: 2048,
-      messages: [{ role: 'user', content: getExtractionPrompt(conversations) }],
-    })
-
-    const rawText = response.choices[0]?.message?.content || ''
+    const { conversations, cardData, draftSelections } = await req.json()
 
     let personaData
-    try {
-      const jsonMatch = rawText.match(/\{[\s\S]*\}/)
-      personaData = jsonMatch ? JSON.parse(jsonMatch[0]) : {}
-    } catch {
-      personaData = {}
+    if (draftSelections) {
+      // 新フロー：ドラフト選択から直接生成（AI抽出不要）
+      personaData = {
+        values_summary: draftSelections.values || '',
+        tone_profile: draftSelections.tone || '',
+        faq_json: draftSelections.faqs || [],
+        achievements_json: [],
+        forbidden_rules_json: draftSelections.forbidden || [],
+        routing_rules_json: [],
+      }
+    } else {
+      // 旧フロー：ヒアリング会話から抽出
+      const response = await deepseek.chat.completions.create({
+        model: MODEL,
+        max_tokens: 2048,
+        messages: [{ role: 'user', content: getExtractionPrompt(conversations || []) }],
+      })
+      const rawText = response.choices[0]?.message?.content || ''
+      try {
+        const jsonMatch = rawText.match(/\{[\s\S]*\}/)
+        personaData = jsonMatch ? JSON.parse(jsonMatch[0]) : {}
+      } catch {
+        personaData = {}
+      }
     }
 
     const { data: persona, error: personaError } = await supabase
