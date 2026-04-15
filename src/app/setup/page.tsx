@@ -262,7 +262,7 @@ export default function SetupPage() {
      STEP: generating
   ════════════════════════════════ */
   if (step === 'generating') {
-    const TOTAL = 20
+    const TOTAL = 60
     const progress = Math.min(5 + (elapsedSeconds / TOTAL) * 90, 95)
     const genSteps = [
       { label: 'あなたの情報を分析中', at: 0 },
@@ -271,7 +271,7 @@ export default function SetupPage() {
       { label: 'よくある質問を生成中', at: 14 },
     ]
     const currentStep = [...genSteps].reverse().find(s => elapsedSeconds >= s.at)
-    const isLong = elapsedSeconds >= 25
+    const isLong = elapsedSeconds >= 75
 
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#F4F3FA' }}>
@@ -286,7 +286,7 @@ export default function SetupPage() {
             </div>
             <h2 className="font-black text-xl mb-1" style={{ color: '#1E1B4B' }}>分身を生成中...</h2>
             <p className="text-sm" style={{ color: '#9896B8' }}>
-              {isLong ? 'AIサーバーが混雑しています。もう少しお待ちください' : 'このまましばらくお待ちください（約15〜20秒）'}
+              {isLong ? 'AIサーバーが混雑しています。もう少しお待ちください' : 'このまましばらくお待ちください（通常1分ほど）'}
             </p>
           </div>
 
@@ -344,7 +344,7 @@ export default function SetupPage() {
 
           {isLong && (
             <p className="text-xs text-center mt-4" style={{ color: '#9896B8' }}>
-              {elapsedSeconds}秒経過 · 通常15〜20秒で完成します
+              {elapsedSeconds}秒経過 · 通常1分ほどで完成します
             </p>
           )}
         </div>
