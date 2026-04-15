@@ -64,7 +64,7 @@ export default function LoginPage() {
           </h2>
           <div className="space-y-5">
             {[
-              '約10分で、あなたらしいAIが完成する',
+              '約3分で、あなたらしいAIが完成する',
               'QRコード一枚で、24時間対応が始まる',
               '要約＋相性スコアつきで、本物の商談へ',
             ].map((text) => (
@@ -116,7 +116,7 @@ export default function LoginPage() {
               {isSignUp ? '分身AIを作成する' : 'おかえりなさい'}
             </h1>
             <p className="text-sm" style={{ color: '#9896B8' }}>
-              {isSignUp ? '無料・約10分で完成します' : 'あなたのAIが待っています'}
+              {isSignUp ? '無料・約3分で完成します' : 'あなたのAIが待っています'}
             </p>
           </div>
 

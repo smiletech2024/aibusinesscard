@@ -80,7 +80,7 @@ export default function HomePage() {
         {/* Feature Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl w-full">
           {[
-            { step: '01', title: 'あなたを深く知る', desc: '約10分のヒアリング。思考・実績・価値観をAIが学習し、あなたらしい答え方を身につける。' },
+            { step: '01', title: 'あなたを深く知る', desc: '約3分のヒアリング。思考・実績・価値観をAIが学習し、あなたらしい答え方を身につける。' },
             { step: '02', title: '代わりに、話す', desc: 'QRを渡せばあとは全自動。深夜でも、移動中でも、顧客の質問にあなたとして答え続ける。' },
             { step: '03', title: '要約して、届ける', desc: '相性・課題・未解決点を整理した状態で通知。本当に動くべき商談だけが手元に届く。' },
           ].map(({ step, title, desc }) => (

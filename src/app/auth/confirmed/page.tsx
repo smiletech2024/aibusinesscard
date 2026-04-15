@@ -56,7 +56,7 @@ export default function ConfirmedPage() {
         </h1>
         <p style={{ fontSize: 14, color: '#9896C4', marginBottom: 32, lineHeight: 1.7 }}>
           あなたの分身AIを、今すぐ作りましょう。<br />
-          約10分で、24時間働くAIが完成します。
+          約3分で、24時間働くAIが完成します。
         </p>
 
         {/* ステップ案内 */}
@@ -75,7 +75,7 @@ export default function ConfirmedPage() {
           </p>
           {[
             { num: '1', text: 'ログインしてダッシュボードへ' },
-            { num: '2', text: 'AIと会話しながら、あなたの思考を学習させる（約10分）' },
+            { num: '2', text: 'AIと会話しながら、あなたの思考を学習させる（約3分）' },
             { num: '3', text: 'QRコード付きのAI名刺が完成。すぐに渡せます' },
           ].map(({ num, text }) => (
             <div key={num} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>

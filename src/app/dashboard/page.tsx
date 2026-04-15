@@ -492,7 +492,7 @@ export default function DashboardPage() {
               </div>
               <h3 className="font-black text-lg mb-2" style={{ color: '#1E1B4B' }}>分身AIを作りましょう</h3>
               <p className="text-sm mb-6" style={{ color: '#9896B8' }}>
-                約10分のヒアリングで、あなたらしく話すAIが完成。<br />
+                約3分のヒアリングで、あなたらしく話すAIが完成。<br />
                 QRコードを渡すだけで、24時間対応が始まります
               </p>
               <Link href="/setup" className="btn-primary text-sm px-7 py-3" style={{ borderRadius: 14 }}>
