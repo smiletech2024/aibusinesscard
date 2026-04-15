@@ -569,6 +569,13 @@ export default function DashboardPage() {
                             編集
                           </Link>
                           <Link
+                            href={`/edit-persona/${card.id}`}
+                            className="text-xs px-4 py-2 rounded-xl font-semibold transition"
+                            style={{ background: '#EEF2FF', color: '#4338CA', border: '1.5px solid #C7D2FE' }}
+                          >
+                            AIを強化
+                          </Link>
+                          <Link
                             href={`/print/${card.id}`}
                             className="btn-ghost text-xs px-4 py-2"
                             style={{ borderRadius: 10 }}

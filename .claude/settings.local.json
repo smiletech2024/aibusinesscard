@@ -21,7 +21,9 @@
       "Bash(git push:*)",
       "Bash(npx web-push:*)",
       "Bash(gh run:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(mkdir -p /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/api/persona/\\\\[personaId\\\\])",
+      "Bash(mkdir -p /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/edit-persona/\\\\[cardId\\\\])"
     ]
   }
 }

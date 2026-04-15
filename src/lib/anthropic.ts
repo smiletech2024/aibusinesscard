@@ -117,7 +117,7 @@ export function getSummaryPrompt(conversations: Array<{ role: string; content: s
     .map(c => `${c.role === 'user' ? '顧客' : '分身AI'}: ${c.content}`)
     .join('\n')
 
-  return `以下は${ownerName}の分身AIと顧客の会話です。営業担当者目線で分析し、JSON形式で出力してください。
+  return `以下は${ownerName}の分身AIと顧客の会話です。営業担当者目線で詳細に分析し、JSON形式で出力してください。
 
 【会話内容】
 ${conversationText}
@@ -130,6 +130,9 @@ ${conversationText}
   "compatibility_score": "相性評価（高い/中程度/低い）とその理由（1〜2文）",
   "unresolved_points": "未解決の論点・疑問点（箇条書き）",
   "next_action": "推奨される次のアクション（具体的に、1〜2文）",
+  "key_interests": "会話の流れで顧客が最も反応した・前のめりになったトピックやキーワード（箇条書き3〜5項目）",
+  "hot_score": "商談温度と理由。形式：「熱い🔥」「ぬるい🌡」「冷たい❄️」のいずれかと、50字以内の理由",
+  "follow_up_message": "${ownerName}本人がそのままコピペで顧客に送れるフォローアップメッセージ草案。会話の内容を踏まえ、自然な口語体で。150字以内。",
   "bant": {
     "budget": "予算感（言及があれば記載、なければ「未確認」）",
     "authority": "決裁権（本人か、上司の承認が必要か）",

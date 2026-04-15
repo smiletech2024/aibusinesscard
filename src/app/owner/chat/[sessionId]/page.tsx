@@ -309,13 +309,12 @@ export default function OwnerChatPage() {
       {showSummary && summary && (
         <div
           className="px-4 py-4"
-          style={{
-            background: '#0F0E20',
-            borderBottom: '1px solid rgba(139,92,246,0.15)',
-          }}
+          style={{ background: '#0F0E20', borderBottom: '1px solid rgba(139,92,246,0.15)' }}
         >
-          <div className="max-w-2xl mx-auto">
-            <p className="text-xs font-black mb-3" style={{ color: '#7B6EF5' }}>AIによる事前整理</p>
+          <div className="max-w-2xl mx-auto space-y-3">
+            <p className="text-xs font-black" style={{ color: '#7B6EF5' }}>AIによる事前整理</p>
+
+            {/* 基本4項目 */}
             <div className="grid grid-cols-2 gap-2">
               {[
                 { key: 'purpose', label: '目的' },
@@ -326,46 +325,75 @@ export default function OwnerChatPage() {
                 const val = summary[key as keyof ConversationSummary] as string
                 if (!val) return null
                 return (
-                  <div
-                    key={key}
-                    className="rounded-xl p-2.5"
-                    style={{ background: '#161428', border: '1px solid rgba(139,92,246,0.1)' }}
-                  >
+                  <div key={key} className="rounded-xl p-2.5"
+                    style={{ background: '#161428', border: '1px solid rgba(139,92,246,0.1)' }}>
                     <p className="text-xs font-bold mb-1" style={{ color: '#7B6EF5' }}>{label}</p>
                     <p className="text-xs leading-relaxed" style={{ color: '#9896C4' }}>{val}</p>
                   </div>
                 )
               })}
             </div>
-            {/* BANT分析 */}
+
+            {/* raw_summary から拡張フィールドを取得 */}
             {(() => {
               try {
-                const raw = summary.raw_summary ? JSON.parse(summary.raw_summary.match(/\{[\s\S]*\}/)?.[0] || '{}') : {}
-                const bant = raw.bant
-                if (!bant) return null
+                const raw = summary.raw_summary
+                  ? JSON.parse(summary.raw_summary.match(/\{[\s\S]*\}/)?.[0] || '{}')
+                  : {}
                 return (
-                  <div className="mt-3 rounded-xl p-3" style={{ background: '#161428', border: '1px solid rgba(139,92,246,0.1)' }}>
-                    <p className="text-xs font-bold mb-2" style={{ color: '#7B6EF5' }}>BANT分析</p>
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {[
-                        { label: '予算', value: bant.budget },
-                        { label: '決裁権', value: bant.authority },
-                        { label: 'ニーズ', value: bant.need },
-                        { label: '時期', value: bant.timeline },
-                      ].map(({ label, value }) => value && (
-                        <div key={label}>
-                          <span className="text-xs font-bold" style={{ color: '#5A587E' }}>{label}：</span>
-                          <span className="text-xs" style={{ color: '#9896C4' }}>{value}</span>
+                  <>
+                    {/* 商談温度 + 関心キーワード */}
+                    {(raw.hot_score || raw.key_interests) && (
+                      <div className="rounded-xl p-3"
+                        style={{ background: '#161428', border: '1px solid rgba(139,92,246,0.1)' }}>
+                        {raw.hot_score && (
+                          <p className="text-xs mb-1.5">
+                            <span className="font-bold" style={{ color: '#7B6EF5' }}>商談温度：</span>
+                            <span style={{ color: '#EDEEFF' }}>{raw.hot_score}</span>
+                          </p>
+                        )}
+                        {raw.key_interests && (
+                          <>
+                            <p className="text-xs font-bold mb-1" style={{ color: '#7B6EF5' }}>関心キーワード</p>
+                            <p className="text-xs leading-relaxed" style={{ color: '#9896C4', whiteSpace: 'pre-wrap' }}>{raw.key_interests}</p>
+                          </>
+                        )}
+                      </div>
+                    )}
+
+                    {/* BANT */}
+                    {raw.bant && (
+                      <div className="rounded-xl p-3"
+                        style={{ background: '#161428', border: '1px solid rgba(139,92,246,0.1)' }}>
+                        <p className="text-xs font-bold mb-2" style={{ color: '#F59E0B' }}>BANT分析</p>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {[
+                            { label: '予算', value: raw.bant.budget },
+                            { label: '決裁権', value: raw.bant.authority },
+                            { label: 'ニーズ', value: raw.bant.need },
+                            { label: '時期', value: raw.bant.timeline },
+                          ].map(({ label, value }) => value && (
+                            <div key={label}>
+                              <span className="text-xs font-bold" style={{ color: '#5A587E' }}>{label}：</span>
+                              <span className="text-xs" style={{ color: '#9896C4' }}>{value}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </div>
+                      </div>
+                    )}
+
+                    {/* フォローアップ草案 */}
+                    {raw.follow_up_message && (
+                      <FollowUpBlock message={raw.follow_up_message} />
+                    )}
+                  </>
                 )
               } catch { return null }
             })()}
+
             <button
               onClick={() => router.push(`/summary/${sessionId}`)}
-              className="text-xs font-medium mt-2.5 transition"
+              className="text-xs font-medium transition"
               style={{ color: '#7B6EF5', background: 'transparent', border: 'none', cursor: 'pointer' }}
             >
               まとめ全文を見る →
@@ -681,6 +709,34 @@ export default function OwnerChatPage() {
           {myName}として送信 · {otherName}に届きます
         </p>
       </div>
+    </div>
+  )
+}
+
+function FollowUpBlock({ message }: { message: string }) {
+  const [copied, setCopied] = useState(false)
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(message)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+  return (
+    <div className="rounded-xl p-3" style={{ background: 'rgba(52,211,153,0.06)', border: '1px solid rgba(52,211,153,0.2)' }}>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs font-bold" style={{ color: '#34D399' }}>📩 フォローアップ草案（コピペで送れます）</p>
+        <button
+          onClick={handleCopy}
+          style={{
+            fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 8,
+            background: copied ? '#34D399' : 'rgba(52,211,153,0.15)',
+            color: copied ? 'white' : '#34D399',
+            border: '1px solid rgba(52,211,153,0.3)', cursor: 'pointer', transition: 'all 0.2s',
+          }}
+        >
+          {copied ? 'コピー済み ✓' : 'コピー'}
+        </button>
+      </div>
+      <p className="text-xs leading-relaxed" style={{ color: '#EDEEFF', whiteSpace: 'pre-wrap' }}>{message}</p>
     </div>
   )
 }
