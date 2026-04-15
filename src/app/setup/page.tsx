@@ -60,11 +60,19 @@ export default function SetupPage() {
     full_name: '', title: '', company: '', short_intro: '', email: '', phone: '', website: '',
   })
 
+  const [elapsedSeconds, setElapsedSeconds] = useState(0)
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) router.push('/auth/login')
     })
   }, [])
+
+  useEffect(() => {
+    if (step !== 'generating') { setElapsedSeconds(0); return }
+    const t = setInterval(() => setElapsedSeconds(s => s + 1), 1000)
+    return () => clearInterval(t)
+  }, [step])
 
   /* ── キーワードタグ操作 ── */
   const addKeyword = (kw: string) => {
@@ -254,29 +262,91 @@ export default function SetupPage() {
      STEP: generating
   ════════════════════════════════ */
   if (step === 'generating') {
+    const TOTAL = 20
+    const progress = Math.min((elapsedSeconds / TOTAL) * 100, 95)
+    const genSteps = [
+      { label: 'あなたの情報を分析中', at: 0 },
+      { label: '話し方スタイルを設計中', at: 4 },
+      { label: '価値観・強みを整理中', at: 9 },
+      { label: 'よくある質問を生成中', at: 14 },
+    ]
+    const currentStep = [...genSteps].reverse().find(s => elapsedSeconds >= s.at)
+    const isLong = elapsedSeconds >= 25
+
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#F4F3FA' }}>
-        <div className="text-center">
-          <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6"
-            style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', boxShadow: '0 8px 32px rgba(99,102,241,0.4)' }}>
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-            </svg>
+        <div className="w-full max-w-sm">
+          {/* アイコン */}
+          <div className="text-center mb-8">
+            <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-4"
+              style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', boxShadow: '0 8px 32px rgba(99,102,241,0.4)' }}>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+              </svg>
+            </div>
+            <h2 className="font-black text-xl mb-1" style={{ color: '#1E1B4B' }}>分身を生成中...</h2>
+            <p className="text-sm" style={{ color: '#9896B8' }}>
+              {isLong ? 'AIサーバーが混雑しています。もう少しお待ちください' : 'このまましばらくお待ちください（約15〜20秒）'}
+            </p>
           </div>
-          <h2 className="font-black text-xl mb-2" style={{ color: '#1E1B4B' }}>あなたの分身を生成中...</h2>
-          <p className="text-sm mb-6" style={{ color: '#9896B8' }}>話し方・価値観・よくある質問を自動作成しています</p>
-          <div className="flex justify-center gap-2">
-            {['話し方を設計中', '価値観を整理中', 'FAQを生成中'].map((label, i) => (
-              <span key={i} className="text-xs px-3 py-1.5 rounded-full font-medium"
-                style={{ background: '#EEF2FF', color: '#6366F1' }}>
-                {label}
-              </span>
-            ))}
+
+          {/* プログレスバー */}
+          <div className="mb-6">
+            <div className="flex justify-between text-xs mb-1.5" style={{ color: '#9896B8' }}>
+              <span>{currentStep?.label ?? '準備中'}...</span>
+              <span>{Math.round(progress)}%</span>
+            </div>
+            <div className="h-2 rounded-full overflow-hidden" style={{ background: '#E8E6F5' }}>
+              <div
+                className="h-2 rounded-full transition-all duration-1000"
+                style={{
+                  width: `${progress}%`,
+                  background: 'linear-gradient(90deg, #6366F1, #8B5CF6)',
+                }}
+              />
+            </div>
           </div>
-          <div className="mt-8 flex justify-center">
-            <div className="w-8 h-8 border-4 rounded-full spin"
-              style={{ borderColor: '#E8E6F5', borderTopColor: '#6366F1' }} />
+
+          {/* ステップリスト */}
+          <div className="card p-4 space-y-3">
+            {genSteps.map((s, i) => {
+              const done = elapsedSeconds > s.at + 4
+              const active = elapsedSeconds >= s.at && !done
+              return (
+                <div key={i} className="flex items-center gap-3">
+                  <div style={{
+                    width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: done ? '#6366F1' : active ? 'rgba(99,102,241,0.15)' : '#F4F3FA',
+                    border: active ? '2px solid #6366F1' : done ? 'none' : '2px solid #E8E6F5',
+                    transition: 'all 0.4s',
+                  }}>
+                    {done ? (
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    ) : active ? (
+                      <div className="w-2 h-2 rounded-full spin" style={{ border: '2px solid transparent', borderTopColor: '#6366F1' }} />
+                    ) : null}
+                  </div>
+                  <span className="text-sm" style={{
+                    color: done ? '#1E1B4B' : active ? '#6366F1' : '#C4C2D8',
+                    fontWeight: done || active ? 600 : 400,
+                    transition: 'all 0.3s',
+                  }}>
+                    {s.label}
+                    {done && <span style={{ color: '#34D399', marginLeft: 6, fontSize: 12 }}>✓</span>}
+                  </span>
+                </div>
+              )
+            })}
           </div>
+
+          {isLong && (
+            <p className="text-xs text-center mt-4" style={{ color: '#9896B8' }}>
+              {elapsedSeconds}秒経過 · 通常15〜20秒で完成します
+            </p>
+          )}
         </div>
       </div>
     )
