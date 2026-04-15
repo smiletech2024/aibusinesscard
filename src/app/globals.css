@@ -1,30 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #F4F3FA;
+  --bg: #FAF5F0;
   --surface: #FFFFFF;
-  --surface-2: #EFEDFA;
-  --primary: #6366F1;
-  --primary-dark: #4F46E5;
-  --primary-light: #EEF2FF;
-  --primary-glow: rgba(99,102,241,0.15);
-  --secondary: #8B5CF6;
+  --surface-2: #F8EDE4;
+  --primary: #F26722;
+  --primary-dark: #D4551A;
+  --primary-light: #FFF0E8;
+  --primary-glow: rgba(242,103,34,0.15);
+  --secondary: #F59340;
   --accent: #F43F5E;
   --success: #10B981;
   --warning: #F59E0B;
-  --border: #E8E6F5;
-  --border-focus: #6366F1;
-  --text: #1E1B4B;
-  --text-2: #4A4870;
-  --muted: #9896B8;
-  --shadow-xs: 0 1px 2px rgba(99,102,241,0.06);
-  --shadow-sm: 0 1px 3px rgba(99,102,241,0.08), 0 4px 12px rgba(99,102,241,0.05);
-  --shadow-md: 0 4px 8px rgba(99,102,241,0.08), 0 12px 30px rgba(99,102,241,0.08);
-  --shadow-lg: 0 8px 16px rgba(99,102,241,0.1), 0 24px 48px rgba(99,102,241,0.12);
-  --shadow-xl: 0 12px 24px rgba(99,102,241,0.12), 0 40px 80px rgba(99,102,241,0.16);
-  --grad-primary: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
-  --grad-dark: linear-gradient(135deg, #4338CA 0%, #6D28D9 100%);
-  --grad-subtle: linear-gradient(135deg, #EEF2FF 0%, #F5F3FF 100%);
+  --border: #EDD9C8;
+  --border-focus: #F26722;
+  --text: #1C0F05;
+  --text-2: #4A2C1A;
+  --muted: #A08068;
+  --shadow-xs: 0 1px 2px rgba(242,103,34,0.06);
+  --shadow-sm: 0 1px 3px rgba(242,103,34,0.08), 0 4px 12px rgba(242,103,34,0.05);
+  --shadow-md: 0 4px 8px rgba(242,103,34,0.08), 0 12px 30px rgba(242,103,34,0.08);
+  --shadow-lg: 0 8px 16px rgba(242,103,34,0.1), 0 24px 48px rgba(242,103,34,0.12);
+  --shadow-xl: 0 12px 24px rgba(242,103,34,0.12), 0 40px 80px rgba(242,103,34,0.16);
+  --grad-primary: linear-gradient(135deg, #F26722 0%, #F59340 100%);
+  --grad-dark: linear-gradient(135deg, #C4511A 0%, #C4511A 100%);
+  --grad-subtle: linear-gradient(135deg, #FFF0E8 0%, #FFF5EE 100%);
   --radius-sm: 8px;
   --radius: 14px;
   --radius-lg: 20px;
@@ -40,8 +40,8 @@ html {
 }
 
 body {
-  background: #F4F3FA;
-  color: #1E1B4B;
+  background: #FAF5F0;
+  color: #1C0F05;
   font-family: 'Inter', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -55,21 +55,21 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+    background: linear-gradient(135deg, #F26722 0%, #F59340 100%);
     color: #fff;
     font-weight: 700;
     font-size: 0.9rem;
     border-radius: 9999px;
     padding: 12px 28px;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+    box-shadow: 0 4px 14px rgba(242,103,34,0.35);
     border: none;
     cursor: pointer;
     text-decoration: none;
   }
   .btn-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(99,102,241,0.4);
+    box-shadow: 0 6px 20px rgba(242,103,34,0.4);
     color: #fff;
   }
   .btn-primary:active { transform: translateY(0); }
@@ -86,47 +86,47 @@ body {
     justify-content: center;
     gap: 8px;
     background: transparent;
-    color: #6366F1;
+    color: #F26722;
     font-weight: 600;
     font-size: 0.875rem;
     border-radius: 9999px;
     padding: 10px 22px;
-    border: 1.5px solid #6366F1;
+    border: 1.5px solid #F26722;
     transition: all 0.2s ease;
     cursor: pointer;
     text-decoration: none;
   }
   .btn-ghost:hover {
-    background: #EEF2FF;
+    background: #FFF0E8;
     transform: translateY(-1px);
-    color: #6366F1;
+    color: #F26722;
   }
 
   /* ─── カード ─── */
   .card {
     background: #FFFFFF;
     border-radius: 20px;
-    box-shadow: 0 1px 3px rgba(99,102,241,0.08), 0 4px 12px rgba(99,102,241,0.05);
-    border: 1px solid #E8E6F5;
+    box-shadow: 0 1px 3px rgba(242,103,34,0.08), 0 4px 12px rgba(242,103,34,0.05);
+    border: 1px solid #EDD9C8;
   }
 
   /* ─── インプット ─── */
   .input-field {
     width: 100%;
-    background: #F4F3FA;
-    border: 1.5px solid #E8E6F5;
+    background: #FAF5F0;
+    border: 1.5px solid #EDD9C8;
     border-radius: 14px;
     padding: 12px 16px;
     font-size: 0.925rem;
-    color: #1E1B4B;
+    color: #1C0F05;
     transition: all 0.2s ease;
     outline: none;
   }
-  .input-field::placeholder { color: #9896B8; }
+  .input-field::placeholder { color: #A08068; }
   .input-field:focus {
-    border-color: #6366F1;
+    border-color: #F26722;
     background: #FFFFFF;
-    box-shadow: 0 0 0 4px rgba(99,102,241,0.15);
+    box-shadow: 0 0 0 4px rgba(242,103,34,0.15);
   }
 
   /* ─── バッジ ─── */
@@ -143,24 +143,24 @@ body {
 
   /* ─── チャットバブル ─── */
   .bubble-user {
-    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+    background: linear-gradient(135deg, #F26722 0%, #F59340 100%);
     color: #fff;
     border-radius: 20px 20px 4px 20px;
     padding: 11px 16px;
     font-size: 0.9rem;
     line-height: 1.5;
-    box-shadow: 0 2px 8px rgba(99,102,241,0.25);
+    box-shadow: 0 2px 8px rgba(242,103,34,0.25);
   }
 
   .bubble-ai {
     background: #FFFFFF;
-    color: #1E1B4B;
+    color: #1C0F05;
     border-radius: 20px 20px 20px 4px;
     padding: 11px 16px;
     font-size: 0.9rem;
     line-height: 1.5;
-    box-shadow: 0 1px 3px rgba(99,102,241,0.08), 0 4px 12px rgba(99,102,241,0.05);
-    border: 1px solid #E8E6F5;
+    box-shadow: 0 1px 3px rgba(242,103,34,0.08), 0 4px 12px rgba(242,103,34,0.05);
+    border: 1px solid #EDD9C8;
   }
 
   /* ─── グラスモーフィズム ─── */
@@ -172,7 +172,7 @@ body {
   }
 
   .glass-dark {
-    background: rgba(30,27,75,0.6);
+    background: rgba(28,15,5,0.6);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255,255,255,0.1);
@@ -180,7 +180,7 @@ body {
 
   /* ─── グラデーション背景 ─── */
   .grad-bg {
-    background: linear-gradient(135deg, #4338CA 0%, #6D28D9 50%, #7C3AED 100%);
+    background: linear-gradient(135deg, #C4511A 0%, #C4511A 50%, #D4691E 100%);
     position: relative;
     overflow: hidden;
   }
@@ -213,7 +213,7 @@ body {
     font-weight: 800;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: #9896B8;
+    color: #A08068;
   }
 }
 
@@ -225,7 +225,7 @@ body {
   .fade-in { animation: fadeIn 0.4s ease forwards; }
   .spin { animation: spin 0.8s linear infinite; }
   .shimmer {
-    background: linear-gradient(90deg, #E8E6F5 25%, #EFEDFA 50%, #E8E6F5 75%);
+    background: linear-gradient(90deg, #EDD9C8 25%, #F8EDE4 50%, #EDD9C8 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
   }
@@ -234,7 +234,7 @@ body {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #9896B8;
+    background: #A08068;
     animation: dotPulse 1.4s infinite;
   }
   .dot-pulse:nth-child(2) { animation-delay: 0.2s; }
@@ -245,7 +245,7 @@ body {
   .float { animation: float 3s ease-in-out infinite; }
   .gradient-shift { animation: gradientShift 4s ease infinite; background-size: 200% 200%; }
   .text-gradient {
-    background: linear-gradient(135deg, #A78BFA 0%, #818CF8 50%, #A78BFA 100%);
+    background: linear-gradient(135deg, #F5C09A 0%, #F5A47A 50%, #F5C09A 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -257,22 +257,22 @@ body {
     background-clip: text;
   }
   .bubble-user-dark {
-    background: linear-gradient(135deg, #6356D4 0%, #7B6EF5 100%);
+    background: linear-gradient(135deg, #E05A18 0%, #F5843A 100%);
     color: #fff;
     border-radius: 20px 20px 4px 20px;
     padding: 12px 18px;
     font-size: 0.9rem;
     line-height: 1.6;
-    box-shadow: 0 4px 20px rgba(123,110,245,0.35);
+    box-shadow: 0 4px 20px rgba(242,103,34,0.35);
   }
   .bubble-ai-dark {
-    background: #161428;
-    color: #EDEEFF;
+    background: #1C0F05;
+    color: #FFF0E8;
     border-radius: 20px 20px 20px 4px;
     padding: 12px 18px;
     font-size: 0.9rem;
     line-height: 1.6;
-    border: 1px solid rgba(139,92,246,0.12);
+    border: 1px solid rgba(242,103,34,0.12);
   }
 }
 
@@ -297,8 +297,8 @@ body {
 }
 
 @keyframes glowPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(123,110,245,0.4), 0 0 20px rgba(123,110,245,0.2); }
-  50% { box-shadow: 0 0 0 8px rgba(123,110,245,0), 0 0 40px rgba(123,110,245,0.3); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(242,103,34,0.4), 0 0 20px rgba(242,103,34,0.2); }
+  50% { box-shadow: 0 0 0 8px rgba(242,103,34,0), 0 0 40px rgba(242,103,34,0.3); }
 }
 @keyframes float {
   0%, 100% { transform: translateY(0px); }

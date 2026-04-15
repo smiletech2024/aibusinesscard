@@ -158,7 +158,7 @@ export default function OwnerChatPage() {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#09081A' }}>
         <div className="w-8 h-8 rounded-full spin"
-          style={{ border: '3px solid rgba(123,110,245,0.3)', borderTopColor: '#7B6EF5' }} />
+          style={{ border: '3px solid rgba(242,103,34,0.3)', borderTopColor: '#F5843A' }} />
       </div>
     )
   }
@@ -196,7 +196,7 @@ export default function OwnerChatPage() {
             style={{
               background: '#0F0E20', borderRadius: 20, padding: '28px 24px',
               maxWidth: 320, width: '100%', textAlign: 'center',
-              border: '1px solid rgba(139,92,246,0.2)',
+              border: '1px solid rgba(242,103,34,0.2)',
               boxShadow: '0 24px 60px rgba(0,0,0,0.6)',
             }}
           >
@@ -211,13 +211,13 @@ export default function OwnerChatPage() {
                 <path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
               </svg>
             </div>
-            <p style={{ fontWeight: 900, fontSize: 16, color: '#EDEEFF', marginBottom: 8 }}>
+            <p style={{ fontWeight: 900, fontSize: 16, color: '#FFF0E8', marginBottom: 8 }}>
               会話履歴を削除しますか？
             </p>
-            <p style={{ fontSize: 13, color: '#9896C4', marginBottom: 6 }}>
+            <p style={{ fontSize: 13, color: '#A08068', marginBottom: 6 }}>
               {customerName}との会話
             </p>
-            <p style={{ fontSize: 12, color: '#5A587E', marginBottom: 24, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 12, color: '#6B4030', marginBottom: 24, lineHeight: 1.6 }}>
               AI会話・まとめ・チャット履歴をすべて削除します。<br />この操作は取り消せません。
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -236,7 +236,7 @@ export default function OwnerChatPage() {
                 onClick={() => setShowDeleteConfirm(false)}
                 style={{
                   flex: 1, padding: '11px 0', borderRadius: 12, fontSize: 13, fontWeight: 600,
-                  background: 'rgba(255,255,255,0.06)', color: '#9896C4',
+                  background: 'rgba(255,255,255,0.06)', color: '#A08068',
                   border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer',
                 }}
               >
@@ -251,7 +251,7 @@ export default function OwnerChatPage() {
         className="sticky top-0 z-10"
         style={{
           background: '#0F0E20',
-          borderBottom: '1px solid rgba(139,92,246,0.12)',
+          borderBottom: '1px solid rgba(242,103,34,0.12)',
           boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
         }}
       >
@@ -259,22 +259,22 @@ export default function OwnerChatPage() {
           <div className="flex items-center -space-x-2 flex-shrink-0">
             <div
               className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold text-white"
-              style={{ background: '#6356D4', borderColor: '#0F0E20' }}
+              style={{ background: '#E05A18', borderColor: '#0F0E20' }}
             >
               {ownerName[0]}
             </div>
             <div
               className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold text-white"
-              style={{ background: '#4F46E5', borderColor: '#0F0E20' }}
+              style={{ background: '#D4551A', borderColor: '#0F0E20' }}
             >
               {customerName[0]}
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <h1 className="font-bold text-sm truncate" style={{ color: '#EDEEFF' }}>
+            <h1 className="font-bold text-sm truncate" style={{ color: '#FFF0E8' }}>
               {ownerName} × {customerName}
             </h1>
-            <p className="text-xs" style={{ color: '#5A587E' }}>
+            <p className="text-xs" style={{ color: '#6B4030' }}>
               {senderRole === 'owner'
                 ? '本会話 · 分身AIが事前整理済み · オーナーとして参加'
                 : '送信したらページを閉じてOK · 返信が届いたら通知します'}
@@ -284,9 +284,9 @@ export default function OwnerChatPage() {
             onClick={() => setShowSummary(!showSummary)}
             className="text-xs px-3 py-1.5 rounded-full flex-shrink-0 transition"
             style={{
-              background: 'rgba(123,110,245,0.12)',
-              color: '#9896C4',
-              border: '1px solid rgba(123,110,245,0.2)',
+              background: 'rgba(242,103,34,0.12)',
+              color: '#A08068',
+              border: '1px solid rgba(242,103,34,0.2)',
               cursor: 'pointer',
             }}
           >
@@ -320,10 +320,10 @@ export default function OwnerChatPage() {
       {showSummary && summary && (
         <div
           className="px-4 py-4"
-          style={{ background: '#0F0E20', borderBottom: '1px solid rgba(139,92,246,0.15)' }}
+          style={{ background: '#0F0E20', borderBottom: '1px solid rgba(242,103,34,0.15)' }}
         >
           <div className="max-w-2xl mx-auto space-y-3">
-            <p className="text-xs font-black" style={{ color: '#7B6EF5' }}>AIによる事前整理</p>
+            <p className="text-xs font-black" style={{ color: '#F5843A' }}>AIによる事前整理</p>
 
             {/* 基本4項目 */}
             <div className="grid grid-cols-2 gap-2">
@@ -337,9 +337,9 @@ export default function OwnerChatPage() {
                 if (!val) return null
                 return (
                   <div key={key} className="rounded-xl p-2.5"
-                    style={{ background: '#161428', border: '1px solid rgba(139,92,246,0.1)' }}>
-                    <p className="text-xs font-bold mb-1" style={{ color: '#7B6EF5' }}>{label}</p>
-                    <p className="text-xs leading-relaxed" style={{ color: '#9896C4' }}>{val}</p>
+                    style={{ background: '#1C0F05', border: '1px solid rgba(242,103,34,0.1)' }}>
+                    <p className="text-xs font-bold mb-1" style={{ color: '#F5843A' }}>{label}</p>
+                    <p className="text-xs leading-relaxed" style={{ color: '#A08068' }}>{val}</p>
                   </div>
                 )
               })}
@@ -356,17 +356,17 @@ export default function OwnerChatPage() {
                     {/* 商談温度 + 関心キーワード */}
                     {(raw.hot_score || raw.key_interests) && (
                       <div className="rounded-xl p-3"
-                        style={{ background: '#161428', border: '1px solid rgba(139,92,246,0.1)' }}>
+                        style={{ background: '#1C0F05', border: '1px solid rgba(242,103,34,0.1)' }}>
                         {raw.hot_score && (
                           <p className="text-xs mb-1.5">
-                            <span className="font-bold" style={{ color: '#7B6EF5' }}>商談温度：</span>
-                            <span style={{ color: '#EDEEFF' }}>{raw.hot_score}</span>
+                            <span className="font-bold" style={{ color: '#F5843A' }}>商談温度：</span>
+                            <span style={{ color: '#FFF0E8' }}>{raw.hot_score}</span>
                           </p>
                         )}
                         {raw.key_interests && (
                           <>
-                            <p className="text-xs font-bold mb-1" style={{ color: '#7B6EF5' }}>関心キーワード</p>
-                            <p className="text-xs leading-relaxed" style={{ color: '#9896C4', whiteSpace: 'pre-wrap' }}>{raw.key_interests}</p>
+                            <p className="text-xs font-bold mb-1" style={{ color: '#F5843A' }}>関心キーワード</p>
+                            <p className="text-xs leading-relaxed" style={{ color: '#A08068', whiteSpace: 'pre-wrap' }}>{raw.key_interests}</p>
                           </>
                         )}
                       </div>
@@ -375,7 +375,7 @@ export default function OwnerChatPage() {
                     {/* BANT */}
                     {raw.bant && (
                       <div className="rounded-xl p-3"
-                        style={{ background: '#161428', border: '1px solid rgba(139,92,246,0.1)' }}>
+                        style={{ background: '#1C0F05', border: '1px solid rgba(242,103,34,0.1)' }}>
                         <p className="text-xs font-bold mb-2" style={{ color: '#F59E0B' }}>BANT分析</p>
                         <div className="grid grid-cols-2 gap-1.5">
                           {[
@@ -385,8 +385,8 @@ export default function OwnerChatPage() {
                             { label: '時期', value: raw.bant.timeline },
                           ].map(({ label, value }) => value && (
                             <div key={label}>
-                              <span className="text-xs font-bold" style={{ color: '#5A587E' }}>{label}：</span>
-                              <span className="text-xs" style={{ color: '#9896C4' }}>{value}</span>
+                              <span className="text-xs font-bold" style={{ color: '#6B4030' }}>{label}：</span>
+                              <span className="text-xs" style={{ color: '#A08068' }}>{value}</span>
                             </div>
                           ))}
                         </div>
@@ -405,7 +405,7 @@ export default function OwnerChatPage() {
             <button
               onClick={() => router.push(`/summary/${sessionId}`)}
               className="text-xs font-medium transition"
-              style={{ color: '#7B6EF5', background: 'transparent', border: 'none', cursor: 'pointer' }}
+              style={{ color: '#F5843A', background: 'transparent', border: 'none', cursor: 'pointer' }}
             >
               まとめ全文を見る →
             </button>
@@ -415,36 +415,36 @@ export default function OwnerChatPage() {
 
       {/* AI会話履歴 */}
       {aiConvs.length > 0 && (
-        <div style={{ borderBottom: '1px solid rgba(139,92,246,0.12)' }}>
+        <div style={{ borderBottom: '1px solid rgba(242,103,34,0.12)' }}>
           <button
             onClick={() => setShowAiHistory(v => !v)}
             className="w-full px-4 py-3 flex items-center justify-between max-w-2xl mx-auto"
             style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
           >
-            <span className="text-xs font-bold" style={{ color: '#7B6EF5' }}>
+            <span className="text-xs font-bold" style={{ color: '#F5843A' }}>
               AIとの会話履歴（{aiConvs.length}件）
             </span>
-            <span style={{ color: '#5A587E', fontSize: 12 }}>{showAiHistory ? '▲ 閉じる' : '▼ 見る'}</span>
+            <span style={{ color: '#6B4030', fontSize: 12 }}>{showAiHistory ? '▲ 閉じる' : '▼ 見る'}</span>
           </button>
           {showAiHistory && (
             <div className="px-4 pb-4 space-y-2 max-w-2xl mx-auto">
               <div className="rounded-xl px-3 py-2 mb-2 flex items-center gap-2"
-                style={{ background: 'rgba(123,110,245,0.08)', border: '1px solid rgba(123,110,245,0.15)' }}>
+                style={{ background: 'rgba(242,103,34,0.08)', border: '1px solid rgba(242,103,34,0.15)' }}>
                 <span style={{ fontSize: 14 }}>💡</span>
-                <p className="text-xs" style={{ color: '#9896C4' }}>
-                  AIの回答が惜しい場合は <span style={{ color: '#9B8BF5', fontWeight: 700 }}>「学習させる」</span> で本人の正解を登録できます
+                <p className="text-xs" style={{ color: '#A08068' }}>
+                  AIの回答が惜しい場合は <span style={{ color: '#F59340', fontWeight: 700 }}>「学習させる」</span> で本人の正解を登録できます
                 </p>
               </div>
               {aiConvs.map((c, i) => (
                 <div key={i} className={`flex gap-2 ${c.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   {c.role === 'assistant' && (
                     <div className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black text-white flex-shrink-0"
-                      style={{ background: 'linear-gradient(135deg, #6356D4, #7B6EF5)', fontSize: 9 }}>AI</div>
+                      style={{ background: 'linear-gradient(135deg, #E05A18, #F5843A)', fontSize: 9 }}>AI</div>
                   )}
                   <div className="flex flex-col gap-1 max-w-xs">
                     <div className="text-xs px-3 py-2 rounded-2xl" style={{
-                      background: c.role === 'user' ? 'rgba(99,86,212,0.2)' : '#161428',
-                      color: '#9896C4', whiteSpace: 'pre-wrap',
+                      background: c.role === 'user' ? 'rgba(99,86,212,0.2)' : '#1C0F05',
+                      color: '#A08068', whiteSpace: 'pre-wrap',
                       borderRadius: c.role === 'user' ? '16px 4px 16px 16px' : '4px 16px 16px 16px',
                     }}>
                       {c.content}
@@ -461,9 +461,9 @@ export default function OwnerChatPage() {
                         style={{
                           alignSelf: 'flex-start', fontSize: 10, fontWeight: 700,
                           padding: '3px 10px', borderRadius: 8,
-                          background: 'rgba(123,110,245,0.1)',
-                          color: '#9B8BF5',
-                          border: '1px solid rgba(123,110,245,0.2)',
+                          background: 'rgba(242,103,34,0.1)',
+                          color: '#F59340',
+                          border: '1px solid rgba(242,103,34,0.2)',
                           cursor: 'pointer',
                         }}
                       >
@@ -491,7 +491,7 @@ export default function OwnerChatPage() {
             <p className="text-xs font-bold" style={{ color: '#93C5FD' }}>あなたは：</p>
             {[
               { role: 'customer' as const, label: `${customerName}（お客様）`, color: '#2563EB' },
-              { role: 'owner' as const, label: `${ownerName}（本人）`, color: '#7B6EF5' },
+              { role: 'owner' as const, label: `${ownerName}（本人）`, color: '#F5843A' },
             ].map(({ role, label, color }) => (
               <button
                 key={role}
@@ -519,19 +519,19 @@ export default function OwnerChatPage() {
                 className="rounded-2xl p-5"
                 style={{
                   background: '#0F0E20',
-                  border: '1px solid rgba(139,92,246,0.15)',
+                  border: '1px solid rgba(242,103,34,0.15)',
                 }}
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div
                     className="w-11 h-11 rounded-xl flex items-center justify-center font-black text-white"
-                    style={{ background: 'linear-gradient(135deg, #6356D4, #7B6EF5)', fontSize: 18 }}
+                    style={{ background: 'linear-gradient(135deg, #E05A18, #F5843A)', fontSize: 18 }}
                   >
                     {ownerName[0]}
                   </div>
                   <div>
-                    <p className="font-black text-sm" style={{ color: '#EDEEFF' }}>{ownerName}本人へ届きます</p>
-                    <p className="text-xs" style={{ color: '#5A587E' }}>AIが整理した内容をもとに、本人が返信します</p>
+                    <p className="font-black text-sm" style={{ color: '#FFF0E8' }}>{ownerName}本人へ届きます</p>
+                    <p className="text-xs" style={{ color: '#6B4030' }}>AIが整理した内容をもとに、本人が返信します</p>
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -542,7 +542,7 @@ export default function OwnerChatPage() {
                   ].map(({ icon, text }) => (
                     <div key={text} className="flex items-center gap-3">
                       <span style={{ fontSize: 16, flexShrink: 0 }}>{icon}</span>
-                      <p className="text-sm" style={{ color: '#9896C4' }}>{text}</p>
+                      <p className="text-sm" style={{ color: '#A08068' }}>{text}</p>
                     </div>
                   ))}
                 </div>
@@ -596,15 +596,15 @@ export default function OwnerChatPage() {
             /* オーナー向け */
             <div className="py-8 px-2 space-y-4 fade-in">
               {!summary && aiConvs.length > 0 && (
-                <div className="rounded-2xl p-5" style={{ background: '#0F0E20', border: '1px solid rgba(123,110,245,0.2)' }}>
-                  <p className="font-bold text-sm mb-1" style={{ color: '#EDEEFF' }}>AI会話をまとめますか？</p>
-                  <p className="text-xs mb-4" style={{ color: '#5A587E' }}>お客様との会話内容を整理して、すぐに本題から話せます</p>
+                <div className="rounded-2xl p-5" style={{ background: '#0F0E20', border: '1px solid rgba(242,103,34,0.2)' }}>
+                  <p className="font-bold text-sm mb-1" style={{ color: '#FFF0E8' }}>AI会話をまとめますか？</p>
+                  <p className="text-xs mb-4" style={{ color: '#6B4030' }}>お客様との会話内容を整理して、すぐに本題から話せます</p>
                   <button
                     onClick={createSummary}
                     disabled={summarizing}
                     className="w-full py-3 font-bold text-white rounded-2xl"
                     style={{
-                      background: 'linear-gradient(135deg, #7B6EF5, #9B8BF5)',
+                      background: 'linear-gradient(135deg, #F5843A, #F59340)',
                       border: 'none', cursor: summarizing ? 'not-allowed' : 'pointer',
                       opacity: summarizing ? 0.7 : 1,
                     }}
@@ -614,8 +614,8 @@ export default function OwnerChatPage() {
                 </div>
               )}
               <div className="text-center py-4">
-                <p className="font-bold mb-1" style={{ color: '#EDEEFF' }}>準備が整っています</p>
-                <p className="text-sm" style={{ color: '#5A587E' }}>下の入力欄からメッセージを送れます</p>
+                <p className="font-bold mb-1" style={{ color: '#FFF0E8' }}>準備が整っています</p>
+                <p className="text-sm" style={{ color: '#6B4030' }}>下の入力欄からメッセージを送れます</p>
               </div>
             </div>
           )
@@ -624,8 +624,8 @@ export default function OwnerChatPage() {
           const isMe = chat.sender_role === senderRole
           const isOwner = chat.sender_role === 'owner'
           const senderName = isOwner ? ownerName : customerName
-          const ownerGrad = 'linear-gradient(135deg, #5B21B6, #7B6EF5)'
-          const customerGrad = 'linear-gradient(135deg, #4338CA, #6356D4)'
+          const ownerGrad = 'linear-gradient(135deg, #C4511A, #F5843A)'
+          const customerGrad = 'linear-gradient(135deg, #C4511A, #E05A18)'
           return (
             <div key={chat.id} className={`flex gap-2.5 fade-up ${isMe ? 'justify-end' : 'justify-start'}`}>
               {!isMe && (
@@ -637,7 +637,7 @@ export default function OwnerChatPage() {
                 </div>
               )}
               <div className="max-w-xs sm:max-w-md">
-                <p className={`text-xs mb-1 ${isMe ? 'text-right' : 'text-left'}`} style={{ color: '#5A587E' }}>
+                <p className={`text-xs mb-1 ${isMe ? 'text-right' : 'text-left'}`} style={{ color: '#6B4030' }}>
                   {senderName}
                 </p>
                 <div
@@ -645,14 +645,14 @@ export default function OwnerChatPage() {
                     borderRadius: isMe ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
                     background: isMe
                       ? (isOwner ? ownerGrad : customerGrad)
-                      : '#161428',
-                    border: isMe ? 'none' : '1px solid rgba(139,92,246,0.12)',
-                    color: isMe ? 'white' : '#EDEEFF',
+                      : '#1C0F05',
+                    border: isMe ? 'none' : '1px solid rgba(242,103,34,0.12)',
+                    color: isMe ? 'white' : '#FFF0E8',
                     padding: '12px 18px',
                     fontSize: '0.9rem',
                     lineHeight: 1.6,
                     whiteSpace: 'pre-wrap',
-                    boxShadow: isMe ? `0 4px 16px rgba(123,110,245,0.3)` : 'none',
+                    boxShadow: isMe ? `0 4px 16px rgba(242,103,34,0.3)` : 'none',
                   }}
                 >
                   {chat.content}
@@ -693,8 +693,8 @@ export default function OwnerChatPage() {
         <div
           className="flex gap-2 p-2 rounded-2xl"
           style={{
-            background: '#161428',
-            border: '1px solid rgba(139,92,246,0.15)',
+            background: '#1C0F05',
+            border: '1px solid rgba(242,103,34,0.15)',
           }}
         >
           <textarea
@@ -714,14 +714,14 @@ export default function OwnerChatPage() {
             placeholder={`${myName}として送信...`}
             rows={1}
             className="flex-1 bg-transparent outline-none px-3 text-sm resize-none"
-            style={{ color: '#EDEEFF', lineHeight: '1.5', paddingTop: 10, paddingBottom: 10, overflowY: 'hidden' }}
+            style={{ color: '#FFF0E8', lineHeight: '1.5', paddingTop: 10, paddingBottom: 10, overflowY: 'hidden' }}
           />
           <button
             onClick={sendMessage}
             disabled={loading || !input.trim()}
             style={{
               padding: '10px 14px',
-              background: 'linear-gradient(135deg, #6356D4, #7B6EF5)',
+              background: 'linear-gradient(135deg, #E05A18, #F5843A)',
               color: 'white',
               border: 'none',
               borderRadius: 14,
@@ -746,7 +746,7 @@ export default function OwnerChatPage() {
             )}
           </button>
         </div>
-        <p className="text-xs text-center mt-2" style={{ color: '#5A587E' }}>
+        <p className="text-xs text-center mt-2" style={{ color: '#6B4030' }}>
           {myName}として送信 · {otherName}に届きます
         </p>
       </div>
@@ -789,39 +789,39 @@ function LearnModal({ question, aiAnswer, personaId, onClose }: {
         style={{
           background: '#0F0E20', borderRadius: '20px 20px 0 0',
           padding: '24px 20px 32px', width: '100%', maxWidth: 600,
-          border: '1px solid rgba(139,92,246,0.2)',
+          border: '1px solid rgba(242,103,34,0.2)',
           boxShadow: '0 -16px 60px rgba(0,0,0,0.6)',
         }}
       >
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="font-black text-base" style={{ color: '#EDEEFF' }}>AIの回答を修正して学習させる</p>
-            <p className="text-xs mt-0.5" style={{ color: '#5A587E' }}>次から同じ質問には本人の回答で答えます</p>
+            <p className="font-black text-base" style={{ color: '#FFF0E8' }}>AIの回答を修正して学習させる</p>
+            <p className="text-xs mt-0.5" style={{ color: '#6B4030' }}>次から同じ質問には本人の回答で答えます</p>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5A587E', fontSize: 20 }}>×</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6B4030', fontSize: 20 }}>×</button>
         </div>
 
         {question && (
-          <div className="rounded-xl p-3 mb-3" style={{ background: '#161428', border: '1px solid rgba(139,92,246,0.1)' }}>
-            <p className="text-xs font-bold mb-1" style={{ color: '#5A587E' }}>お客様の質問</p>
-            <p className="text-sm" style={{ color: '#9896C4' }}>{question}</p>
+          <div className="rounded-xl p-3 mb-3" style={{ background: '#1C0F05', border: '1px solid rgba(242,103,34,0.1)' }}>
+            <p className="text-xs font-bold mb-1" style={{ color: '#6B4030' }}>お客様の質問</p>
+            <p className="text-sm" style={{ color: '#A08068' }}>{question}</p>
           </div>
         )}
 
         <div className="mb-4">
-          <p className="text-xs font-bold mb-2" style={{ color: '#9B8BF5' }}>本人の正しい回答（編集してください）</p>
+          <p className="text-xs font-bold mb-2" style={{ color: '#F59340' }}>本人の正しい回答（編集してください）</p>
           <textarea
             value={myAnswer}
             onChange={e => setMyAnswer(e.target.value)}
             rows={5}
             style={{
               width: '100%', padding: '12px 14px', fontSize: 13, lineHeight: 1.6,
-              background: '#161428', color: '#EDEEFF',
-              border: '1.5px solid rgba(123,110,245,0.3)', borderRadius: 12,
+              background: '#1C0F05', color: '#FFF0E8',
+              border: '1.5px solid rgba(242,103,34,0.3)', borderRadius: 12,
               outline: 'none', resize: 'none', boxSizing: 'border-box',
             }}
-            onFocus={e => { e.target.style.borderColor = '#7B6EF5' }}
-            onBlur={e => { e.target.style.borderColor = 'rgba(123,110,245,0.3)' }}
+            onFocus={e => { e.target.style.borderColor = '#F5843A' }}
+            onBlur={e => { e.target.style.borderColor = 'rgba(242,103,34,0.3)' }}
           />
         </div>
 
@@ -830,9 +830,9 @@ function LearnModal({ question, aiAnswer, personaId, onClose }: {
           disabled={saving || done || !myAnswer.trim()}
           style={{
             width: '100%', padding: '14px', fontSize: 15, fontWeight: 700,
-            background: done ? '#34D399' : 'linear-gradient(135deg, #6356D4, #7B6EF5)',
+            background: done ? '#34D399' : 'linear-gradient(135deg, #E05A18, #F5843A)',
             color: 'white', border: 'none', borderRadius: 12, cursor: 'pointer',
-            boxShadow: '0 4px 16px rgba(123,110,245,0.35)',
+            boxShadow: '0 4px 16px rgba(242,103,34,0.35)',
             opacity: saving ? 0.7 : 1,
           }}
         >
@@ -866,7 +866,7 @@ function FollowUpBlock({ message }: { message: string }) {
           {copied ? 'コピー済み ✓' : 'コピー'}
         </button>
       </div>
-      <p className="text-xs leading-relaxed" style={{ color: '#EDEEFF', whiteSpace: 'pre-wrap' }}>{message}</p>
+      <p className="text-xs leading-relaxed" style={{ color: '#FFF0E8', whiteSpace: 'pre-wrap' }}>{message}</p>
     </div>
   )
 }

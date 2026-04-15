@@ -130,7 +130,7 @@ export default function ChatPage() {
         className="sticky top-0 z-10"
         style={{
           background: '#0F0E20',
-          borderBottom: '1px solid rgba(139,92,246,0.1)',
+          borderBottom: '1px solid rgba(242,103,34,0.1)',
           boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
         }}
       >
@@ -138,20 +138,20 @@ export default function ChatPage() {
           <div
             className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm flex-shrink-0"
             style={{
-              background: 'linear-gradient(135deg, #6356D4, #7B6EF5)',
+              background: 'linear-gradient(135deg, #E05A18, #F5843A)',
               color: 'white',
-              boxShadow: '0 0 12px rgba(123,110,245,0.3)',
+              boxShadow: '0 0 12px rgba(242,103,34,0.3)',
             }}
           >
             AI
           </div>
           <div className="flex-1 min-w-0">
-            <h1 className="font-bold text-sm leading-tight" style={{ color: '#EDEEFF' }}>
+            <h1 className="font-bold text-sm leading-tight" style={{ color: '#FFF0E8' }}>
               {ownerName}の分身AI
             </h1>
             <div className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#34D399' }} />
-              <p className="text-xs truncate" style={{ color: '#5A587E' }}>
+              <p className="text-xs truncate" style={{ color: '#6B4030' }}>
                 本人監修のAI · 会話は後で本人に届きます
               </p>
             </div>
@@ -162,9 +162,9 @@ export default function ChatPage() {
               disabled={summarizing}
               className="text-xs font-bold px-3 py-1.5 rounded-full flex-shrink-0 transition"
               style={{
-                background: 'rgba(123,110,245,0.15)',
-                color: '#9B8BF5',
-                border: '1px solid rgba(123,110,245,0.3)',
+                background: 'rgba(242,103,34,0.15)',
+                color: '#F59340',
+                border: '1px solid rgba(242,103,34,0.3)',
                 cursor: 'pointer',
               }}
             >
@@ -178,11 +178,11 @@ export default function ChatPage() {
       <div
         className="px-4 py-2.5 text-center"
         style={{
-          background: 'rgba(123,110,245,0.08)',
-          borderBottom: '1px solid rgba(139,92,246,0.2)',
+          background: 'rgba(242,103,34,0.08)',
+          borderBottom: '1px solid rgba(242,103,34,0.2)',
         }}
       >
-        <p className="text-xs font-medium" style={{ color: '#9896C4' }}>
+        <p className="text-xs font-medium" style={{ color: '#A08068' }}>
           このAIは{ownerName}本人が学習させた分身です。具体的な契約・金額は本人が対応します
         </p>
       </div>
@@ -194,7 +194,7 @@ export default function ChatPage() {
             {msg.role === 'assistant' && (
               <div
                 className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-black text-white shadow-sm"
-                style={{ background: 'linear-gradient(135deg, #6356D4, #7B6EF5)' }}
+                style={{ background: 'linear-gradient(135deg, #E05A18, #F5843A)' }}
               >
                 AI
               </div>
@@ -205,9 +205,9 @@ export default function ChatPage() {
             >
               {msg.content || (
                 <span className="flex items-center gap-1.5 py-0.5">
-                  <span className="dot-pulse" style={{ background: '#9896C4' }} />
-                  <span className="dot-pulse" style={{ background: '#9896C4' }} />
-                  <span className="dot-pulse" style={{ background: '#9896C4' }} />
+                  <span className="dot-pulse" style={{ background: '#A08068' }} />
+                  <span className="dot-pulse" style={{ background: '#A08068' }} />
+                  <span className="dot-pulse" style={{ background: '#A08068' }} />
                 </span>
               )}
             </div>
@@ -246,7 +246,7 @@ export default function ChatPage() {
               <button
                 onClick={() => setPushAsked(false)}
                 className="text-xs px-3 py-1.5 rounded-full"
-                style={{ background: 'rgba(255,255,255,0.08)', color: '#9896C4', border: 'none', cursor: 'pointer' }}
+                style={{ background: 'rgba(255,255,255,0.08)', color: '#A08068', border: 'none', cursor: 'pointer' }}
               >
                 あとで
               </button>
@@ -260,14 +260,14 @@ export default function ChatPage() {
         <div
           className="px-4 py-4"
           style={{
-            background: '#161428',
-            borderTop: '1px solid rgba(139,92,246,0.2)',
+            background: '#1C0F05',
+            borderTop: '1px solid rgba(242,103,34,0.2)',
           }}
         >
           <div className="max-w-2xl mx-auto flex items-center gap-3">
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold" style={{ color: '#EDEEFF' }}>本人に引き継ぐ準備ができました</p>
-              <p className="text-xs mt-0.5" style={{ color: '#9896C4' }}>
+              <p className="text-sm font-bold" style={{ color: '#FFF0E8' }}>本人に引き継ぐ準備ができました</p>
+              <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>
                 会話をまとめて{ownerName}へ橋渡しします
               </p>
             </div>
@@ -275,10 +275,10 @@ export default function ChatPage() {
               onClick={createSummary}
               className="text-xs font-bold px-4 py-2.5 rounded-xl flex-shrink-0 text-white"
               style={{
-                background: 'linear-gradient(135deg, #7B6EF5, #9B8BF5)',
+                background: 'linear-gradient(135deg, #F5843A, #F59340)',
                 border: 'none',
                 cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(123,110,245,0.35)',
+                boxShadow: '0 4px 14px rgba(242,103,34,0.35)',
               }}
             >
               まとめへ →
@@ -297,9 +297,9 @@ export default function ChatPage() {
             onClick={() => router.push(`/owner/chat/${sessionId}`)}
             className="w-full py-3.5 font-bold text-white rounded-2xl"
             style={{
-              background: 'linear-gradient(135deg, #7B6EF5, #9B8BF5)',
+              background: 'linear-gradient(135deg, #F5843A, #F59340)',
               border: 'none', cursor: 'pointer', fontSize: '0.95rem',
-              boxShadow: '0 4px 20px rgba(123,110,245,0.4)',
+              boxShadow: '0 4px 20px rgba(242,103,34,0.4)',
             }}
           >
             このお客様と直接話す →
@@ -318,8 +318,8 @@ export default function ChatPage() {
         <div
           className="flex gap-2 p-2 rounded-2xl"
           style={{
-            background: '#161428',
-            border: '1px solid rgba(139,92,246,0.15)',
+            background: '#1C0F05',
+            border: '1px solid rgba(242,103,34,0.15)',
           }}
         >
           <textarea
@@ -340,14 +340,14 @@ export default function ChatPage() {
             placeholder="メッセージを入力..."
             rows={1}
             className="flex-1 bg-transparent outline-none px-3 text-sm resize-none"
-            style={{ color: '#EDEEFF', lineHeight: '1.5', paddingTop: 10, paddingBottom: 10, overflowY: 'hidden' }}
+            style={{ color: '#FFF0E8', lineHeight: '1.5', paddingTop: 10, paddingBottom: 10, overflowY: 'hidden' }}
           />
           <button
             onClick={sendMessage}
             disabled={loading || !input.trim() || summarizing}
             style={{
               padding: '10px 14px',
-              background: 'linear-gradient(135deg, #6356D4, #7B6EF5)',
+              background: 'linear-gradient(135deg, #E05A18, #F5843A)',
               color: 'white',
               border: 'none',
               borderRadius: 14,

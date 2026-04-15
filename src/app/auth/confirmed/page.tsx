@@ -9,7 +9,7 @@ export default function ConfirmedPage() {
       style={{
         minHeight: '100vh',
         background: '#07060F',
-        backgroundImage: 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(123,110,245,0.2) 0%, transparent 70%)',
+        backgroundImage: 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(242,103,34,0.2) 0%, transparent 70%)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -25,7 +25,7 @@ export default function ConfirmedPage() {
           maxWidth: 420,
           width: '100%',
           textAlign: 'center',
-          border: '1px solid rgba(123,110,245,0.2)',
+          border: '1px solid rgba(242,103,34,0.2)',
           boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
         }}
       >
@@ -51,10 +51,10 @@ export default function ConfirmedPage() {
         </div>
 
         {/* メッセージ */}
-        <h1 style={{ fontSize: 22, fontWeight: 900, color: '#EDEEFF', marginBottom: 8, lineHeight: 1.3 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 900, color: '#FFF0E8', marginBottom: 8, lineHeight: 1.3 }}>
           準備ができました。
         </h1>
-        <p style={{ fontSize: 14, color: '#9896C4', marginBottom: 32, lineHeight: 1.7 }}>
+        <p style={{ fontSize: 14, color: '#A08068', marginBottom: 32, lineHeight: 1.7 }}>
           あなたの分身AIを、今すぐ作りましょう。<br />
           約3分で、24時間働くAIが完成します。
         </p>
@@ -62,15 +62,15 @@ export default function ConfirmedPage() {
         {/* ステップ案内 */}
         <div
           style={{
-            background: '#161428',
+            background: '#1C0F05',
             borderRadius: 14,
             padding: '20px 16px',
             marginBottom: 28,
             textAlign: 'left',
-            border: '1px solid rgba(139,92,246,0.1)',
+            border: '1px solid rgba(242,103,34,0.1)',
           }}
         >
-          <p style={{ fontSize: 11, fontWeight: 800, color: '#5A587E', letterSpacing: '0.1em', marginBottom: 14, textTransform: 'uppercase' }}>
+          <p style={{ fontSize: 11, fontWeight: 800, color: '#6B4030', letterSpacing: '0.1em', marginBottom: 14, textTransform: 'uppercase' }}>
             3ステップで完成
           </p>
           {[
@@ -82,15 +82,15 @@ export default function ConfirmedPage() {
               <div
                 style={{
                   width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
-                  background: 'linear-gradient(135deg, #6356D4, #7B6EF5)',
+                  background: 'linear-gradient(135deg, #E05A18, #F5843A)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 11, fontWeight: 900, color: 'white',
-                  boxShadow: '0 2px 8px rgba(123,110,245,0.3)',
+                  boxShadow: '0 2px 8px rgba(242,103,34,0.3)',
                 }}
               >
                 {num}
               </div>
-              <p style={{ fontSize: 13, color: '#9896C4', fontWeight: 500, lineHeight: 1.5, margin: 0, paddingTop: 3 }}>
+              <p style={{ fontSize: 13, color: '#A08068', fontWeight: 500, lineHeight: 1.5, margin: 0, paddingTop: 3 }}>
                 {text}
               </p>
             </div>
@@ -104,20 +104,20 @@ export default function ConfirmedPage() {
             display: 'block',
             width: '100%',
             padding: '16px',
-            background: 'linear-gradient(135deg, #7B6EF5, #9B8BF5)',
+            background: 'linear-gradient(135deg, #F26722, #F59340)',
             color: 'white',
             fontWeight: 700,
             fontSize: 16,
             borderRadius: 14,
             textDecoration: 'none',
-            boxShadow: '0 8px 28px rgba(123,110,245,0.4)',
+            boxShadow: '0 8px 28px rgba(242,103,34,0.4)',
             marginBottom: 12,
           }}
         >
           分身AIを作り始める →
         </Link>
 
-        <p style={{ fontSize: 12, color: '#5A587E' }}>
+        <p style={{ fontSize: 12, color: '#6B4030' }}>
           登録したメールアドレスとパスワードでログインできます
         </p>
 

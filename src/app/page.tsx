@@ -7,7 +7,7 @@ export default function HomePage() {
       className="min-h-screen flex flex-col"
       style={{
         background: '#07060F',
-        backgroundImage: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(123,110,245,0.15) 0%, transparent 100%)',
+        backgroundImage: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(242,103,34,0.15) 0%, transparent 100%)',
       }}
     >
       {/* Nav */}
@@ -17,7 +17,7 @@ export default function HomePage() {
           href="/auth/login"
           className="text-sm font-semibold px-5 py-2 rounded-full transition"
           style={{
-            color: '#EDEEFF',
+            color: '#FFF0E8',
             border: '1px solid rgba(255,255,255,0.15)',
             background: 'transparent',
           }}
@@ -39,14 +39,14 @@ export default function HomePage() {
 
         {/* Heading */}
         <h1 className="font-black mb-6 leading-tight tracking-tight" style={{ fontSize: 'clamp(40px, 7vw, 72px)' }}>
-          <span style={{ color: '#EDEEFF', display: 'block' }}>あなたの名刺が、</span>
+          <span style={{ color: '#FFF0E8', display: 'block' }}>あなたの名刺が、</span>
           <span className="text-gradient" style={{ display: 'block' }}>24時間話し続ける。</span>
         </h1>
 
         {/* Subtext */}
         <p
           className="text-base max-w-lg mb-12 leading-relaxed"
-          style={{ color: '#9896C4', whiteSpace: 'pre-line' }}
+          style={{ color: '#A08068', whiteSpace: 'pre-line' }}
         >
           {`QRコードを渡すだけ。あなたの分身AIが顧客の相談に応え、\n本当に会うべき人だけを、整理された状態で届けてくれる。`}
         </p>
@@ -58,7 +58,7 @@ export default function HomePage() {
             className="font-bold px-8 py-4 rounded-full text-base transition hover:opacity-90"
             style={{
               background: 'white',
-              color: '#4F46E5',
+              color: '#D4551A',
               boxShadow: '0 4px 24px rgba(0,0,0,0.35)',
             }}
           >
@@ -68,7 +68,7 @@ export default function HomePage() {
             href="/auth/login"
             className="font-semibold px-8 py-4 rounded-full text-base transition"
             style={{
-              color: '#EDEEFF',
+              color: '#FFF0E8',
               border: '1.5px solid rgba(255,255,255,0.2)',
               background: 'transparent',
             }}
@@ -89,17 +89,17 @@ export default function HomePage() {
               className="text-left p-6 rounded-2xl"
               style={{
                 background: '#0F0E20',
-                border: '1px solid rgba(139,92,246,0.12)',
+                border: '1px solid rgba(242,103,34,0.12)',
               }}
             >
               <div
                 className="text-xs font-black mb-4"
-                style={{ color: '#7B6EF5' }}
+                style={{ color: '#F5843A' }}
               >
                 {step} /
               </div>
-              <h3 className="font-bold mb-2" style={{ color: '#EDEEFF' }}>{title}</h3>
-              <p className="text-sm leading-relaxed" style={{ color: '#9896C4' }}>
+              <h3 className="font-bold mb-2" style={{ color: '#FFF0E8' }}>{title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: '#A08068' }}>
                 {desc}
               </p>
             </div>
@@ -109,7 +109,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <div className="text-center py-6">
-        <p className="text-xs" style={{ color: '#5A587E' }}>
+        <p className="text-xs" style={{ color: '#6B4030' }}>
           © 2026 AI名刺
         </p>
       </div>

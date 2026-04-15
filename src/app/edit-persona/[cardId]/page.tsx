@@ -149,23 +149,23 @@ export default function EditPersonaPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#F4F3FA' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#FAF5F0' }}>
         <div className="w-8 h-8 border-4 rounded-full spin"
-          style={{ borderColor: '#E8E6F5', borderTopColor: '#6366F1' }} />
+          style={{ borderColor: '#EDD9C8', borderTopColor: '#F26722' }} />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen" style={{ background: '#F4F3FA' }}>
+    <div className="min-h-screen" style={{ background: '#FAF5F0' }}>
       {/* Header */}
-      <div className="sticky top-0 z-10" style={{ background: 'white', borderBottom: '1px solid #E8E6F5' }}>
+      <div className="sticky top-0 z-10" style={{ background: 'white', borderBottom: '1px solid #EDD9C8' }}>
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">
           <button
             onClick={() => router.push('/dashboard')}
             style={{
               width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center',
-              justifyContent: 'center', background: '#F4F3FA', border: 'none', cursor: 'pointer',
+              justifyContent: 'center', background: '#FAF5F0', border: 'none', cursor: 'pointer',
             }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -173,8 +173,8 @@ export default function EditPersonaPage() {
             </svg>
           </button>
           <div>
-            <h1 className="font-black text-base" style={{ color: '#1E1B4B' }}>AIの知識を強化する</h1>
-            <p className="text-xs" style={{ color: '#9896B8' }}>スキル・案件事例を学習させると回答精度が上がります</p>
+            <h1 className="font-black text-base" style={{ color: '#1C0F05' }}>AIの知識を強化する</h1>
+            <p className="text-xs" style={{ color: '#A08068' }}>スキル・案件事例を学習させると回答精度が上がります</p>
           </div>
         </div>
       </div>
@@ -183,17 +183,17 @@ export default function EditPersonaPage() {
 
         {/* 生の声 ← 最も重要なセクション */}
         <div className="rounded-2xl p-5"
-          style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.06), rgba(139,92,246,0.1))', border: '1.5px solid rgba(99,102,241,0.25)' }}>
+          style={{ background: 'linear-gradient(135deg, rgba(242,103,34,0.06), rgba(242,103,34,0.1))', border: '1.5px solid rgba(242,103,34,0.25)' }}>
           <div className="flex items-start gap-3 mb-3">
             <span style={{ fontSize: 24, flexShrink: 0 }}>🎤</span>
             <div>
-              <h2 className="font-black text-sm" style={{ color: '#1E1B4B' }}>
+              <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>
                 あなたの生の言葉を貼り付ける
                 <span className="ml-2 text-xs font-bold px-2 py-0.5 rounded-full"
-                  style={{ background: 'rgba(99,102,241,0.12)', color: '#6366F1' }}>最も効果大</span>
+                  style={{ background: 'rgba(242,103,34,0.12)', color: '#F26722' }}>最も効果大</span>
               </h2>
               <p className="text-xs mt-1 leading-relaxed" style={{ color: '#6B7280' }}>
-                SNS投稿・メール・ブログ・仕事への想いなど、<strong style={{ color: '#1E1B4B' }}>あなたが実際に書いた文章</strong>をそのまま貼り付けてください。<br />
+                SNS投稿・メール・ブログ・仕事への想いなど、<strong style={{ color: '#1C0F05' }}>あなたが実際に書いた文章</strong>をそのまま貼り付けてください。<br />
                 整えなくていいです。文体・語彙・熱量をAIが直接学習します。
               </p>
             </div>
@@ -205,39 +205,39 @@ export default function EditPersonaPage() {
             placeholder={`例：\n「正直、数字だけ追いかける仕事が好きじゃなくて。お客さんが「あ、なんか変わった気がする」って言ってくれた瞬間が一番うれしいんですよね。\n\n成果を出すことは当たり前だけど、それよりその人の事業が面白くなるかどうかを一番気にしてます。小手先の施策じゃなくて、なぜこれをやるのか、の部分から一緒に考えたい。」\n\n→ あなたが実際に書いた・話した文章をそのままどうぞ`}
             style={{
               width: '100%', padding: '14px', fontSize: 13, lineHeight: 1.7,
-              border: '1.5px solid rgba(99,102,241,0.2)', borderRadius: 12,
-              background: 'white', color: '#1E1B4B', outline: 'none',
+              border: '1.5px solid rgba(242,103,34,0.2)', borderRadius: 12,
+              background: 'white', color: '#1C0F05', outline: 'none',
               resize: 'vertical', boxSizing: 'border-box',
             }}
-            onFocus={e => { e.target.style.borderColor = '#6366F1'; e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.1)' }}
-            onBlur={e => { e.target.style.borderColor = 'rgba(99,102,241,0.2)'; e.target.style.boxShadow = 'none' }}
+            onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.boxShadow = '0 0 0 3px rgba(242,103,34,0.1)' }}
+            onBlur={e => { e.target.style.borderColor = 'rgba(242,103,34,0.2)'; e.target.style.boxShadow = 'none' }}
           />
           {rawVoice.length > 0 && (
-            <p className="text-xs mt-2" style={{ color: '#9896B8' }}>{rawVoice.length}文字 · 多いほど精度が上がります</p>
+            <p className="text-xs mt-2" style={{ color: '#A08068' }}>{rawVoice.length}文字 · 多いほど精度が上がります</p>
           )}
         </div>
 
         {/* スキルセット */}
         <div className="card p-5">
-          <h2 className="font-black text-sm mb-1" style={{ color: '#1E1B4B' }}>
+          <h2 className="font-black text-sm mb-1" style={{ color: '#1C0F05' }}>
             スキルセット・専門領域
           </h2>
-          <p className="text-xs mb-3" style={{ color: '#9896B8' }}>
+          <p className="text-xs mb-3" style={{ color: '#A08068' }}>
             技術・手法・得意分野などを入力。Enterで追加（最大20個）
           </p>
           <div
             className="flex flex-wrap gap-2 p-2.5 rounded-xl"
-            style={{ background: '#F4F3FA', border: '1.5px solid #D1D0E8', minHeight: 50 }}
+            style={{ background: '#FAF5F0', border: '1.5px solid #DEC4AD', minHeight: 50 }}
           >
             {skills.map(sk => (
               <span key={sk}
                 className="flex items-center gap-1 text-sm font-semibold px-3 py-1 rounded-full"
-                style={{ background: '#EEF2FF', color: '#4338CA' }}
+                style={{ background: '#FFF0E8', color: '#C4511A' }}
               >
                 {sk}
                 <button
                   onClick={() => setSkills(p => p.filter(s => s !== sk))}
-                  style={{ color: '#818CF8', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1 }}
+                  style={{ color: '#F5A47A', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1 }}
                 >×</button>
               </span>
             ))}
@@ -249,12 +249,12 @@ export default function EditPersonaPage() {
                 onBlur={() => kwInput && addSkill(kwInput)}
                 placeholder={skills.length === 0 ? 'React, TypeScript, BtoB営業... など' : '追加...'}
                 className="outline-none bg-transparent text-sm flex-1"
-                style={{ minWidth: 140, color: '#1E1B4B' }}
+                style={{ minWidth: 140, color: '#1C0F05' }}
               />
             )}
           </div>
           {skills.length > 0 && (
-            <p className="text-xs mt-2" style={{ color: '#9896B8' }}>{skills.length}個登録済み</p>
+            <p className="text-xs mt-2" style={{ color: '#A08068' }}>{skills.length}個登録済み</p>
           )}
         </div>
 
@@ -262,34 +262,34 @@ export default function EditPersonaPage() {
         <div>
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h2 className="font-black text-sm" style={{ color: '#1E1B4B' }}>よくある質問（FAQ）</h2>
-              <p className="text-xs mt-0.5" style={{ color: '#9896B8' }}>お客様がよく聞く質問と回答を登録しておくと精度が上がります</p>
+              <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>よくある質問（FAQ）</h2>
+              <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>お客様がよく聞く質問と回答を登録しておくと精度が上がります</p>
             </div>
             <button
               onClick={addFaq}
               style={{
                 fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 10,
-                background: '#EEF2FF', color: '#4338CA', border: '1.5px solid #C7D2FE', cursor: 'pointer',
+                background: '#FFF0E8', color: '#C4511A', border: '1.5px solid #FDD5B5', cursor: 'pointer',
               }}
             >＋ 追加</button>
           </div>
           <div className="space-y-3">
             {faqs.length === 0 && (
-              <div className="rounded-xl p-4 text-center" style={{ background: 'rgba(255,255,255,0.5)', border: '1.5px dashed #D1D0E8' }}>
-                <p className="text-sm" style={{ color: '#9896B8' }}>＋ 追加ボタンでFAQを登録できます</p>
+              <div className="rounded-xl p-4 text-center" style={{ background: 'rgba(255,255,255,0.5)', border: '1.5px dashed #DEC4AD' }}>
+                <p className="text-sm" style={{ color: '#A08068' }}>＋ 追加ボタンでFAQを登録できます</p>
               </div>
             )}
             {faqs.map((faq, idx) => (
               <div key={faq.id} className="card p-4 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-black" style={{ color: '#6366F1' }}>FAQ {idx + 1}</span>
+                  <span className="text-xs font-black" style={{ color: '#F26722' }}>FAQ {idx + 1}</span>
                   <button
                     onClick={() => removeFaq(faq.id)}
                     style={{ color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
                   >削除</button>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold mb-1" style={{ color: '#4A4870' }}>
+                  <label className="block text-xs font-semibold mb-1" style={{ color: '#4A2C1A' }}>
                     質問 <span style={{ color: '#EF4444' }}>*</span>
                   </label>
                   <textarea
@@ -299,16 +299,16 @@ export default function EditPersonaPage() {
                     rows={2}
                     style={{
                       width: '100%', padding: '9px 12px', fontSize: 13, lineHeight: 1.6,
-                      border: '1.5px solid #D1D0E8', borderRadius: 8,
-                      background: '#F4F3FA', color: '#1E1B4B', outline: 'none',
+                      border: '1.5px solid #DEC4AD', borderRadius: 8,
+                      background: '#FAF5F0', color: '#1C0F05', outline: 'none',
                       boxSizing: 'border-box', resize: 'none',
                     }}
-                    onFocus={e => { e.target.style.borderColor = '#6366F1'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.1)' }}
-                    onBlur={e => { e.target.style.borderColor = '#D1D0E8'; e.target.style.background = '#F4F3FA'; e.target.style.boxShadow = 'none' }}
+                    onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 3px rgba(242,103,34,0.1)' }}
+                    onBlur={e => { e.target.style.borderColor = '#DEC4AD'; e.target.style.background = '#FAF5F0'; e.target.style.boxShadow = 'none' }}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold mb-1" style={{ color: '#4A4870' }}>回答</label>
+                  <label className="block text-xs font-semibold mb-1" style={{ color: '#4A2C1A' }}>回答</label>
                   <textarea
                     value={faq.answer}
                     onChange={e => updateFaq(faq.id, 'answer', e.target.value)}
@@ -316,12 +316,12 @@ export default function EditPersonaPage() {
                     placeholder="例：プロジェクト規模によりますが、月10〜30万円が目安です。まずはご相談ください。"
                     style={{
                       width: '100%', padding: '9px 12px', fontSize: 13, lineHeight: 1.6,
-                      border: '1.5px solid #D1D0E8', borderRadius: 8,
-                      background: '#F4F3FA', color: '#1E1B4B', outline: 'none',
+                      border: '1.5px solid #DEC4AD', borderRadius: 8,
+                      background: '#FAF5F0', color: '#1C0F05', outline: 'none',
                       resize: 'vertical', boxSizing: 'border-box',
                     }}
-                    onFocus={e => { e.target.style.borderColor = '#6366F1'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.1)' }}
-                    onBlur={e => { e.target.style.borderColor = '#D1D0E8'; e.target.style.background = '#F4F3FA'; e.target.style.boxShadow = 'none' }}
+                    onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 3px rgba(242,103,34,0.1)' }}
+                    onBlur={e => { e.target.style.borderColor = '#DEC4AD'; e.target.style.background = '#FAF5F0'; e.target.style.boxShadow = 'none' }}
                   />
                 </div>
               </div>
@@ -333,14 +333,14 @@ export default function EditPersonaPage() {
         <div>
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h2 className="font-black text-sm" style={{ color: '#1E1B4B' }}>過去案件・プロジェクト事例</h2>
-              <p className="text-xs mt-0.5" style={{ color: '#9896B8' }}>具体的な数字・結果まで書くほど精度が上がります</p>
+              <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>過去案件・プロジェクト事例</h2>
+              <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>具体的な数字・結果まで書くほど精度が上がります</p>
             </div>
             <button
               onClick={addProject}
               style={{
                 fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 10,
-                background: '#EEF2FF', color: '#4338CA', border: '1.5px solid #C7D2FE',
+                background: '#FFF0E8', color: '#C4511A', border: '1.5px solid #FDD5B5',
                 cursor: 'pointer',
               }}
             >
@@ -352,7 +352,7 @@ export default function EditPersonaPage() {
             {projects.map((proj, idx) => (
               <div key={proj.id} className="card p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-black" style={{ color: '#6366F1' }}>案件 {idx + 1}</span>
+                  <span className="text-xs font-black" style={{ color: '#F26722' }}>案件 {idx + 1}</span>
                   {projects.length > 1 && (
                     <button
                       onClick={() => removeProject(proj.id)}
@@ -370,7 +370,7 @@ export default function EditPersonaPage() {
                   { field: 'tech',      label: '使用技術・ツール（任意）', placeholder: 'Google Ads, GA4, Figma' },
                 ].map(({ field, label, placeholder, required }) => (
                   <div key={field}>
-                    <label className="block text-xs font-semibold mb-1" style={{ color: '#4A4870' }}>
+                    <label className="block text-xs font-semibold mb-1" style={{ color: '#4A2C1A' }}>
                       {label}{required && <span style={{ color: '#EF4444', marginLeft: 3 }}>*</span>}
                     </label>
                     <input
@@ -380,12 +380,12 @@ export default function EditPersonaPage() {
                       placeholder={placeholder}
                       style={{
                         width: '100%', padding: '9px 12px', fontSize: 13,
-                        border: '1.5px solid #D1D0E8', borderRadius: 8,
-                        background: '#F4F3FA', color: '#1E1B4B', outline: 'none',
+                        border: '1.5px solid #DEC4AD', borderRadius: 8,
+                        background: '#FAF5F0', color: '#1C0F05', outline: 'none',
                         boxSizing: 'border-box',
                       }}
-                      onFocus={e => { e.target.style.borderColor = '#6366F1'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.1)' }}
-                      onBlur={e => { e.target.style.borderColor = '#D1D0E8'; e.target.style.background = '#F4F3FA'; e.target.style.boxShadow = 'none' }}
+                      onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 3px rgba(242,103,34,0.1)' }}
+                      onBlur={e => { e.target.style.borderColor = '#DEC4AD'; e.target.style.background = '#FAF5F0'; e.target.style.boxShadow = 'none' }}
                     />
                   </div>
                 ))}
@@ -404,8 +404,8 @@ export default function EditPersonaPage() {
             onClick={() => router.push('/dashboard')}
             style={{
               flex: 1, padding: '13px', fontSize: 14, fontWeight: 600,
-              background: '#F4F3FA', color: '#6B7280',
-              border: '1.5px solid #D1D0E8', borderRadius: 12, cursor: 'pointer',
+              background: '#FAF5F0', color: '#6B7280',
+              border: '1.5px solid #DEC4AD', borderRadius: 12, cursor: 'pointer',
             }}
           >
             キャンセル
@@ -415,11 +415,11 @@ export default function EditPersonaPage() {
             disabled={saving}
             style={{
               flex: 2, padding: '13px', fontSize: 15, fontWeight: 700,
-              background: saving ? '#D1D0E8' : 'linear-gradient(135deg, #6366F1, #8B5CF6)',
-              color: saving ? '#9896B8' : 'white',
+              background: saving ? '#DEC4AD' : 'linear-gradient(135deg, #F26722, #F59340)',
+              color: saving ? '#A08068' : 'white',
               border: 'none', borderRadius: 12,
               cursor: saving ? 'not-allowed' : 'pointer',
-              boxShadow: saving ? 'none' : '0 4px 14px rgba(99,102,241,0.3)',
+              boxShadow: saving ? 'none' : '0 4px 14px rgba(242,103,34,0.3)',
             }}
           >
             {saving ? '保存中...' : 'AIに学習させる →'}

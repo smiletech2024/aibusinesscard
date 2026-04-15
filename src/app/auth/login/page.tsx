@@ -57,10 +57,10 @@ export default function LoginPage() {
         <div className="relative z-10">
           <h2
             className="font-black leading-tight mb-8"
-            style={{ color: '#EDEEFF', fontSize: 36 }}
+            style={{ color: '#FFF0E8', fontSize: 36 }}
           >
             名刺を渡した瞬間から、<br />
-            <span style={{ color: '#7B6EF5' }}>商談が動き始める。</span>
+            <span style={{ color: '#F5843A' }}>商談が動き始める。</span>
           </h2>
           <div className="space-y-5">
             {[
@@ -71,13 +71,13 @@ export default function LoginPage() {
               <div key={text} className="flex items-center gap-3">
                 <div
                   className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'rgba(123,110,245,0.2)', border: '1px solid rgba(123,110,245,0.4)' }}
+                  style={{ background: 'rgba(242,103,34,0.2)', border: '1px solid rgba(242,103,34,0.4)' }}
                 >
                   <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                    <path d="M2 6L5 9L10 3" stroke="#7B6EF5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M2 6L5 9L10 3" stroke="#F5843A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
-                <span className="text-sm" style={{ color: '#9896C4' }}>{text}</span>
+                <span className="text-sm" style={{ color: '#A08068' }}>{text}</span>
               </div>
             ))}
           </div>
@@ -87,17 +87,17 @@ export default function LoginPage() {
             className="mt-10 p-5 rounded-2xl"
             style={{
               background: '#0F0E20',
-              border: '1px solid rgba(139,92,246,0.15)',
+              border: '1px solid rgba(242,103,34,0.15)',
             }}
           >
-            <p className="text-sm italic mb-3 leading-relaxed" style={{ color: '#9896C4' }}>
+            <p className="text-sm italic mb-3 leading-relaxed" style={{ color: '#A08068' }}>
               「寝ている間に3件の問い合わせが来ていた。<br />全部、AIが整理してくれていた。」
             </p>
-            <p className="text-xs" style={{ color: '#5A587E' }}>— AI名刺ユーザーの声</p>
+            <p className="text-xs" style={{ color: '#6B4030' }}>— AI名刺ユーザーの声</p>
           </div>
         </div>
 
-        <p style={{ color: '#5A587E', fontSize: 12 }}>© 2026 AI名刺</p>
+        <p style={{ color: '#6B4030', fontSize: 12 }}>© 2026 AI名刺</p>
       </div>
 
       {/* Right panel — light clean */}
@@ -112,17 +112,17 @@ export default function LoginPage() {
           </div>
 
           <div className="mb-8">
-            <h1 className="font-black mb-1" style={{ color: '#1E1B4B', fontSize: 26 }}>
+            <h1 className="font-black mb-1" style={{ color: '#1C0F05', fontSize: 26 }}>
               {isSignUp ? '分身AIを作成する' : 'おかえりなさい'}
             </h1>
-            <p className="text-sm" style={{ color: '#9896B8' }}>
+            <p className="text-sm" style={{ color: '#A08068' }}>
               {isSignUp ? '無料・約3分で完成します' : 'あなたのAIが待っています'}
             </p>
           </div>
 
           <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 8, color: '#4A4870' }}>
+              <label style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 8, color: '#4A2C1A' }}>
                 メールアドレス
               </label>
               <input
@@ -133,16 +133,16 @@ export default function LoginPage() {
                 placeholder="you@example.com"
                 style={{
                   width: '100%', padding: '13px 16px', fontSize: 15,
-                  border: '1.5px solid #D1D0E8', borderRadius: 14,
-                  background: '#F4F3FA', color: '#1E1B4B', outline: 'none',
+                  border: '1.5px solid #DEC4AD', borderRadius: 14,
+                  background: '#FAF5F0', color: '#1C0F05', outline: 'none',
                   boxSizing: 'border-box', transition: 'all 0.2s',
                 }}
-                onFocus={e => { e.target.style.borderColor = '#6366F1'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 4px rgba(99,102,241,0.12)' }}
-                onBlur={e => { e.target.style.borderColor = '#D1D0E8'; e.target.style.background = '#F4F3FA'; e.target.style.boxShadow = 'none' }}
+                onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 4px rgba(242,103,34,0.12)' }}
+                onBlur={e => { e.target.style.borderColor = '#DEC4AD'; e.target.style.background = '#FAF5F0'; e.target.style.boxShadow = 'none' }}
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 8, color: '#4A4870' }}>
+              <label style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 8, color: '#4A2C1A' }}>
                 パスワード
               </label>
               <input
@@ -154,12 +154,12 @@ export default function LoginPage() {
                 placeholder="6文字以上"
                 style={{
                   width: '100%', padding: '13px 16px', fontSize: 15,
-                  border: '1.5px solid #D1D0E8', borderRadius: 14,
-                  background: '#F4F3FA', color: '#1E1B4B', outline: 'none',
+                  border: '1.5px solid #DEC4AD', borderRadius: 14,
+                  background: '#FAF5F0', color: '#1C0F05', outline: 'none',
                   boxSizing: 'border-box', transition: 'all 0.2s',
                 }}
-                onFocus={e => { e.target.style.borderColor = '#6366F1'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 4px rgba(99,102,241,0.12)' }}
-                onBlur={e => { e.target.style.borderColor = '#D1D0E8'; e.target.style.background = '#F4F3FA'; e.target.style.boxShadow = 'none' }}
+                onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 4px rgba(242,103,34,0.12)' }}
+                onBlur={e => { e.target.style.borderColor = '#DEC4AD'; e.target.style.background = '#FAF5F0'; e.target.style.boxShadow = 'none' }}
               />
             </div>
 
@@ -179,9 +179,9 @@ export default function LoginPage() {
               disabled={loading}
               style={{
                 width: '100%', padding: '15px', fontSize: 16, fontWeight: 700,
-                background: loading ? '#A5B4FC' : 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+                background: loading ? '#F5C09A' : 'linear-gradient(135deg, #F26722, #F59340)',
                 color: 'white', border: 'none', borderRadius: 14, cursor: loading ? 'not-allowed' : 'pointer',
-                boxShadow: '0 4px 20px rgba(99,102,241,0.4)', marginTop: 4,
+                boxShadow: '0 4px 20px rgba(242,103,34,0.4)', marginTop: 4,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 transition: 'all 0.2s',
               }}
@@ -193,7 +193,7 @@ export default function LoginPage() {
           <div style={{ marginTop: 24, textAlign: 'center' }}>
             <button
               onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage('') }}
-              style={{ fontSize: 14, fontWeight: 600, color: '#6366F1', background: 'none', border: 'none', cursor: 'pointer' }}
+              style={{ fontSize: 14, fontWeight: 600, color: '#F26722', background: 'none', border: 'none', cursor: 'pointer' }}
             >
               {isSignUp ? 'すでにアカウントをお持ちの方はこちら →' : 'アカウントをお持ちでない方 →'}
             </button>

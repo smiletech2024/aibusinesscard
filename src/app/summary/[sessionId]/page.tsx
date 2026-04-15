@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import { CustomerSession, ConversationSummary } from '@/types'
 
 const summaryItems = [
-  { key: 'purpose', label: '相談目的', color: '#7B6EF5', border: '#7B6EF5', icon: (
+  { key: 'purpose', label: '相談目的', color: '#F5843A', border: '#F5843A', icon: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
     </svg>
@@ -33,7 +33,7 @@ const summaryItems = [
       <circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" />
     </svg>
   )},
-  { key: 'next_action', label: '推奨アクション', color: '#A78BFA', border: '#A78BFA', icon: (
+  { key: 'next_action', label: '推奨アクション', color: '#F5C09A', border: '#F5C09A', icon: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="9 18 15 12 9 6" />
     </svg>
@@ -71,9 +71,9 @@ export default function SummaryPage() {
         <div className="text-center">
           <div
             className="w-10 h-10 rounded-full spin mx-auto mb-3"
-            style={{ border: '3px solid rgba(123,110,245,0.3)', borderTopColor: '#7B6EF5' }}
+            style={{ border: '3px solid rgba(242,103,34,0.3)', borderTopColor: '#F5843A' }}
           />
-          <p className="text-sm" style={{ color: '#5A587E' }}>まとめを読み込み中...</p>
+          <p className="text-sm" style={{ color: '#6B4030' }}>まとめを読み込み中...</p>
         </div>
       </div>
     )
@@ -88,18 +88,18 @@ export default function SummaryPage() {
           <div
             className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-5"
             style={{
-              background: 'rgba(123,110,245,0.1)',
-              border: '1px solid rgba(123,110,245,0.3)',
-              boxShadow: '0 0 30px rgba(123,110,245,0.2)',
+              background: 'rgba(242,103,34,0.1)',
+              border: '1px solid rgba(242,103,34,0.3)',
+              boxShadow: '0 0 30px rgba(242,103,34,0.2)',
             }}
           >
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#9B8BF5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#F59340" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
               <line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" />
             </svg>
           </div>
-          <h1 className="text-2xl font-black mb-2" style={{ color: '#EDEEFF' }}>AIがすべて整理しました</h1>
-          <p className="text-sm mb-6" style={{ color: '#9896C4' }}>
+          <h1 className="text-2xl font-black mb-2" style={{ color: '#FFF0E8' }}>AIがすべて整理しました</h1>
+          <p className="text-sm mb-6" style={{ color: '#A08068' }}>
             {ownerName}本人に話しかける前に、確認しておきましょう
           </p>
 
@@ -107,32 +107,32 @@ export default function SummaryPage() {
           <div className="inline-flex items-center gap-3">
             <div
               className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-              style={{ background: 'rgba(123,110,245,0.12)', border: '1px solid rgba(123,110,245,0.2)' }}
+              style={{ background: 'rgba(242,103,34,0.12)', border: '1px solid rgba(242,103,34,0.2)' }}
             >
               <div
                 className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                style={{ background: 'linear-gradient(135deg, #6356D4, #7B6EF5)' }}
+                style={{ background: 'linear-gradient(135deg, #E05A18, #F5843A)' }}
               >
                 {(session?.customer_name || '顧')[0]}
               </div>
-              <span className="text-xs font-medium" style={{ color: '#9896C4' }}>
+              <span className="text-xs font-medium" style={{ color: '#A08068' }}>
                 {session?.customer_name || '顧客'}
               </span>
             </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A587E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B4030" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
             </svg>
             <div
               className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-              style={{ background: 'rgba(123,110,245,0.12)', border: '1px solid rgba(123,110,245,0.2)' }}
+              style={{ background: 'rgba(242,103,34,0.12)', border: '1px solid rgba(242,103,34,0.2)' }}
             >
               <div
                 className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                style={{ background: 'linear-gradient(135deg, #7C3AED, #4F46E5)' }}
+                style={{ background: 'linear-gradient(135deg, #D4691E, #D4551A)' }}
               >
                 {ownerName[0]}
               </div>
-              <span className="text-xs font-medium" style={{ color: '#9896C4' }}>{ownerName}</span>
+              <span className="text-xs font-medium" style={{ color: '#A08068' }}>{ownerName}</span>
             </div>
           </div>
         </div>
@@ -152,7 +152,7 @@ export default function SummaryPage() {
                   style={{
                     background: '#0F0E20',
                     borderLeft: `3px solid ${border}`,
-                    border: `1px solid rgba(139,92,246,0.1)`,
+                    border: `1px solid rgba(242,103,34,0.1)`,
                     borderLeftColor: border,
                   }}
                 >
@@ -165,7 +165,7 @@ export default function SummaryPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold mb-1" style={{ color }}>{label}</p>
-                      <p className="text-sm leading-relaxed" style={{ color: '#9896C4', whiteSpace: 'pre-wrap' }}>{value}</p>
+                      <p className="text-sm leading-relaxed" style={{ color: '#A08068', whiteSpace: 'pre-wrap' }}>{value}</p>
                     </div>
                   </div>
                 </div>
@@ -182,7 +182,7 @@ export default function SummaryPage() {
                     className="p-4 rounded-xl"
                     style={{
                       background: '#0F0E20',
-                      border: '1px solid rgba(139,92,246,0.1)',
+                      border: '1px solid rgba(242,103,34,0.1)',
                       borderLeft: '3px solid #F59E0B',
                       borderLeftColor: '#F59E0B',
                     }}
@@ -206,8 +206,8 @@ export default function SummaryPage() {
                             { label: '時期 (Timeline)', value: bant.timeline },
                           ].map(({ label, value }) => value && (
                             <div key={label}>
-                              <p className="text-xs font-bold mb-0.5" style={{ color: '#5A587E' }}>{label}</p>
-                              <p className="text-sm" style={{ color: '#9896C4' }}>{value}</p>
+                              <p className="text-xs font-bold mb-0.5" style={{ color: '#6B4030' }}>{label}</p>
+                              <p className="text-sm" style={{ color: '#A08068' }}>{value}</p>
                             </div>
                           ))}
                         </div>
@@ -221,14 +221,14 @@ export default function SummaryPage() {
         ) : (
           <div
             className="p-8 text-center rounded-xl"
-            style={{ background: '#0F0E20', border: '1px solid rgba(139,92,246,0.1)' }}
+            style={{ background: '#0F0E20', border: '1px solid rgba(242,103,34,0.1)' }}
           >
             <div className="text-4xl mb-3">📝</div>
-            <p className="font-bold mb-1" style={{ color: '#EDEEFF' }}>まだ整理が完了していません</p>
+            <p className="font-bold mb-1" style={{ color: '#FFF0E8' }}>まだ整理が完了していません</p>
             <button
               onClick={() => router.push(`/chat/${sessionId}`)}
               className="text-sm font-medium mt-2"
-              style={{ color: '#7B6EF5', background: 'transparent', border: 'none', cursor: 'pointer' }}
+              style={{ color: '#F5843A', background: 'transparent', border: 'none', cursor: 'pointer' }}
             >
               会話に戻る →
             </button>
@@ -248,8 +248,8 @@ export default function SummaryPage() {
             }}
             className="w-full py-4 text-base font-bold text-white rounded-2xl transition hover:opacity-90"
             style={{
-              background: 'linear-gradient(135deg, #7B6EF5, #9B8BF5)',
-              boxShadow: '0 8px 30px rgba(123,110,245,0.45)',
+              background: 'linear-gradient(135deg, #F5843A, #F59340)',
+              boxShadow: '0 8px 30px rgba(242,103,34,0.45)',
               border: 'none',
               cursor: 'pointer',
             }}
@@ -270,7 +270,7 @@ export default function SummaryPage() {
           </button>
         </div>
 
-        <p className="text-xs text-center" style={{ color: '#5A587E' }}>
+        <p className="text-xs text-center" style={{ color: '#6B4030' }}>
           このまとめは{ownerName}にも届いています
         </p>
       </div>

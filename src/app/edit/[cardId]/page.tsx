@@ -85,30 +85,30 @@ export default function EditCardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#F4F3FA' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#FAF5F0' }}>
         <div className="w-8 h-8 border-4 rounded-full spin"
-          style={{ borderColor: '#E8E6F5', borderTopColor: '#6366F1' }} />
+          style={{ borderColor: '#EDD9C8', borderTopColor: '#F26722' }} />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen" style={{ background: '#F4F3FA' }}>
+    <div className="min-h-screen" style={{ background: '#FAF5F0' }}>
       {/* Header */}
-      <div className="sticky top-0 z-10" style={{ background: 'white', borderBottom: '1px solid #E8E6F5' }}>
+      <div className="sticky top-0 z-10" style={{ background: 'white', borderBottom: '1px solid #EDD9C8' }}>
         <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-3">
           <button
             onClick={() => router.push('/dashboard')}
             style={{
               width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center',
-              justifyContent: 'center', background: '#F4F3FA', border: 'none', cursor: 'pointer',
+              justifyContent: 'center', background: '#FAF5F0', border: 'none', cursor: 'pointer',
             }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6" />
             </svg>
           </button>
-          <h1 className="font-black text-base" style={{ color: '#1E1B4B' }}>名刺情報を編集</h1>
+          <h1 className="font-black text-base" style={{ color: '#1C0F05' }}>名刺情報を編集</h1>
         </div>
       </div>
 
@@ -116,7 +116,7 @@ export default function EditCardPage() {
         <div className="card p-6 space-y-4">
           {cardFields.map(({ key, label, placeholder, required }) => (
             <div key={key}>
-              <label className="block text-sm font-semibold mb-1.5" style={{ color: '#4A4870' }}>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: '#4A2C1A' }}>
                 {label}{required && <span style={{ color: '#EF4444', marginLeft: 4 }}>*</span>}
               </label>
               <input
@@ -126,18 +126,18 @@ export default function EditCardPage() {
                 placeholder={placeholder}
                 style={{
                   width: '100%', padding: '11px 14px', fontSize: 14,
-                  border: '1.5px solid #D1D0E8', borderRadius: 10,
-                  background: '#F4F3FA', color: '#1E1B4B', outline: 'none',
+                  border: '1.5px solid #DEC4AD', borderRadius: 10,
+                  background: '#FAF5F0', color: '#1C0F05', outline: 'none',
                   boxSizing: 'border-box',
                 }}
                 onFocus={e => {
-                  e.target.style.borderColor = '#6366F1'
+                  e.target.style.borderColor = '#F26722'
                   e.target.style.background = '#fff'
-                  e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.12)'
+                  e.target.style.boxShadow = '0 0 0 3px rgba(242,103,34,0.12)'
                 }}
                 onBlur={e => {
-                  e.target.style.borderColor = '#D1D0E8'
-                  e.target.style.background = '#F4F3FA'
+                  e.target.style.borderColor = '#DEC4AD'
+                  e.target.style.background = '#FAF5F0'
                   e.target.style.boxShadow = 'none'
                 }}
               />
@@ -153,8 +153,8 @@ export default function EditCardPage() {
               onClick={() => router.push('/dashboard')}
               style={{
                 flex: 1, padding: '13px', fontSize: 14, fontWeight: 600,
-                background: '#F4F3FA', color: '#6B7280',
-                border: '1.5px solid #D1D0E8', borderRadius: 12, cursor: 'pointer',
+                background: '#FAF5F0', color: '#6B7280',
+                border: '1.5px solid #DEC4AD', borderRadius: 12, cursor: 'pointer',
               }}
             >
               キャンセル
@@ -165,12 +165,12 @@ export default function EditCardPage() {
               style={{
                 flex: 2, padding: '13px', fontSize: 15, fontWeight: 700,
                 background: cardData.full_name && !saving
-                  ? 'linear-gradient(135deg, #6366F1, #8B5CF6)'
-                  : '#D1D0E8',
-                color: cardData.full_name && !saving ? 'white' : '#9896B8',
+                  ? 'linear-gradient(135deg, #F26722, #F59340)'
+                  : '#DEC4AD',
+                color: cardData.full_name && !saving ? 'white' : '#A08068',
                 border: 'none', borderRadius: 12,
                 cursor: cardData.full_name && !saving ? 'pointer' : 'not-allowed',
-                boxShadow: cardData.full_name && !saving ? '0 4px 14px rgba(99,102,241,0.3)' : 'none',
+                boxShadow: cardData.full_name && !saving ? '0 4px 14px rgba(242,103,34,0.3)' : 'none',
               }}
             >
               {saving ? '保存中...' : '保存する'}

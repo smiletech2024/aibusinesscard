@@ -131,7 +131,7 @@ interface LogoProps {
 
 /** ロゴアイコン + ワードマーク "AI名刺" */
 export function Logo({ size = 32, variant = 'dark', showText = true, className = '' }: LogoProps) {
-  const textColor = variant === 'light' ? '#FFFFFF' : '#1E1B4B'
+  const textColor = variant === 'light' ? '#FFFFFF' : '#1C0F05'
   const fontSize  = Math.round(size * 0.47)
 
   return (
@@ -171,7 +171,7 @@ export function LogoBrand({ className = '' }: { className?: string }) {
           style={{
             fontSize: 30,
             fontWeight: 900,
-            background: 'linear-gradient(135deg, #4338CA, #7C3AED)',
+            background: 'linear-gradient(135deg, #C4511A, #D4691E)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             letterSpacing: '-0.04em',
@@ -184,7 +184,7 @@ export function LogoBrand({ className = '' }: { className?: string }) {
         <div
           style={{
             fontSize: 11,
-            color: '#9896B8',
+            color: '#A08068',
             fontWeight: 600,
             letterSpacing: '0.12em',
             marginTop: 6,

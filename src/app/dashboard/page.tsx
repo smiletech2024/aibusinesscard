@@ -11,9 +11,9 @@ import QRCode from 'qrcode'
 import { Logo } from '@/components/Logo'
 
 const statusConfig: Record<string, { label: string; bg: string; color: string; step: number }> = {
-  ai_chat:    { label: 'AIと会話中',    bg: 'rgba(99,102,241,0.1)',  color: '#818CF8', step: 2 },
+  ai_chat:    { label: 'AIと会話中',    bg: 'rgba(242,103,34,0.1)',  color: '#F5A47A', step: 2 },
   summarized: { label: 'まとめ確認中',  bg: 'rgba(52,211,153,0.1)',  color: '#34D399', step: 3 },
-  owner_chat: { label: 'チャット希望',  bg: 'rgba(167,139,250,0.1)', color: '#A78BFA', step: 4 },
+  owner_chat: { label: 'チャット希望',  bg: 'rgba(242,103,34,0.1)', color: '#F5C09A', step: 4 },
   closed:     { label: '完了',          bg: 'rgba(156,163,175,0.1)', color: '#9CA3AF', step: 0 },
 }
 
@@ -26,8 +26,8 @@ function Avatar({ name, size = 40, gradient = false }: { name: string; size?: nu
         height: size,
         fontSize: size * 0.38,
         background: gradient
-          ? 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)'
-          : 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
+          ? 'linear-gradient(135deg, #F26722 0%, #F59340 100%)'
+          : 'linear-gradient(135deg, #D4551A 0%, #D4691E 100%)',
       }}
     >
       {name[0]}
@@ -65,7 +65,7 @@ export default function DashboardPage() {
       const qrUrls: Record<string, string> = {}
       for (const card of cardsData) {
         qrUrls[card.id] = await QRCode.toDataURL(`${window.location.origin}/card/${card.id}`, {
-          width: 160, margin: 1, color: { dark: '#1E1B4B', light: '#FFFFFF' }
+          width: 160, margin: 1, color: { dark: '#1C0F05', light: '#FFFFFF' }
         })
       }
       setQrDataUrls(qrUrls)
@@ -155,11 +155,11 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#F5F4FC' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#FAF5F0' }}>
         <div className="text-center">
           <div className="w-10 h-10 border-3 rounded-full spin mx-auto mb-4"
-            style={{ border: '3px solid #E8E6F5', borderTopColor: '#6366F1' }} />
-          <p className="text-sm" style={{ color: '#9896B8' }}>読み込み中...</p>
+            style={{ border: '3px solid #EDD9C8', borderTopColor: '#F26722' }} />
+          <p className="text-sm" style={{ color: '#A08068' }}>読み込み中...</p>
         </div>
       </div>
     )
@@ -169,7 +169,7 @@ export default function DashboardPage() {
   const summaryCount = sessions.filter(s => s.status === 'summarized' || s.status === 'owner_chat').length
 
   return (
-    <div className="min-h-screen" style={{ background: '#F5F4FC' }}>
+    <div className="min-h-screen" style={{ background: '#FAF5F0' }}>
 
       {/* QR拡大モーダル */}
       {qrModal && (
@@ -190,26 +190,26 @@ export default function DashboardPage() {
               boxShadow: '0 32px 80px rgba(0,0,0,0.4)',
             }}
           >
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#9896B8', marginBottom: 4 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#A08068', marginBottom: 4 }}>
               このQRコードを読み取ってください
             </p>
-            <p style={{ fontSize: 16, fontWeight: 900, color: '#1E1B4B', marginBottom: 20 }}>
+            <p style={{ fontSize: 16, fontWeight: 900, color: '#1C0F05', marginBottom: 20 }}>
               {qrModal.name}
             </p>
             <div style={{
               display: 'inline-block', padding: 12, borderRadius: 16,
-              background: '#F4F3FA', marginBottom: 20,
+              background: '#FAF5F0', marginBottom: 20,
             }}>
               <img src={qrModal.url} alt="QR" style={{ width: 220, height: 220, display: 'block', borderRadius: 8 }} />
             </div>
-            <p style={{ fontSize: 11, color: '#9896B8', marginBottom: 20, wordBreak: 'break-all' }}>
+            <p style={{ fontSize: 11, color: '#A08068', marginBottom: 20, wordBreak: 'break-all' }}>
               {qrModal.cardUrl}
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
               <a href={qrModal.cardUrl} target="_blank" rel="noopener noreferrer"
                 style={{
                   flex: 1, padding: '11px 0', borderRadius: 12, fontSize: 13, fontWeight: 700,
-                  background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', color: 'white',
+                  background: 'linear-gradient(135deg, #F26722, #F59340)', color: 'white',
                   textDecoration: 'none', display: 'block',
                 }}>
                 名刺を開く →
@@ -217,7 +217,7 @@ export default function DashboardPage() {
               <button onClick={() => setQrModal(null)}
                 style={{
                   flex: 1, padding: '11px 0', borderRadius: 12, fontSize: 13, fontWeight: 600,
-                  background: '#F4F3FA', color: '#6B7280', border: 'none', cursor: 'pointer',
+                  background: '#FAF5F0', color: '#6B7280', border: 'none', cursor: 'pointer',
                 }}>
                 閉じる
               </button>
@@ -255,13 +255,13 @@ export default function DashboardPage() {
                 <path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
               </svg>
             </div>
-            <p style={{ fontWeight: 900, fontSize: 16, color: '#1E1B4B', marginBottom: 8 }}>
+            <p style={{ fontWeight: 900, fontSize: 16, color: '#1C0F05', marginBottom: 8 }}>
               この名刺を削除しますか？
             </p>
-            <p style={{ fontSize: 13, color: '#9896B8', marginBottom: 6 }}>
+            <p style={{ fontSize: 13, color: '#A08068', marginBottom: 6 }}>
               「{deleteConfirm.name}」
             </p>
-            <p style={{ fontSize: 12, color: '#9896B8', marginBottom: 24, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 12, color: '#A08068', marginBottom: 24, lineHeight: 1.6 }}>
               削除後はQRコードを読み取っても<br />使えなくなります。この操作は取り消せません。
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -278,7 +278,7 @@ export default function DashboardPage() {
                 onClick={() => setDeleteConfirm(null)}
                 style={{
                   flex: 1, padding: '11px 0', borderRadius: 12, fontSize: 13, fontWeight: 600,
-                  background: '#F4F3FA', color: '#6B7280', border: 'none', cursor: 'pointer',
+                  background: '#FAF5F0', color: '#6B7280', border: 'none', cursor: 'pointer',
                 }}
               >
                 キャンセル
@@ -317,13 +317,13 @@ export default function DashboardPage() {
                 <path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
               </svg>
             </div>
-            <p style={{ fontWeight: 900, fontSize: 16, color: '#1E1B4B', marginBottom: 8 }}>
+            <p style={{ fontWeight: 900, fontSize: 16, color: '#1C0F05', marginBottom: 8 }}>
               この会話履歴を削除しますか？
             </p>
-            <p style={{ fontSize: 13, color: '#9896B8', marginBottom: 6 }}>
+            <p style={{ fontSize: 13, color: '#A08068', marginBottom: 6 }}>
               「{deleteSessionConfirm.name}」との会話
             </p>
-            <p style={{ fontSize: 12, color: '#9896B8', marginBottom: 24, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 12, color: '#A08068', marginBottom: 24, lineHeight: 1.6 }}>
               AI会話・まとめ・チャット履歴をすべて削除します。<br />この操作は取り消せません。
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -346,7 +346,7 @@ export default function DashboardPage() {
                 onClick={() => setDeleteSessionConfirm(null)}
                 style={{
                   flex: 1, padding: '11px 0', borderRadius: 12, fontSize: 13, fontWeight: 600,
-                  background: '#F4F3FA', color: '#6B7280', border: 'none', cursor: 'pointer',
+                  background: '#FAF5F0', color: '#6B7280', border: 'none', cursor: 'pointer',
                 }}
               >
                 キャンセル
@@ -359,14 +359,14 @@ export default function DashboardPage() {
       {/* Header */}
       <header
         className="sticky top-0 z-20 border-b"
-        style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)', borderColor: '#E8E6F5' }}
+        style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)', borderColor: '#EDD9C8' }}
       >
         <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between">
           <Logo size={28} variant="dark" />
           <button
             onClick={handleLogout}
             className="text-xs font-medium px-3 py-1.5 rounded-full transition hover:bg-red-50"
-            style={{ color: '#9896B8' }}
+            style={{ color: '#A08068' }}
           >
             ログアウト
           </button>
@@ -380,12 +380,12 @@ export default function DashboardPage() {
             <div
               key={n.id}
               style={{
-                background: 'linear-gradient(135deg, #4F46E5, #7C3AED)',
+                background: 'linear-gradient(135deg, #D4551A, #D4691E)',
                 padding: '14px 20px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
-                boxShadow: '0 4px 24px rgba(99,102,241,0.45)',
+                boxShadow: '0 4px 24px rgba(242,103,34,0.45)',
               }}
             >
               <div style={{
@@ -410,7 +410,7 @@ export default function DashboardPage() {
                 <Link
                   href={`/owner/chat/${n.sessionId}`}
                   style={{
-                    background: 'white', color: '#6366F1', fontWeight: 700,
+                    background: 'white', color: '#F26722', fontWeight: 700,
                     fontSize: 13, padding: '8px 16px', borderRadius: 20,
                     textDecoration: 'none', display: 'block', whiteSpace: 'nowrap',
                   }}
@@ -439,8 +439,8 @@ export default function DashboardPage() {
         {sessions.length > 0 && (
           <div className="grid grid-cols-3 gap-4">
             {[
-              { label: 'AI名刺', value: cards.length, unit: '枚', color: '#6366F1', borderColor: '#6366F1' },
-              { label: 'AI対話中', value: aiChatCount, unit: '件', color: '#8B5CF6', borderColor: '#8B5CF6' },
+              { label: 'AI名刺', value: cards.length, unit: '枚', color: '#F26722', borderColor: '#F26722' },
+              { label: 'AI対話中', value: aiChatCount, unit: '件', color: '#F59340', borderColor: '#F59340' },
               { label: '返事を待っています', value: summaryCount, unit: '件', color: '#059669', borderColor: '#059669' },
             ].map(({ label, value, unit, color, borderColor }) => (
               <div
@@ -448,13 +448,13 @@ export default function DashboardPage() {
                 className="p-5 text-center rounded-2xl"
                 style={{
                   background: 'white',
-                  border: '1px solid #E8E6F5',
+                  border: '1px solid #EDD9C8',
                   borderLeft: `3px solid ${borderColor}`,
-                  boxShadow: '0 1px 3px rgba(99,102,241,0.06)',
+                  boxShadow: '0 1px 3px rgba(242,103,34,0.06)',
                 }}
               >
                 <div className="text-3xl font-black mb-1" style={{ color }}>{value}</div>
-                <div className="text-xs font-medium" style={{ color: '#9896B8' }}>{label}</div>
+                <div className="text-xs font-medium" style={{ color: '#A08068' }}>{label}</div>
                 <div className="text-xs" style={{ color }}>{unit}</div>
               </div>
             ))}
@@ -466,7 +466,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-5">
             <div>
               <p className="section-label mb-1">名刺管理</p>
-              <h2 className="text-lg font-black" style={{ color: '#1E1B4B' }}>AI名刺</h2>
+              <h2 className="text-lg font-black" style={{ color: '#1C0F05' }}>AI名刺</h2>
             </div>
             <Link
               href="/setup"
@@ -480,18 +480,18 @@ export default function DashboardPage() {
           {cards.length === 0 ? (
             <div
               className="p-12 text-center rounded-2xl"
-              style={{ background: 'white', border: '1px solid #E8E6F5' }}
+              style={{ background: 'white', border: '1px solid #EDD9C8' }}
             >
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5"
-                style={{ background: '#EEF2FF' }}>
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                style={{ background: '#FFF0E8' }}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#F26722" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="2" y="7" width="20" height="14" rx="3" />
                   <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
                   <circle cx="12" cy="14" r="2" />
                 </svg>
               </div>
-              <h3 className="font-black text-lg mb-2" style={{ color: '#1E1B4B' }}>分身AIを作りましょう</h3>
-              <p className="text-sm mb-6" style={{ color: '#9896B8' }}>
+              <h3 className="font-black text-lg mb-2" style={{ color: '#1C0F05' }}>分身AIを作りましょう</h3>
+              <p className="text-sm mb-6" style={{ color: '#A08068' }}>
                 約3分のヒアリングで、あなたらしく話すAIが完成。<br />
                 QRコードを渡すだけで、24時間対応が始まります
               </p>
@@ -507,12 +507,12 @@ export default function DashboardPage() {
                   <div
                     key={card.id}
                     className="rounded-2xl overflow-hidden group"
-                    style={{ background: 'white', border: '1px solid #E8E6F5', boxShadow: '0 1px 3px rgba(99,102,241,0.06)' }}
+                    style={{ background: 'white', border: '1px solid #EDD9C8', boxShadow: '0 1px 3px rgba(242,103,34,0.06)' }}
                   >
                     {/* Card header gradient */}
                     <div
                       className="h-24 relative"
-                      style={{ background: 'linear-gradient(135deg, #3730A3 0%, #5B21B6 50%, #7C3AED 100%)' }}
+                      style={{ background: 'linear-gradient(135deg, #C4511A 0%, #D4551A 50%, #D4691E 100%)' }}
                     >
                       <div className="absolute inset-0 flex items-end px-5 pb-0">
                         <div
@@ -525,9 +525,9 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="pt-10 px-5 pb-3">
-                      <h3 className="font-black text-base" style={{ color: '#1E1B4B' }}>{card.full_name}</h3>
-                      {card.title && <p className="text-sm font-medium mt-0.5" style={{ color: '#6366F1' }}>{card.title}</p>}
-                      {card.company && <p className="text-xs mt-0.5" style={{ color: '#9896B8' }}>{card.company}</p>}
+                      <h3 className="font-black text-base" style={{ color: '#1C0F05' }}>{card.full_name}</h3>
+                      {card.title && <p className="text-sm font-medium mt-0.5" style={{ color: '#F26722' }}>{card.title}</p>}
+                      {card.company && <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>{card.company}</p>}
                     </div>
 
                     {/* QR + actions */}
@@ -536,20 +536,20 @@ export default function DashboardPage() {
                         <button
                           onClick={() => setQrModal({ url: qrDataUrls[card.id], cardUrl, name: card.full_name })}
                           className="p-2 rounded-xl flex-shrink-0 block transition hover:opacity-80 active:scale-95 relative"
-                          style={{ background: '#F4F3FA', border: 'none', cursor: 'pointer' }}
+                          style={{ background: '#FAF5F0', border: 'none', cursor: 'pointer' }}
                           title="タップして拡大"
                         >
                           <img src={qrDataUrls[card.id]} alt="QR" className="w-14 h-14 rounded-lg" />
                           <span style={{
                             position: 'absolute', bottom: 4, right: 4,
-                            background: 'rgba(99,102,241,0.85)', borderRadius: 4,
+                            background: 'rgba(242,103,34,0.85)', borderRadius: 4,
                             padding: '1px 4px', fontSize: 8, color: 'white', fontWeight: 700,
                             lineHeight: 1.4,
                           }}>拡大</span>
                         </button>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs" style={{ color: '#9896B8' }}>QRスキャン後にお客様が見る画面 ↓</p>
+                        <p className="text-xs" style={{ color: '#A08068' }}>QRスキャン後にお客様が見る画面 ↓</p>
                         <div className="mb-1.5" />
                         <div className="flex flex-wrap gap-2">
                           <a
@@ -571,7 +571,7 @@ export default function DashboardPage() {
                           <Link
                             href={`/edit-persona/${card.id}`}
                             className="text-xs px-4 py-2 rounded-xl font-semibold transition"
-                            style={{ background: '#EEF2FF', color: '#4338CA', border: '1.5px solid #C7D2FE' }}
+                            style={{ background: '#FFF0E8', color: '#C4511A', border: '1.5px solid #FDD5B5' }}
                           >
                             AIを強化
                           </Link>
@@ -604,27 +604,27 @@ export default function DashboardPage() {
           <div
             className="rounded-2xl p-5"
             style={{
-              background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.12) 100%)',
-              border: '1.5px solid rgba(99,102,241,0.2)',
+              background: 'linear-gradient(135deg, rgba(242,103,34,0.08) 0%, rgba(242,103,34,0.12) 100%)',
+              border: '1.5px solid rgba(242,103,34,0.2)',
             }}
           >
             <div className="flex items-start gap-4">
               <div
                 className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', boxShadow: '0 4px 12px rgba(99,102,241,0.35)' }}
+                style={{ background: 'linear-gradient(135deg, #F26722, #F59340)', boxShadow: '0 4px 12px rgba(242,103,34,0.35)' }}
               >
                 <span style={{ fontSize: 22 }}>🧠</span>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-black text-sm" style={{ color: '#1E1B4B' }}>AIをあなた本人に近づける</h3>
+                  <h3 className="font-black text-sm" style={{ color: '#1C0F05' }}>AIをあなた本人に近づける</h3>
                   <span
                     className="text-xs font-bold px-2 py-0.5 rounded-full"
-                    style={{ background: 'rgba(99,102,241,0.12)', color: '#6366F1' }}
+                    style={{ background: 'rgba(242,103,34,0.12)', color: '#F26722' }}
                   >New</span>
                 </div>
                 <p className="text-xs leading-relaxed mb-3" style={{ color: '#6B7280' }}>
-                  AIが受けた質問に<strong style={{ color: '#1E1B4B' }}>本人の正解を登録</strong>すると、次から同じ質問にあなたらしく答えられます。<br />
+                  AIが受けた質問に<strong style={{ color: '#1C0F05' }}>本人の正解を登録</strong>すると、次から同じ質問にあなたらしく答えられます。<br />
                   お客様との会話履歴を見ながら「惜しい回答」を本人の言葉に直しましょう。
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -634,9 +634,9 @@ export default function DashboardPage() {
                       href={`/edit-persona/${card.id}`}
                       className="text-xs font-bold px-4 py-2 rounded-xl transition"
                       style={{
-                        background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+                        background: 'linear-gradient(135deg, #F26722, #F59340)',
                         color: 'white',
-                        boxShadow: '0 2px 8px rgba(99,102,241,0.3)',
+                        boxShadow: '0 2px 8px rgba(242,103,34,0.3)',
                       }}
                     >
                       {card.full_name}のAIを育てる →
@@ -645,8 +645,8 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-            <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(99,102,241,0.15)' }}>
-              <p className="text-xs font-bold mb-2" style={{ color: '#9896B8' }}>AIを育てる3つの方法</p>
+            <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(242,103,34,0.15)' }}>
+              <p className="text-xs font-bold mb-2" style={{ color: '#A08068' }}>AIを育てる3つの方法</p>
               <div className="grid grid-cols-3 gap-2">
                 {[
                   { icon: '📚', title: 'スキル登録', desc: '専門領域・ツールを登録' },
@@ -654,10 +654,10 @@ export default function DashboardPage() {
                   { icon: '✏️', title: '回答修正', desc: '会話履歴から直接フィードバック' },
                 ].map(({ icon, title, desc }) => (
                   <div key={title} className="rounded-xl p-2.5 text-center"
-                    style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(99,102,241,0.1)' }}>
+                    style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(242,103,34,0.1)' }}>
                     <div style={{ fontSize: 18, marginBottom: 4 }}>{icon}</div>
-                    <p className="text-xs font-bold" style={{ color: '#1E1B4B' }}>{title}</p>
-                    <p className="text-xs mt-0.5" style={{ color: '#9896B8' }}>{desc}</p>
+                    <p className="text-xs font-bold" style={{ color: '#1C0F05' }}>{title}</p>
+                    <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>{desc}</p>
                   </div>
                 ))}
               </div>
@@ -670,21 +670,21 @@ export default function DashboardPage() {
           <div>
             <div className="mb-5">
               <p className="section-label mb-1">顧客管理</p>
-              <h2 className="text-lg font-black" style={{ color: '#1E1B4B' }}>AIが受けた相談</h2>
+              <h2 className="text-lg font-black" style={{ color: '#1C0F05' }}>AIが受けた相談</h2>
             </div>
 
             {/* お客様フロー説明 */}
             <div
               className="mb-4 px-4 py-3 rounded-2xl"
-              style={{ background: 'white', border: '1px solid #E8E6F5' }}
+              style={{ background: 'white', border: '1px solid #EDD9C8' }}
             >
-              <p className="text-xs font-bold mb-2.5" style={{ color: '#9896B8' }}>お客様の流れ</p>
+              <p className="text-xs font-bold mb-2.5" style={{ color: '#A08068' }}>お客様の流れ</p>
               <div className="flex items-center gap-1 flex-wrap">
                 {[
-                  { label: 'QRスキャン', color: '#6366F1', bg: 'rgba(99,102,241,0.08)' },
-                  { label: 'AIと会話中', color: '#818CF8', bg: 'rgba(99,102,241,0.08)' },
+                  { label: 'QRスキャン', color: '#F26722', bg: 'rgba(242,103,34,0.08)' },
+                  { label: 'AIと会話中', color: '#F5A47A', bg: 'rgba(242,103,34,0.08)' },
                   { label: 'まとめ確認中', color: '#34D399', bg: 'rgba(52,211,153,0.08)' },
-                  { label: 'チャット希望', color: '#A78BFA', bg: 'rgba(167,139,250,0.08)' },
+                  { label: 'チャット希望', color: '#F5C09A', bg: 'rgba(242,103,34,0.08)' },
                 ].map((s, i) => (
                   <div key={s.label} className="flex items-center gap-1">
                     <span
@@ -713,8 +713,8 @@ export default function DashboardPage() {
                     className="px-4 py-4 flex items-center gap-4 rounded-2xl transition-shadow hover:shadow-md"
                     style={{
                       background: needsAttention ? '#FDFAFF' : 'white',
-                      border: '1px solid #E8E6F5',
-                      borderLeft: needsAttention ? '3px solid #7C3AED' : '1px solid #E8E6F5',
+                      border: '1px solid #EDD9C8',
+                      borderLeft: needsAttention ? '3px solid #D4691E' : '1px solid #EDD9C8',
                     }}
                   >
                     <div className="relative flex-shrink-0">
@@ -723,7 +723,7 @@ export default function DashboardPage() {
                         <span style={{
                           position: 'absolute', top: -2, right: -2,
                           width: 12, height: 12, borderRadius: '50%',
-                          background: '#7C3AED', border: '2px solid white',
+                          background: '#D4691E', border: '2px solid white',
                           animation: 'pulse 1.5s infinite',
                           display: 'block',
                         }} />
@@ -731,7 +731,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                        <p className="font-semibold text-sm truncate" style={{ color: '#1E1B4B' }}>{name}</p>
+                        <p className="font-semibold text-sm truncate" style={{ color: '#1C0F05' }}>{name}</p>
                         <span
                           className="badge text-xs flex-shrink-0"
                           style={{ background: st.bg, color: st.color, padding: '3px 10px', borderRadius: 9999, fontSize: '0.7rem', fontWeight: 700 }}
@@ -740,14 +740,14 @@ export default function DashboardPage() {
                         </span>
                         {needsAttention && (
                           <span style={{
-                            fontSize: 11, fontWeight: 700, color: '#7C3AED',
+                            fontSize: 11, fontWeight: 700, color: '#D4691E',
                             background: '#EDE9FE', borderRadius: 6, padding: '2px 6px',
                           }}>
                             あなたを待っています
                           </span>
                         )}
                       </div>
-                      <p className="text-xs" style={{ color: '#9896B8' }}>
+                      <p className="text-xs" style={{ color: '#A08068' }}>
                         {new Date(session.updated_at).toLocaleDateString('ja-JP', {
                           month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
                         })}
