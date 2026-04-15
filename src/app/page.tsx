@@ -6,8 +6,8 @@ export default function HomePage() {
     <main
       className="min-h-screen flex flex-col"
       style={{
-        background: '#07060F',
-        backgroundImage: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(242,103,34,0.15) 0%, transparent 100%)',
+        background: '#0D0600',
+        backgroundImage: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(242,103,34,0.22) 0%, transparent 100%)',
       }}
     >
       {/* Nav */}
@@ -46,7 +46,7 @@ export default function HomePage() {
         {/* Subtext */}
         <p
           className="text-base max-w-lg mb-12 leading-relaxed"
-          style={{ color: '#A08068', whiteSpace: 'pre-line' }}
+          style={{ color: '#C49A80', whiteSpace: 'pre-line' }}
         >
           {`QRコードを渡すだけ。あなたの分身AIが顧客の相談に応え、\n本当に会うべき人だけを、整理された状態で届けてくれる。`}
         </p>
@@ -88,8 +88,8 @@ export default function HomePage() {
               key={step}
               className="text-left p-6 rounded-2xl"
               style={{
-                background: '#0F0E20',
-                border: '1px solid rgba(242,103,34,0.12)',
+                background: '#1A0900',
+                border: '1px solid rgba(242,103,34,0.18)',
               }}
             >
               <div
