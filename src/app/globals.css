@@ -36,18 +36,13 @@
 }
 
 /* iOS Safari scroll jump fix:
-   Tailwind の min-h-screen (100vh) を安定した高さに上書き。
-   100svh = アドレスバー込みの固定高さ → 出没時に変化しない */
+   動的ビューポート単位は使用しない。固定の 100vh のみ。 */
 .min-h-screen {
-  min-height: 100vh;                  /* 非対応ブラウザ フォールバック */
-  min-height: -webkit-fill-available; /* iOS Safari 旧バージョン */
-  min-height: 100svh;                 /* iOS 16+ / モダンブラウザ */
+  min-height: 100vh;
 }
 
 html {
   overflow-x: clip;
-  /* iOS Safari: アドレスバー出没によるリサイズを安定化 */
-  height: -webkit-fill-available;
 }
 
 body {
@@ -57,11 +52,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
-  /* iOS Safari スクロールジャンプ対策 */
-  overscroll-behavior-y: none;        /* バウンス無効 → ジャンプして見える現象を防ぐ */
+  /* iOS Safari スクロールジャンプ対策:
+     動的ビューポート単位 (-webkit-fill-available / svh) は
+     アドレスバー出没で高さが変わりページ全体をリフローさせる。
+     min-height は固定の 100vh のみ使用し、コンテンツの自然な高さに任せる。 */
+  overscroll-behavior-y: none;
   min-height: 100vh;
-  min-height: -webkit-fill-available; /* アドレスバーを含む安定した高さ */
-  min-height: 100svh;                 /* iOS 16+: 常に小さいビューポート基準 */
 }
 
 @layer components {

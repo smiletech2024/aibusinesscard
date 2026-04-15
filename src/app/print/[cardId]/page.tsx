@@ -102,7 +102,7 @@ function BackBrandLogo() {
 /* ══════════════════════════════════════════
    EXECUTIVE — 白 × インディゴ
 ══════════════════════════════════════════ */
-function ExecutiveFront({ card, qrUrl, fontFamily }: { card: BusinessCard; qrUrl: string; fontFamily?: string }) {
+function ExecutiveFront({ card, qrUrl, fontFamily, logoUrl }: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string }) {
   return (
     <div className="print-card" style={{ width: W, height: H, background: '#FFFFFF', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
       {/* Left accent bar */}
@@ -112,8 +112,13 @@ function ExecutiveFront({ card, qrUrl, fontFamily }: { card: BusinessCard; qrUrl
       <div style={{ position: 'absolute', top: -40, right: -40, width: 120, height: 120, borderRadius: '50%', background: '#FFF0E8', opacity: 0.7 }} />
       <div style={{ position: 'absolute', top: -20, right: -20, width: 70, height: 70, borderRadius: '50%', background: '#FDD5B5', opacity: 0.4 }} />
 
+      {/* User logo (top-left, above company name) */}
+      {logoUrl && (
+        <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: 18, left: 32, maxHeight: 28, maxWidth: 90, objectFit: 'contain', objectPosition: 'left' }} />
+      )}
+
       {/* Main content */}
-      <div style={{ position: 'absolute', left: 32, top: 0, right: 112, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
+      <div style={{ position: 'absolute', left: 32, top: logoUrl ? 54 : 0, right: 112, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
 
         {/* Company */}
         {card.company && (
@@ -226,7 +231,7 @@ function ExecutiveBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: 
 /* ══════════════════════════════════════════
    MIDNIGHT — 漆黒 × バイオレットゴールド
 ══════════════════════════════════════════ */
-function MidnightFront({ card, qrUrl, fontFamily }: { card: BusinessCard; qrUrl: string; fontFamily?: string }) {
+function MidnightFront({ card, qrUrl, fontFamily, logoUrl }: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string }) {
   return (
     <div className="print-card" style={{ width: W, height: H, background: '#0D0C2A', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
       {/* Radial glow */}
@@ -241,13 +246,18 @@ function MidnightFront({ card, qrUrl, fontFamily }: { card: BusinessCard; qrUrl:
       {/* Top gold line */}
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent 0%, #FDD5B5 30%, #F59340 70%, transparent 100%)' }} />
 
+      {/* User logo */}
+      {logoUrl && (
+        <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: 14, left: 32, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', filter: 'brightness(0) invert(1)', opacity: 0.85 }} />
+      )}
+
       {/* Initial — large decorative */}
       <div style={{ position: 'absolute', right: 140, top: '50%', transform: 'translateY(-50%)', fontSize: 120, fontWeight: 900, color: 'rgba(242,103,34,0.06)', lineHeight: 1, letterSpacing: '-0.05em', userSelect: 'none' }}>
         {card.full_name[0]}
       </div>
 
       {/* Left content */}
-      <div style={{ position: 'absolute', left: 32, top: 36, bottom: 36, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <div style={{ position: 'absolute', left: 32, top: logoUrl ? 50 : 36, bottom: 36, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
           {card.company && (
             <p style={{ fontSize: 8, color: '#F5A47A', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 10px' }}>
@@ -341,7 +351,7 @@ function MidnightBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: s
 /* ══════════════════════════════════════════
    VIVID — フルグラデーション
 ══════════════════════════════════════════ */
-function VividFront({ card, qrUrl, fontFamily }: { card: BusinessCard; qrUrl: string; fontFamily?: string }) {
+function VividFront({ card, qrUrl, fontFamily, logoUrl }: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string }) {
   return (
     <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(135deg, #C4511A 0%, #F26722 40%, #D4691E 70%, #F59340 100%)', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
       {/* Geometric decorations */}
@@ -354,8 +364,13 @@ function VividFront({ card, qrUrl, fontFamily }: { card: BusinessCard; qrUrl: st
         {card.full_name[0]}
       </div>
 
+      {/* User logo */}
+      {logoUrl && (
+        <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: 14, left: 32, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', filter: 'brightness(0) invert(1)', opacity: 0.85 }} />
+      )}
+
       {/* Left content */}
-      <div style={{ position: 'absolute', left: 32, top: 32, bottom: 44, right: 120, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <div style={{ position: 'absolute', left: 32, top: logoUrl ? 48 : 32, bottom: 44, right: 120, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
           {card.company && (
             <p style={{ fontSize: 8, color: 'rgba(255,255,255,0.7)', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', margin: '0 0 10px' }}>
@@ -527,6 +542,8 @@ export default function PrintCardPage() {
   const [loading, setLoading] = useState(true)
   const [design, setDesign] = useState<Design>('executive')
   const [font, setFont] = useState<Font>('sans')
+  const [logoUrl, setLogoUrl] = useState<string>('')
+  const [logoUploading, setLogoUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [savedBanner, setSavedBanner] = useState(false)
   const [dlState, setDlState] = useState<'idle' | 'front' | 'back' | 'both' | 'qr' | 'pdf'>('idle')
@@ -642,6 +659,7 @@ export default function PrintCardPage() {
           const cfg = JSON.parse(data.image_url)
           if (cfg.theme && cfg.theme in designMeta) setDesign(cfg.theme as Design)
           if (cfg.font  && cfg.font  in fontMeta)   setFont(cfg.font  as Font)
+          if (cfg.logoUrl) setLogoUrl(cfg.logoUrl)
         } catch {
           // image_url が JSON でない場合は無視（旧データ互換）
         }
@@ -650,6 +668,34 @@ export default function PrintCardPage() {
     setLoading(false)
   }
 
+  // ロゴをcanvasでリサイズしてbase64に変換
+  const handleLogoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setLogoUploading(true)
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const img = new window.Image()
+      img.onload = () => {
+        const MAX = 200
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height))
+        const w = Math.round(img.width * scale)
+        const h = Math.round(img.height * scale)
+        const canvas = document.createElement('canvas')
+        canvas.width = w
+        canvas.height = h
+        const ctx = canvas.getContext('2d')!
+        ctx.drawImage(img, 0, 0, w, h)
+        setLogoUrl(canvas.toDataURL('image/png'))
+        setLogoUploading(false)
+      }
+      img.src = ev.target?.result as string
+    }
+    reader.readAsDataURL(file)
+    // input をリセット（同じファイルを再選択できるように）
+    e.target.value = ''
+  }, [])
+
   const handleSaveStyle = async () => {
     if (saving) return
     setSaving(true)
@@ -657,7 +703,7 @@ export default function PrintCardPage() {
       const res = await fetch(`/api/card/${cardId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ style_config: { theme: design, font } }),
+        body: JSON.stringify({ style_config: { theme: design, font, logoUrl: logoUrl || null } }),
       })
       if (res.ok) {
         setSavedBanner(true)
@@ -684,7 +730,7 @@ export default function PrintCardPage() {
     )
   }
 
-  const FrontComponent = (design === 'executive' ? ExecutiveFront : design === 'midnight' ? MidnightFront : VividFront) as React.ComponentType<{ card: BusinessCard; qrUrl: string; fontFamily?: string }>
+  const FrontComponent = (design === 'executive' ? ExecutiveFront : design === 'midnight' ? MidnightFront : VividFront) as React.ComponentType<{ card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string }>
   const BackComponent  = (design === 'executive' ? ExecutiveBack  : design === 'midnight' ? MidnightBack  : VividBack)  as React.ComponentType<{ card: BusinessCard; fontFamily?: string }>
 
   const currentFontFamily = fontMeta[font].family
@@ -830,6 +876,36 @@ export default function PrintCardPage() {
               {saving ? '保存中...' : '保存'}
             </button>
           </div>
+
+          {/* 行4: ロゴアップロード */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#A08068', whiteSpace: 'nowrap', letterSpacing: '0.06em', minWidth: 36 }}>ロゴ</span>
+            <label style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '6px 14px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+              background: 'white', color: '#4A2C1A',
+              border: '1.5px solid #EDD9C8', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+            }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              {logoUploading ? '処理中...' : 'ロゴ画像を選択'}
+              <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleLogoChange} disabled={logoUploading} />
+            </label>
+            {logoUrl && (
+              <>
+                <img src={logoUrl} alt="logo preview" style={{ height: 28, maxWidth: 80, objectFit: 'contain', borderRadius: 4, border: '1px solid #EDD9C8', background: 'white', padding: 2 }} />
+                <button onClick={() => setLogoUrl('')} style={{
+                  width: 22, height: 22, borderRadius: '50%', border: '1px solid #EDD9C8',
+                  background: 'white', color: '#A08068', cursor: 'pointer', fontSize: 12,
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}>×</button>
+              </>
+            )}
+            {!logoUrl && (
+              <span style={{ fontSize: 10, color: '#A08068' }}>PNG・JPG・SVG 対応</span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -853,7 +929,7 @@ export default function PrintCardPage() {
           btnLabel="表面を保存"
           captureRef={frontRef}
         >
-          <FrontComponent card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} />
+          <FrontComponent card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} logoUrl={logoUrl || undefined} />
         </CardPreview>
 
         {/* 裏面 */}
