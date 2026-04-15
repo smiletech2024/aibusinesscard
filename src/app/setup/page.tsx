@@ -129,7 +129,7 @@ export default function SetupPage() {
         }),
       })
       const data = await res.json()
-      if (data.personaId) { setStep('done'); setTimeout(() => router.push('/dashboard'), 2000) }
+      if (data.personaId) { setStep('done') }
       else setStep('select')
     } catch { setStep('select') }
   }
