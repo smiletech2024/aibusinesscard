@@ -562,6 +562,13 @@ export default function DashboardPage() {
                             お客様が見る画面を確認
                           </a>
                           <Link
+                            href={`/edit/${card.id}`}
+                            className="btn-ghost text-xs px-4 py-2"
+                            style={{ borderRadius: 10 }}
+                          >
+                            編集
+                          </Link>
+                          <Link
                             href={`/print/${card.id}`}
                             className="btn-ghost text-xs px-4 py-2"
                             style={{ borderRadius: 10 }}
