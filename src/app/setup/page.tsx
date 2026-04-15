@@ -140,8 +140,8 @@ export default function SetupPage() {
   if (step === 'quick') {
     const canGenerate = qName && qTitle && qIndustry && keywords.length > 0
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: '#F4F3FA' }}>
-        <div className="w-full max-w-lg">
+      <div className="min-h-screen px-4 py-10" style={{ background: '#F4F3FA' }}>
+        <div className="w-full max-w-lg mx-auto">
           <div className="text-center mb-8">
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: '#EEF2FF' }}>
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -602,8 +602,8 @@ export default function SetupPage() {
   ════════════════════════════════ */
   if (step === 'card') {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: '#F4F3FA' }}>
-        <div className="w-full max-w-lg">
+      <div className="min-h-screen px-4 py-10" style={{ background: '#F4F3FA' }}>
+        <div className="w-full max-w-lg mx-auto">
           <div className="text-center mb-8">
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: '#EEF2FF' }}>
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
