@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/client'
 import { BusinessCard } from '@/types'
 import QRCode from 'qrcode'
 import { LogoIcon } from '@/components/Logo'
+import jsPDF from 'jspdf'
 
 type Design = 'executive' | 'midnight' | 'vivid'
 type Font   = 'sans' | 'serif' | 'rounded'
@@ -528,7 +529,7 @@ export default function PrintCardPage() {
   const [font, setFont] = useState<Font>('sans')
   const [saving, setSaving] = useState(false)
   const [savedBanner, setSavedBanner] = useState(false)
-  const [dlState, setDlState] = useState<'idle' | 'front' | 'back' | 'both' | 'qr'>('idle')
+  const [dlState, setDlState] = useState<'idle' | 'front' | 'back' | 'both' | 'qr' | 'pdf'>('idle')
   const frontRef  = useRef<HTMLDivElement>(null)
   const backRef   = useRef<HTMLDivElement>(null)
   const qrBlockRef = useRef<HTMLDivElement>(null)
@@ -539,14 +540,44 @@ export default function PrintCardPage() {
   // 印刷会社向け高解像度PNG (350dpi 相当 / pixelRatio=3)
   const downloadPng = useCallback(async (ref: React.RefObject<HTMLDivElement | null>, filename: string) => {
     if (!ref.current) return
-    const dataUrl = await toPng(ref.current, {
-      pixelRatio: 3,
-    })
+    const dataUrl = await toPng(ref.current, { pixelRatio: 3 })
     const a = document.createElement('a')
     a.download = filename
     a.href = dataUrl
     a.click()
   }, [])
+
+  // 印刷会社入稿用PDF（表面+裏面を1ファイルに）
+  const handleDownloadPdf = useCallback(async () => {
+    if (!card || !frontRef.current || !backRef.current) return
+    setDlState('pdf')
+    try {
+      // 91×55mm を px 換算（pixelRatio=3 → 350dpi 相当）
+      const [frontDataUrl, backDataUrl] = await Promise.all([
+        toPng(frontRef.current, { pixelRatio: 3 }),
+        toPng(backRef.current, { pixelRatio: 3 }),
+      ])
+
+      // jsPDF: 横向き 91×55mm
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: [91, 55],
+      })
+
+      // 表面（1ページ目）
+      pdf.addImage(frontDataUrl, 'PNG', 0, 0, 91, 55, undefined, 'FAST')
+
+      // 裏面（2ページ目）
+      pdf.addPage([91, 55], 'landscape')
+      pdf.addImage(backDataUrl, 'PNG', 0, 0, 91, 55, undefined, 'FAST')
+
+      const base = card.full_name.replace(/\s/g, '_')
+      pdf.save(`${base}_名刺入稿用_${designMeta[design].label}.pdf`)
+    } finally {
+      setDlState('idle')
+    }
+  }, [card, design])
 
   const handleDownload = useCallback(async (side: 'front' | 'back' | 'both' | 'qr') => {
     if (!card) return
@@ -662,22 +693,34 @@ export default function PrintCardPage() {
               <p style={{ fontSize: 13, fontWeight: 900, color: '#1C0F05', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>名刺デザイン</p>
               <p style={{ fontSize: 10, color: '#A08068', margin: 0 }}>91×55mm · 表面・裏面</p>
             </div>
-            {/* PDFで保存ボタン */}
-            <button onClick={() => {
-              alert('印刷ダイアログが開きます。\n「送信先」を「PDFに保存」に変更して保存してください。')
-              window.print()
-            }} style={{
-              display: 'inline-flex', alignItems: 'center', gap: 5,
-              fontSize: 11, fontWeight: 700, padding: '7px 12px', borderRadius: 10,
-              background: '#1C0F05', color: '#F0C040',
-              border: 'none', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-            }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-                <line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
-              </svg>
-              PDFで保存
+            {/* 入稿用PDFボタン */}
+            <button
+              onClick={handleDownloadPdf}
+              disabled={dlState !== 'idle'}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                fontSize: 11, fontWeight: 700, padding: '7px 12px', borderRadius: 10,
+                background: dlState === 'pdf' ? '#EDD9C8' : '#1C0F05',
+                color: dlState === 'pdf' ? '#A08068' : '#F0C040',
+                border: 'none', cursor: dlState !== 'idle' ? 'not-allowed' : 'pointer',
+                flexShrink: 0, whiteSpace: 'nowrap',
+                boxShadow: dlState === 'pdf' ? 'none' : '0 2px 8px rgba(0,0,0,0.2)',
+              }}
+            >
+              {dlState === 'pdf' ? (
+                <>
+                  <span style={{ width: 10, height: 10, border: '2px solid #A08068', borderTopColor: '#F26722', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.8s linear infinite' }} />
+                  作成中...
+                </>
+              ) : (
+                <>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                    <line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
+                  </svg>
+                  入稿用PDFを保存
+                </>
+              )}
             </button>
             <button onClick={() => window.print()} style={{
               display: 'inline-flex', alignItems: 'center', gap: 5,
@@ -906,7 +949,7 @@ export default function PrintCardPage() {
               { icon: '🖨️', text: '解像度: 350dpi 相当（印刷品質）で保存されます' },
               { icon: '🎨', text: 'カラーモード: RGB（印刷会社でCMYKに変換を依頼）' },
               { icon: '✂️', text: '塗り足し: 必要な場合は印刷会社に3mm塗り足し追加を依頼' },
-              { icon: '📄', text: 'ファイル形式: PNG（入稿可能かを事前に印刷会社へ確認）' },
+              { icon: '📄', text: 'ファイル形式: PDF（表面+裏面2ページ）またはPNG単体での入稿も可' },
             ].map(({ icon, text }) => (
               <div key={text} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                 <span style={{ fontSize: 14, flexShrink: 0, lineHeight: 1.4 }}>{icon}</span>
@@ -916,7 +959,7 @@ export default function PrintCardPage() {
           </div>
           <div style={{ marginTop: 16, padding: '12px 14px', background: '#FAF5F0', borderRadius: 10 }}>
             <p style={{ fontSize: 11, color: '#A08068', lineHeight: 1.6, margin: 0 }}>
-              💡 「PNG保存」ボタンで表面・裏面を一括ダウンロード。「PDFで保存」ボタンは印刷ダイアログで「PDFに保存」を選択してください。
+              💡 「入稿用PDFを保存」で表面+裏面が1つのPDFファイル（91×55mm · 2ページ）として出力されます。印刷会社への入稿に直接使えます。PNG単体で入稿する場合は各カード下の「表面を保存」「裏面を保存」をご利用ください。
             </p>
           </div>
         </div>
