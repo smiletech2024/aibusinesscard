@@ -6,6 +6,15 @@ import { useState, useEffect, useRef, KeyboardEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
+const KEYWORD_PRESETS = [
+  { category: '営業', items: ['BtoB営業', '法人営業', '新規開拓', 'カスタマーサクセス'] },
+  { category: 'マーケ', items: ['SNS運用', 'Web広告', 'SEO', 'コンテンツマーケ'] },
+  { category: 'IT・開発', items: ['Web開発', 'アプリ開発', 'UI/UX設計', 'AI活用'] },
+  { category: '経営・戦略', items: ['経営企画', '事業開発', '新規事業', 'コンサルティング'] },
+  { category: 'クリエイティブ', items: ['Webデザイン', '動画制作', 'ライティング', 'ブランディング'] },
+  { category: '人材・組織', items: ['採用・HR', 'コーチング', '研修・育成'] },
+]
+
 interface CardData {
   full_name: string; title: string; company: string
   short_intro: string; email: string; phone: string; website: string
@@ -207,36 +216,77 @@ export default function SetupPage() {
 
             {/* キーワード */}
             <div>
-              <label className="block text-sm font-semibold mb-1" style={{ color: '#4A2C1A' }}>
-                得意分野・キーワード <span style={{ color: '#EF4444' }}>*</span>
-              </label>
-              <p className="text-xs mb-2" style={{ color: '#A08068' }}>Enterで追加（最大6個）例：SNS運用、BtoB、スタートアップ支援</p>
-              <div
-                className="flex flex-wrap gap-2 p-2 rounded-xl"
-                style={{ background: '#FAF5F0', border: '1.5px solid #DEC4AD', minHeight: 46 }}
-              >
-                {keywords.map(kw => (
-                  <span
-                    key={kw}
-                    className="flex items-center gap-1 text-sm font-semibold px-3 py-1 rounded-full"
-                    style={{ background: '#FFF0E8', color: '#C4511A' }}
-                  >
-                    {kw}
-                    <button onClick={() => setKeywords(p => p.filter(k => k !== kw))} style={{ color: '#F5A47A', fontWeight: 700, lineHeight: 1, background: 'none', border: 'none', cursor: 'pointer' }}>×</button>
-                  </span>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-semibold" style={{ color: '#4A2C1A' }}>
+                  得意分野・キーワード <span style={{ color: '#EF4444' }}>*</span>
+                </label>
+                <span className="text-xs font-bold" style={{ color: keywords.length >= 6 ? '#EF4444' : '#A08068' }}>
+                  {keywords.length}/6
+                </span>
+              </div>
+              <p className="text-xs mb-3" style={{ color: '#A08068' }}>タップで最大6個選択。一覧にないものは下から追加</p>
+
+              {/* プリセット */}
+              <div className="space-y-2 mb-3">
+                {KEYWORD_PRESETS.map(group => (
+                  <div key={group.category}>
+                    <p className="text-xs font-black mb-1" style={{ color: '#A08068', letterSpacing: '0.06em' }}>{group.category}</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {group.items.map(item => {
+                        const selected = keywords.includes(item)
+                        return (
+                          <button
+                            key={item}
+                            onClick={() => {
+                              if (selected) setKeywords(p => p.filter(k => k !== item))
+                              else if (keywords.length < 6) setKeywords(p => [...p, item])
+                            }}
+                            style={{
+                              padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                              background: selected ? '#F26722' : 'white',
+                              color: selected ? 'white' : '#4A2C1A',
+                              border: `1.5px solid ${selected ? 'transparent' : '#DEC4AD'}`,
+                              cursor: keywords.length >= 6 && !selected ? 'not-allowed' : 'pointer',
+                              opacity: keywords.length >= 6 && !selected ? 0.4 : 1,
+                              transition: 'all 0.15s',
+                            }}
+                          >
+                            {selected ? `✓ ${item}` : item}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
                 ))}
-                {keywords.length < 6 && (
+              </div>
+
+              {/* 自由入力 */}
+              {keywords.length < 6 && (
+                <div className="flex gap-2" style={{ borderTop: '1px solid #EDD9C8', paddingTop: 10 }}>
                   <input
                     type="text" value={kwInput}
                     onChange={e => setKwInput(e.target.value)}
                     onKeyDown={handleKwKey}
                     onBlur={() => kwInput && addKeyword(kwInput)}
-                    placeholder={keywords.length === 0 ? 'キーワードを入力してEnter' : '追加...'}
-                    className="outline-none bg-transparent text-sm flex-1"
-                    style={{ minWidth: 120, color: '#1C0F05' }}
+                    placeholder="例: 補助金, 中国語, ..."
+                    style={{
+                      flex: 1, padding: '8px 12px', fontSize: 13, borderRadius: 8,
+                      border: '1.5px solid #DEC4AD', background: '#FAF5F0', color: '#1C0F05', outline: 'none',
+                    }}
+                    onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.background = 'white' }}
                   />
-                )}
-              </div>
+                  <button
+                    onClick={() => addKeyword(kwInput)}
+                    disabled={!kwInput.trim()}
+                    style={{
+                      padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700,
+                      background: kwInput.trim() ? '#F26722' : '#EDD9C8',
+                      color: kwInput.trim() ? 'white' : '#A08068',
+                      border: 'none', cursor: kwInput.trim() ? 'pointer' : 'not-allowed',
+                    }}
+                  >追加</button>
+                </div>
+              )}
             </div>
 
             <button

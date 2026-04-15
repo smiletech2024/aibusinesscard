@@ -3,6 +3,16 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect, KeyboardEvent } from 'react'
+
+const SKILL_PRESETS = [
+  { category: '営業', items: ['BtoB営業', 'BtoC営業', '法人営業', '新規開拓', 'インサイドセールス', 'カスタマーサクセス', '代理店営業'] },
+  { category: 'マーケ・集客', items: ['SNS運用', 'Web広告', 'SEO', 'コンテンツマーケ', 'メールマーケ', 'ブランディング', 'PR・広報'] },
+  { category: 'IT・開発', items: ['Web開発', 'React', 'TypeScript', 'Python', 'AWS', 'アプリ開発', 'UI/UX設計', 'Figma', 'AI/機械学習'] },
+  { category: '経営・戦略', items: ['経営企画', '事業開発', '新規事業', 'PMO', 'スタートアップ', 'コンサルティング', '資金調達', 'M&A'] },
+  { category: 'クリエイティブ', items: ['Webデザイン', 'グラフィックデザイン', '動画制作', 'ライティング', '写真撮影', '映像編集'] },
+  { category: '人材・組織', items: ['採用・HR', '研修・育成', 'コーチング', '組織開発', 'キャリア支援'] },
+  { category: '財務・法務', items: ['財務・会計', '税務', '法務・契約', 'IPO支援'] },
+]
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -219,42 +229,108 @@ export default function EditPersonaPage() {
 
         {/* スキルセット */}
         <div className="card p-5">
-          <h2 className="font-black text-sm mb-1" style={{ color: '#1C0F05' }}>
-            スキルセット・専門領域
-          </h2>
-          <p className="text-xs mb-3" style={{ color: '#A08068' }}>
-            技術・手法・得意分野などを入力。Enterで追加（最大20個）
-          </p>
-          <div
-            className="flex flex-wrap gap-2 p-2.5 rounded-xl"
-            style={{ background: '#FAF5F0', border: '1.5px solid #DEC4AD', minHeight: 50 }}
-          >
-            {skills.map(sk => (
-              <span key={sk}
-                className="flex items-center gap-1 text-sm font-semibold px-3 py-1 rounded-full"
-                style={{ background: '#FFF0E8', color: '#C4511A' }}
-              >
-                {sk}
-                <button
-                  onClick={() => setSkills(p => p.filter(s => s !== sk))}
-                  style={{ color: '#F5A47A', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1 }}
-                >×</button>
-              </span>
-            ))}
-            {skills.length < 20 && (
-              <input
-                type="text" value={kwInput}
-                onChange={e => setKwInput(e.target.value)}
-                onKeyDown={handleKwKey}
-                onBlur={() => kwInput && addSkill(kwInput)}
-                placeholder={skills.length === 0 ? 'React, TypeScript, BtoB営業... など' : '追加...'}
-                className="outline-none bg-transparent text-sm flex-1"
-                style={{ minWidth: 140, color: '#1C0F05' }}
-              />
-            )}
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>スキルセット・専門領域</h2>
+            <span className="text-xs font-bold" style={{ color: skills.length >= 20 ? '#EF4444' : '#A08068' }}>
+              {skills.length}/20
+            </span>
           </div>
-          {skills.length > 0 && (
-            <p className="text-xs mt-2" style={{ color: '#A08068' }}>{skills.length}個登録済み</p>
+          <p className="text-xs mb-4" style={{ color: '#A08068' }}>
+            タップで追加・解除。一覧にないものは下の入力欄から追加できます
+          </p>
+
+          {/* プリセット選択肢 */}
+          <div className="space-y-3 mb-4">
+            {SKILL_PRESETS.map(group => (
+              <div key={group.category}>
+                <p className="text-xs font-black mb-1.5" style={{ color: '#A08068', letterSpacing: '0.06em' }}>
+                  {group.category}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {group.items.map(item => {
+                    const selected = skills.includes(item)
+                    return (
+                      <button
+                        key={item}
+                        onClick={() => {
+                          if (selected) {
+                            setSkills(p => p.filter(s => s !== item))
+                          } else if (skills.length < 20) {
+                            setSkills(p => [...p, item])
+                          }
+                        }}
+                        style={{
+                          padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                          background: selected ? '#F26722' : 'white',
+                          color: selected ? 'white' : '#4A2C1A',
+                          border: `1.5px solid ${selected ? 'transparent' : '#DEC4AD'}`,
+                          cursor: skills.length >= 20 && !selected ? 'not-allowed' : 'pointer',
+                          opacity: skills.length >= 20 && !selected ? 0.4 : 1,
+                          transition: 'all 0.15s',
+                        }}
+                      >
+                        {selected ? `✓ ${item}` : item}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* 自由入力（一覧にないスキル用） */}
+          {skills.length < 20 && (
+            <div style={{ borderTop: '1px solid #EDD9C8', paddingTop: 12 }}>
+              <p className="text-xs font-semibold mb-2" style={{ color: '#A08068' }}>一覧にないスキルを追加</p>
+              <div className="flex gap-2">
+                <input
+                  type="text" value={kwInput}
+                  onChange={e => setKwInput(e.target.value)}
+                  onKeyDown={handleKwKey}
+                  onBlur={() => kwInput && addSkill(kwInput)}
+                  placeholder="例: 補助金申請, 中国語, ..."
+                  style={{
+                    flex: 1, padding: '8px 12px', fontSize: 13, borderRadius: 8,
+                    border: '1.5px solid #DEC4AD', background: '#FAF5F0', color: '#1C0F05', outline: 'none',
+                  }}
+                  onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.background = '#fff' }}
+                  onBlurCapture={e => { e.target.style.borderColor = '#DEC4AD'; e.target.style.background = '#FAF5F0' }}
+                />
+                <button
+                  onClick={() => addSkill(kwInput)}
+                  disabled={!kwInput.trim()}
+                  style={{
+                    padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700,
+                    background: kwInput.trim() ? '#F26722' : '#EDD9C8',
+                    color: kwInput.trim() ? 'white' : '#A08068',
+                    border: 'none', cursor: kwInput.trim() ? 'pointer' : 'not-allowed',
+                  }}
+                >
+                  追加
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* 追加済みカスタムスキル（プリセット外のもの） */}
+          {skills.filter(s => !SKILL_PRESETS.flatMap(g => g.items).includes(s)).length > 0 && (
+            <div style={{ borderTop: '1px solid #EDD9C8', paddingTop: 10, marginTop: 10 }}>
+              <p className="text-xs font-semibold mb-2" style={{ color: '#A08068' }}>カスタム追加済み</p>
+              <div className="flex flex-wrap gap-1.5">
+                {skills.filter(s => !SKILL_PRESETS.flatMap(g => g.items).includes(s)).map(sk => (
+                  <span key={sk}
+                    className="flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full"
+                    style={{ background: '#1C0F05', color: 'white' }}
+                  >
+                    {sk}
+                    <button
+                      onClick={() => setSkills(p => p.filter(s => s !== sk))}
+                      style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1 }}
+                    >×</button>
+                  </span>
+                ))}
+              </div>
+            </div>
           )}
         </div>
 
