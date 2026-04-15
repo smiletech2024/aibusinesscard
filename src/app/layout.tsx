@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 
@@ -10,6 +10,12 @@ const geistSans = Geist({
 export const metadata: Metadata = {
   title: "AI名刺 - 分身AIが顧客との対話を蓄積する営業OS",
   description: "名刺を起点に、分身AIが顧客との対話を蓄積し、本人と顧客の会話までつなぐ営業OS",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({

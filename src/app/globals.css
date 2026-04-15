@@ -38,6 +38,7 @@
 body {
   background: #F4F3FA;
   color: #1E1B4B;
+  overflow-x: hidden;
   font-family: 'Inter', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
