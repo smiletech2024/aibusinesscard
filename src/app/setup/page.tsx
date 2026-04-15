@@ -541,11 +541,12 @@ export default function SetupPage() {
                                 style={{ fontSize: 11, color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}
                               >削除</button>
                             </div>
-                            <input
+                            <textarea
                               value={faq.question}
                               onChange={e => updateFaq(faq.id, 'question', e.target.value)}
                               placeholder="例：料金はどのくらいですか？"
-                              style={editInputStyle}
+                              rows={2}
+                              style={{ ...editInputStyle, resize: 'none', lineHeight: 1.6, marginBottom: 6, paddingTop: 10, paddingBottom: 10 }}
                             />
                             <textarea
                               value={faq.answer}

@@ -292,16 +292,16 @@ export default function EditPersonaPage() {
                   <label className="block text-xs font-semibold mb-1" style={{ color: '#4A4870' }}>
                     質問 <span style={{ color: '#EF4444' }}>*</span>
                   </label>
-                  <input
-                    type="text"
+                  <textarea
                     value={faq.question}
                     onChange={e => updateFaq(faq.id, 'question', e.target.value)}
                     placeholder="例：料金はどのくらいですか？"
+                    rows={2}
                     style={{
-                      width: '100%', padding: '9px 12px', fontSize: 13,
+                      width: '100%', padding: '9px 12px', fontSize: 13, lineHeight: 1.6,
                       border: '1.5px solid #D1D0E8', borderRadius: 8,
                       background: '#F4F3FA', color: '#1E1B4B', outline: 'none',
-                      boxSizing: 'border-box',
+                      boxSizing: 'border-box', resize: 'none',
                     }}
                     onFocus={e => { e.target.style.borderColor = '#6366F1'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.1)' }}
                     onBlur={e => { e.target.style.borderColor = '#D1D0E8'; e.target.style.background = '#F4F3FA'; e.target.style.boxShadow = 'none' }}
