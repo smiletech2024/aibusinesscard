@@ -113,7 +113,7 @@ function ExecutiveFront({ card, qrUrl, fontFamily }: { card: BusinessCard; qrUrl
       <div style={{ position: 'absolute', top: -20, right: -20, width: 70, height: 70, borderRadius: '50%', background: '#FDD5B5', opacity: 0.4 }} />
 
       {/* Main content */}
-      <div style={{ position: 'absolute', left: 32, top: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
+      <div style={{ position: 'absolute', left: 32, top: 0, right: 112, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
 
         {/* Company */}
         {card.company && (

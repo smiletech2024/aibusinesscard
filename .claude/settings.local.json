@@ -27,7 +27,8 @@
       "Bash(vercel --version)",
       "Bash(vercel ls:*)",
       "Bash(npx vercel:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(gh deployment:*)"
     ]
   }
 }
