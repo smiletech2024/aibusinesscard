@@ -7,6 +7,15 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 interface Message { role: 'user' | 'assistant'; content: string }
+
+function parseChoices(content: string): { text: string; choices: string[] } {
+  const match = content.match(/《選択肢》(.+?)《\/選択肢》/s)
+  if (!match) return { text: content, choices: [] }
+  const choices = match[1].split('｜').map((c: string) => c.trim()).filter(Boolean)
+  const text = content.replace(/《選択肢》.+?《\/選択肢》/s, '').trim()
+  return { text, choices }
+}
+
 interface CardData {
   full_name: string; title: string; company: string
   short_intro: string; email: string; phone: string; website: string
@@ -71,10 +80,10 @@ export default function SetupPage() {
     } finally { setLoading(false) }
   }
 
-  const sendMessage = async () => {
-    if (!input.trim() || loading) return
-    const userMessage = input.trim()
-    setInput('')
+  const sendMessage = async (overrideMessage?: string) => {
+    const userMessage = overrideMessage ?? input.trim()
+    if (!userMessage || loading) return
+    if (!overrideMessage) setInput('')
     const newMessages: Message[] = [...messages, { role: 'user', content: userMessage }]
     setMessages(newMessages)
     setLoading(true)
@@ -299,23 +308,61 @@ export default function SetupPage() {
 
       {/* メッセージ */}
       <div className="flex-1 overflow-y-auto px-4 py-5 space-y-4 max-w-2xl mx-auto w-full">
-        {messages.map((msg, i) => (
-          <div key={i} className={`flex gap-3 fade-up ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {msg.role === 'assistant' && (
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
-                style={{ background: 'var(--grad-primary)' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="8" r="4" />
-                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-                </svg>
+        {messages.map((msg, i) => {
+          const isLastAssistant = msg.role === 'assistant' && i === messages.length - 1 && !loading
+          const { text, choices } = msg.role === 'assistant' ? parseChoices(msg.content) : { text: msg.content, choices: [] }
+          return (
+            <div key={i} className={`fade-up ${msg.role === 'user' ? 'flex justify-end' : 'flex flex-col gap-2'}`}>
+              <div className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                {msg.role === 'assistant' && (
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
+                    style={{ background: 'var(--grad-primary)' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="8" r="4" />
+                      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+                    </svg>
+                  </div>
+                )}
+                <div className={`max-w-xs sm:max-w-md ${msg.role === 'user' ? 'bubble-user' : 'bubble-ai'}`}
+                  style={{ whiteSpace: 'pre-wrap' }}>
+                  {text || msg.content}
+                </div>
               </div>
-            )}
-            <div className={`max-w-xs sm:max-w-md ${msg.role === 'user' ? 'bubble-user' : 'bubble-ai'}`}
-              style={{ whiteSpace: 'pre-wrap' }}>
-              {msg.content}
+              {isLastAssistant && choices.length > 0 && (
+                <div className="flex flex-wrap gap-2 pl-11">
+                  {choices.map((choice, ci) => (
+                    <button
+                      key={ci}
+                      onClick={() => sendMessage(choice)}
+                      style={{
+                        padding: '8px 16px',
+                        background: 'white',
+                        color: '#4338CA',
+                        border: '1.5px solid #C7D2FE',
+                        borderRadius: 20,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                        boxShadow: '0 1px 4px rgba(99,102,241,0.1)',
+                      }}
+                      onMouseEnter={e => {
+                        (e.target as HTMLButtonElement).style.background = '#EEF2FF'
+                        ;(e.target as HTMLButtonElement).style.borderColor = '#818CF8'
+                      }}
+                      onMouseLeave={e => {
+                        (e.target as HTMLButtonElement).style.background = 'white'
+                        ;(e.target as HTMLButtonElement).style.borderColor = '#C7D2FE'
+                      }}
+                    >
+                      {choice}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          )
+        })}
 
         {loading && messages.length === 0 && (
           <div className="flex gap-3 justify-start fade-in">
