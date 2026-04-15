@@ -737,88 +737,61 @@ export default function PrintCardPage() {
             </button>
           </div>
 
-          {/* 行2: カラー選択 */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflowX: 'auto' }}>
-            <span style={{ fontSize: 10, fontWeight: 800, color: '#A08068', whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>カラー</span>
-            {(Object.entries(designMeta) as [Design, typeof designMeta[Design]][]).map(([key, meta]) => (
-              <button key={key} onClick={() => setDesign(key)} style={{
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                padding: '5px 11px', borderRadius: 8, fontSize: 11, fontWeight: 700,
-                background: design === key ? '#F26722' : 'white',
-                color: design === key ? 'white' : '#4A2C1A',
-                border: `1.5px solid ${design === key ? 'transparent' : '#EDD9C8'}`,
-                cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
-                boxShadow: design === key ? '0 2px 8px rgba(242,103,34,0.3)' : 'none',
-                transition: 'all 0.15s',
-              }}>
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: meta.preview, border: '1.5px solid rgba(0,0,0,0.12)', flexShrink: 0 }} />
-                {meta.label}
-              </button>
-            ))}
+          {/* 行2: カラー選択（1行に収まる・スクロール不要） */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#A08068', whiteSpace: 'nowrap', letterSpacing: '0.06em', minWidth: 36 }}>カラー</span>
+            <div style={{ display: 'flex', gap: 5, flex: 1 }}>
+              {(Object.entries(designMeta) as [Design, typeof designMeta[Design]][]).map(([key, meta]) => (
+                <button key={key} onClick={() => setDesign(key)} style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+                  flex: 1, padding: '6px 4px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+                  background: design === key ? '#F26722' : 'white',
+                  color: design === key ? 'white' : '#4A2C1A',
+                  border: `1.5px solid ${design === key ? 'transparent' : '#EDD9C8'}`,
+                  cursor: 'pointer', whiteSpace: 'nowrap',
+                  boxShadow: design === key ? '0 2px 8px rgba(242,103,34,0.3)' : 'none',
+                  transition: 'all 0.15s',
+                }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: meta.preview, border: '1.5px solid rgba(0,0,0,0.12)', flexShrink: 0 }} />
+                  {meta.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-            <div style={{ width: 1, height: 20, background: '#EDD9C8', flexShrink: 0, margin: '0 2px' }} />
-
-            {/* フォント選択 */}
-            <span style={{ fontSize: 10, fontWeight: 800, color: '#A08068', whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>フォント</span>
-            {(Object.entries(fontMeta) as [Font, typeof fontMeta[Font]][]).map(([key, meta]) => (
-              <button key={key} onClick={() => setFont(key)} style={{
-                padding: '5px 11px', borderRadius: 8, fontSize: 11, fontWeight: 700,
-                background: font === key ? '#1C0F05' : 'white',
-                color: font === key ? 'white' : '#4A2C1A',
-                border: `1.5px solid ${font === key ? 'transparent' : '#EDD9C8'}`,
-                cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
-                boxShadow: font === key ? '0 2px 8px rgba(0,0,0,0.2)' : 'none',
-                fontFamily: meta.family,
-                transition: 'all 0.15s',
-              }}>
-                {meta.label}
-              </button>
-            ))}
-
-            <div style={{ flex: 1, minWidth: 8 }} />
-
-            {/* 保存 + ダウンロード */}
+          {/* 行3: フォント選択 + 保存ボタン */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#A08068', whiteSpace: 'nowrap', letterSpacing: '0.06em', minWidth: 36 }}>書体</span>
+            <div style={{ display: 'flex', gap: 5, flex: 1 }}>
+              {(Object.entries(fontMeta) as [Font, typeof fontMeta[Font]][]).map(([key, meta]) => (
+                <button key={key} onClick={() => setFont(key)} style={{
+                  flex: 1, padding: '6px 4px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+                  background: font === key ? '#1C0F05' : 'white',
+                  color: font === key ? 'white' : '#4A2C1A',
+                  border: `1.5px solid ${font === key ? 'transparent' : '#EDD9C8'}`,
+                  cursor: 'pointer', whiteSpace: 'nowrap',
+                  boxShadow: font === key ? '0 2px 8px rgba(0,0,0,0.2)' : 'none',
+                  fontFamily: meta.family,
+                  transition: 'all 0.15s',
+                }}>
+                  {meta.label}
+                </button>
+              ))}
+            </div>
+            {/* 保存ボタン */}
             <button
               onClick={handleSaveStyle}
               disabled={saving}
               style={{
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                padding: '5px 12px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                padding: '6px 12px', borderRadius: 8, fontSize: 11, fontWeight: 700,
                 background: saving ? '#EDD9C8' : '#FFF0E8',
                 color: saving ? '#A08068' : '#C4511A',
                 border: '1.5px solid #FDD5B5',
                 cursor: saving ? 'not-allowed' : 'pointer', flexShrink: 0, whiteSpace: 'nowrap',
               }}
             >
-              {saving ? '保存中...' : '✓ デザインを保存'}
-            </button>
-
-            <button
-              onClick={() => handleDownload('both')}
-              disabled={dlState !== 'idle'}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                padding: '5px 12px', borderRadius: 8, fontSize: 11, fontWeight: 700,
-                background: dlState !== 'idle' ? '#EDD9C8' : '#0F0E1E',
-                color: dlState !== 'idle' ? '#A08068' : '#F0C040',
-                border: 'none', cursor: dlState !== 'idle' ? 'not-allowed' : 'pointer',
-                whiteSpace: 'nowrap', flexShrink: 0,
-                boxShadow: dlState !== 'idle' ? 'none' : '0 2px 8px rgba(0,0,0,0.2)',
-              }}
-            >
-              {dlState !== 'idle' ? (
-                <>
-                  <span style={{ width: 9, height: 9, border: '2px solid #A08068', borderTopColor: '#F26722', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.8s linear infinite' }} />
-                  作成中...
-                </>
-              ) : (
-                <>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-                  </svg>
-                  PNG保存
-                </>
-              )}
+              {saving ? '保存中...' : '保存'}
             </button>
           </div>
         </div>
