@@ -356,21 +356,29 @@ export default function SetupPage() {
      STEP: select
   ════════════════════════════════ */
   if (step === 'select' && draft) {
-    const toggleFaq = (id: string) => {
-      setSelFaqIds(prev => {
-        const next = new Set(prev)
-        next.has(id) ? next.delete(id) : next.add(id)
-        return next
-      })
+    const toggleFaq = (id: string) => setSelFaqIds(prev => {
+      const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next
+    })
+    const updateTone = (id: string, profile: string) =>
+      setDraft(d => d ? { ...d, tones: d.tones.map(t => t.id === id ? { ...t, profile } : t) } : d)
+    const updateValue = (id: string, text: string) =>
+      setDraft(d => d ? { ...d, values: d.values.map(v => v.id === id ? { ...v, text } : v) } : d)
+    const updateFaq = (id: string, field: 'question' | 'answer', val: string) =>
+      setDraft(d => d ? { ...d, faqs: d.faqs.map(f => f.id === id ? { ...f, [field]: val } : f) } : d)
+
+    const editAreaStyle: React.CSSProperties = {
+      width: '100%', padding: '8px 10px', fontSize: 13, lineHeight: 1.6,
+      border: '1.5px solid #C7D2FE', borderRadius: 8,
+      background: '#F8F7FF', color: '#1E1B4B', outline: 'none',
+      resize: 'none', boxSizing: 'border-box', marginTop: 6,
     }
 
     return (
       <div className="min-h-screen" style={{ background: '#F4F3FA' }}>
-        {/* Header */}
         <div className="sticky top-0 z-10" style={{ background: 'linear-gradient(135deg, #4338CA, #6D28D9)', padding: '16px 16px 14px' }}>
           <div className="max-w-2xl mx-auto">
             <h1 className="font-black text-white text-base">あなたの分身を選んで確定</h1>
-            <p className="text-white/60 text-xs mt-0.5">各セクションの内容を選ぶだけで完成します</p>
+            <p className="text-white/60 text-xs mt-0.5">選んだ後、テキストをそのまま編集できます</p>
           </div>
         </div>
 
@@ -383,31 +391,38 @@ export default function SetupPage() {
               話し方スタイル
             </h2>
             <div className="space-y-2.5">
-              {draft.tones.map(tone => (
-                <button
-                  key={tone.id}
-                  onClick={() => setSelToneId(tone.id)}
-                  className="w-full text-left p-4 rounded-2xl transition-all"
-                  style={{
-                    background: selToneId === tone.id ? 'white' : 'rgba(255,255,255,0.6)',
-                    border: selToneId === tone.id ? '2px solid #6366F1' : '2px solid transparent',
-                    boxShadow: selToneId === tone.id ? '0 4px 16px rgba(99,102,241,0.15)' : 'none',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div style={{
-                      width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
-                      border: selToneId === tone.id ? '6px solid #6366F1' : '2px solid #D1D0E8',
-                      background: 'white', transition: 'all 0.15s',
-                    }} />
-                    <div>
-                      <p className="font-bold text-sm" style={{ color: selToneId === tone.id ? '#4338CA' : '#1E1B4B' }}>{tone.label}</p>
-                      <p className="text-xs mt-0.5 leading-relaxed" style={{ color: '#6B7280' }}>{tone.profile}</p>
+              {draft.tones.map(tone => {
+                const sel = selToneId === tone.id
+                return (
+                  <div key={tone.id} className="p-4 rounded-2xl transition-all"
+                    style={{
+                      background: sel ? 'white' : 'rgba(255,255,255,0.6)',
+                      border: sel ? '2px solid #6366F1' : '2px solid transparent',
+                      boxShadow: sel ? '0 4px 16px rgba(99,102,241,0.15)' : 'none',
+                    }}>
+                    <div className="flex items-center gap-3 cursor-pointer" onClick={() => setSelToneId(tone.id)}>
+                      <div style={{
+                        width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
+                        border: sel ? '6px solid #6366F1' : '2px solid #D1D0E8',
+                        background: 'white', transition: 'all 0.15s',
+                      }} />
+                      <p className="font-bold text-sm" style={{ color: sel ? '#4338CA' : '#1E1B4B' }}>{tone.label}</p>
                     </div>
+                    {sel ? (
+                      <textarea
+                        value={tone.profile}
+                        onChange={e => updateTone(tone.id, e.target.value)}
+                        rows={3}
+                        style={editAreaStyle}
+                        onClick={e => e.stopPropagation()}
+                      />
+                    ) : (
+                      <p className="text-xs mt-1.5 leading-relaxed ml-8" style={{ color: '#9896B8' }}>{tone.profile}</p>
+                    )}
+                    {sel && <p className="text-xs mt-1 ml-1" style={{ color: '#A5B4FC' }}>✏️ 直接編集できます</p>}
                   </div>
-                </button>
-              ))}
+                )
+              })}
             </div>
           </section>
 
@@ -418,28 +433,37 @@ export default function SetupPage() {
               価値観・強みの紹介文
             </h2>
             <div className="space-y-2.5">
-              {draft.values.map(val => (
-                <button
-                  key={val.id}
-                  onClick={() => setSelValueId(val.id)}
-                  className="w-full text-left p-4 rounded-2xl transition-all"
-                  style={{
-                    background: selValueId === val.id ? 'white' : 'rgba(255,255,255,0.6)',
-                    border: selValueId === val.id ? '2px solid #6366F1' : '2px solid transparent',
-                    boxShadow: selValueId === val.id ? '0 4px 16px rgba(99,102,241,0.15)' : 'none',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <div className="flex items-start gap-3">
-                    <div style={{
-                      width: 20, height: 20, borderRadius: '50%', flexShrink: 0, marginTop: 2,
-                      border: selValueId === val.id ? '6px solid #6366F1' : '2px solid #D1D0E8',
-                      background: 'white', transition: 'all 0.15s',
-                    }} />
-                    <p className="text-sm leading-relaxed" style={{ color: selValueId === val.id ? '#1E1B4B' : '#6B7280' }}>{val.text}</p>
+              {draft.values.map(val => {
+                const sel = selValueId === val.id
+                return (
+                  <div key={val.id} className="p-4 rounded-2xl transition-all"
+                    style={{
+                      background: sel ? 'white' : 'rgba(255,255,255,0.6)',
+                      border: sel ? '2px solid #6366F1' : '2px solid transparent',
+                      boxShadow: sel ? '0 4px 16px rgba(99,102,241,0.15)' : 'none',
+                    }}>
+                    <div className="flex items-start gap-3 cursor-pointer" onClick={() => setSelValueId(val.id)}>
+                      <div style={{
+                        width: 20, height: 20, borderRadius: '50%', flexShrink: 0, marginTop: 2,
+                        border: sel ? '6px solid #6366F1' : '2px solid #D1D0E8',
+                        background: 'white', transition: 'all 0.15s',
+                      }} />
+                      {sel ? (
+                        <textarea
+                          value={val.text}
+                          onChange={e => updateValue(val.id, e.target.value)}
+                          rows={4}
+                          style={{ ...editAreaStyle, marginTop: 0, flex: 1 }}
+                          onClick={e => e.stopPropagation()}
+                        />
+                      ) : (
+                        <p className="text-sm leading-relaxed" style={{ color: '#6B7280' }}>{val.text}</p>
+                      )}
+                    </div>
+                    {sel && <p className="text-xs mt-1 ml-8" style={{ color: '#A5B4FC' }}>✏️ 直接編集できます</p>}
                   </div>
-                </button>
-              ))}
+                )
+              })}
             </div>
           </section>
 
@@ -447,45 +471,62 @@ export default function SetupPage() {
           <section>
             <h2 className="text-sm font-black mb-1 flex items-center gap-2" style={{ color: '#1E1B4B' }}>
               <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black text-white" style={{ background: '#6366F1' }}>3</span>
-              よくある質問（使うものだけオンに）
+              よくある質問
             </h2>
-            <p className="text-xs mb-3 ml-8" style={{ color: '#9896B8' }}>分身AIが自動で答えられる質問です</p>
+            <p className="text-xs mb-3 ml-8" style={{ color: '#9896B8' }}>使うものをオンにして、内容も直接編集できます</p>
             <div className="space-y-2">
               {draft.faqs.map(faq => {
                 const on = selFaqIds.has(faq.id)
                 return (
-                  <button
-                    key={faq.id}
-                    onClick={() => toggleFaq(faq.id)}
-                    className="w-full text-left p-3.5 rounded-xl transition-all"
+                  <div key={faq.id} className="p-3.5 rounded-xl transition-all"
                     style={{
                       background: on ? 'white' : 'rgba(255,255,255,0.45)',
                       border: on ? '1.5px solid #C7D2FE' : '1.5px solid transparent',
-                      cursor: 'pointer',
-                    }}
-                  >
+                    }}>
                     <div className="flex items-start gap-3">
-                      <div style={{
-                        width: 20, height: 20, borderRadius: 6, flexShrink: 0, marginTop: 1,
-                        background: on ? '#6366F1' : 'white',
-                        border: on ? 'none' : '2px solid #D1D0E8',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        transition: 'all 0.15s',
-                      }}>
+                      <button
+                        onClick={() => toggleFaq(faq.id)}
+                        style={{
+                          width: 20, height: 20, borderRadius: 6, flexShrink: 0, marginTop: 2,
+                          background: on ? '#6366F1' : 'white',
+                          border: on ? 'none' : '2px solid #D1D0E8',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          transition: 'all 0.15s', cursor: 'pointer',
+                        }}
+                      >
                         {on && <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold" style={{ color: on ? '#1E1B4B' : '#9896B8' }}>{faq.question}</p>
-                        {on && <p className="text-xs mt-1 leading-relaxed" style={{ color: '#6B7280' }}>{faq.answer}</p>}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        {on ? (
+                          <>
+                            <input
+                              value={faq.question}
+                              onChange={e => updateFaq(faq.id, 'question', e.target.value)}
+                              style={{
+                                width: '100%', padding: '6px 10px', fontSize: 13, fontWeight: 600,
+                                border: '1.5px solid #C7D2FE', borderRadius: 7,
+                                background: '#F8F7FF', color: '#1E1B4B', outline: 'none',
+                                boxSizing: 'border-box', marginBottom: 6,
+                              }}
+                            />
+                            <textarea
+                              value={faq.answer}
+                              onChange={e => updateFaq(faq.id, 'answer', e.target.value)}
+                              rows={3}
+                              style={editAreaStyle}
+                            />
+                          </>
+                        ) : (
+                          <p className="text-sm font-semibold" style={{ color: '#9896B8' }}>{faq.question}</p>
+                        )}
                       </div>
                     </div>
-                  </button>
+                  </div>
                 )
               })}
             </div>
           </section>
 
-          {/* ── 確定ボタン ── */}
           <button
             onClick={() => setStep('card')}
             disabled={!selToneId || !selValueId || selFaqIds.size === 0}
