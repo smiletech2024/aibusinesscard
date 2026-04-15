@@ -263,7 +263,7 @@ export default function SetupPage() {
   ════════════════════════════════ */
   if (step === 'generating') {
     const TOTAL = 20
-    const progress = Math.min((elapsedSeconds / TOTAL) * 100, 95)
+    const progress = Math.min(5 + (elapsedSeconds / TOTAL) * 90, 95)
     const genSteps = [
       { label: 'あなたの情報を分析中', at: 0 },
       { label: '話し方スタイルを設計中', at: 4 },
