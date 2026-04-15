@@ -102,7 +102,7 @@ function BackBrandLogo() {
 /* ══════════════════════════════════════════
    EXECUTIVE — 白 × インディゴ
 ══════════════════════════════════════════ */
-function ExecutiveFront({ card, qrUrl, fontFamily, logoUrl }: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string }) {
+function ExecutiveFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 18 }: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) {
   return (
     <div className="print-card" style={{ width: W, height: H, background: '#FFFFFF', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
       {/* Left accent bar */}
@@ -112,13 +112,13 @@ function ExecutiveFront({ card, qrUrl, fontFamily, logoUrl }: { card: BusinessCa
       <div style={{ position: 'absolute', top: -40, right: -40, width: 120, height: 120, borderRadius: '50%', background: '#FFF0E8', opacity: 0.7 }} />
       <div style={{ position: 'absolute', top: -20, right: -20, width: 70, height: 70, borderRadius: '50%', background: '#FDD5B5', opacity: 0.4 }} />
 
-      {/* User logo (top-left, above company name) */}
+      {/* User logo */}
       {logoUrl && (
-        <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: 18, left: 32, maxHeight: 28, maxWidth: 90, objectFit: 'contain', objectPosition: 'left' }} />
+        <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 28, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', pointerEvents: 'none' }} />
       )}
 
       {/* Main content */}
-      <div style={{ position: 'absolute', left: 32, top: logoUrl ? 54 : 0, right: 112, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
+      <div style={{ position: 'absolute', left: 32, top: 0, right: 112, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
 
         {/* Company */}
         {card.company && (
@@ -231,7 +231,7 @@ function ExecutiveBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: 
 /* ══════════════════════════════════════════
    MIDNIGHT — 漆黒 × バイオレットゴールド
 ══════════════════════════════════════════ */
-function MidnightFront({ card, qrUrl, fontFamily, logoUrl }: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string }) {
+function MidnightFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) {
   return (
     <div className="print-card" style={{ width: W, height: H, background: '#0D0C2A', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
       {/* Radial glow */}
@@ -248,7 +248,7 @@ function MidnightFront({ card, qrUrl, fontFamily, logoUrl }: { card: BusinessCar
 
       {/* User logo */}
       {logoUrl && (
-        <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: 14, left: 32, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', filter: 'brightness(0) invert(1)', opacity: 0.85 }} />
+        <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', filter: 'brightness(0) invert(1)', opacity: 0.85, pointerEvents: 'none' }} />
       )}
 
       {/* Initial — large decorative */}
@@ -257,7 +257,7 @@ function MidnightFront({ card, qrUrl, fontFamily, logoUrl }: { card: BusinessCar
       </div>
 
       {/* Left content */}
-      <div style={{ position: 'absolute', left: 32, top: logoUrl ? 50 : 36, bottom: 36, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <div style={{ position: 'absolute', left: 32, top: 36, bottom: 36, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
           {card.company && (
             <p style={{ fontSize: 8, color: '#F5A47A', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 10px' }}>
@@ -351,7 +351,7 @@ function MidnightBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: s
 /* ══════════════════════════════════════════
    VIVID — フルグラデーション
 ══════════════════════════════════════════ */
-function VividFront({ card, qrUrl, fontFamily, logoUrl }: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string }) {
+function VividFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) {
   return (
     <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(135deg, #C4511A 0%, #F26722 40%, #D4691E 70%, #F59340 100%)', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
       {/* Geometric decorations */}
@@ -366,11 +366,11 @@ function VividFront({ card, qrUrl, fontFamily, logoUrl }: { card: BusinessCard; 
 
       {/* User logo */}
       {logoUrl && (
-        <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: 14, left: 32, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', filter: 'brightness(0) invert(1)', opacity: 0.85 }} />
+        <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', filter: 'brightness(0) invert(1)', opacity: 0.85, pointerEvents: 'none' }} />
       )}
 
       {/* Left content */}
-      <div style={{ position: 'absolute', left: 32, top: logoUrl ? 48 : 32, bottom: 44, right: 120, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <div style={{ position: 'absolute', left: 32, top: 32, bottom: 44, right: 120, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
           {card.company && (
             <p style={{ fontSize: 8, color: 'rgba(255,255,255,0.7)', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', margin: '0 0 10px' }}>
@@ -471,7 +471,8 @@ function VividBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: stri
    カードプレビュー（レスポンシブ対応）
 ══════════════════════════════════════════ */
 function CardPreview({
-  label, children, onDownload, disabled, btnLabel, captureRef
+  label, children, onDownload, disabled, btnLabel, captureRef,
+  overlay,
 }: {
   label: string
   children: React.ReactNode
@@ -479,6 +480,8 @@ function CardPreview({
   disabled: boolean
   btnLabel: string
   captureRef: React.RefObject<HTMLDivElement | null>
+  /** captureRef の外・scale内に描画するオーバーレイ（ドラッグハンドル等）*/
+  overlay?: (scale: number) => React.ReactNode
 }) {
   const [scale, setScale] = React.useState(0.85)
   const wrapperRef = React.useRef<HTMLDivElement>(null)
@@ -508,11 +511,13 @@ function CardPreview({
         flexShrink: 0,
       }}>
         {/* スケール内：フルサイズでレンダリング → transform で縮小 */}
-        <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left', width: W, height: H }}>
+        <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left', width: W, height: H, position: 'relative' }}>
           {/* ← ここに ref を付ける：スケール前のフルサイズDOM */}
           <div ref={captureRef} style={{ width: W, height: H }}>
             {children}
           </div>
+          {/* captureRef の外に描画するオーバーレイ（キャプチャ対象外） */}
+          {overlay?.(scale)}
         </div>
       </div>
       <button onClick={onDownload} disabled={disabled} style={{
@@ -543,6 +548,8 @@ export default function PrintCardPage() {
   const [design, setDesign] = useState<Design>('executive')
   const [font, setFont] = useState<Font>('sans')
   const [logoUrl, setLogoUrl] = useState<string>('')
+  const [logoX, setLogoX] = useState(32)
+  const [logoY, setLogoY] = useState(16)
   const [logoUploading, setLogoUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [savedBanner, setSavedBanner] = useState(false)
@@ -660,6 +667,8 @@ export default function PrintCardPage() {
           if (cfg.theme && cfg.theme in designMeta) setDesign(cfg.theme as Design)
           if (cfg.font  && cfg.font  in fontMeta)   setFont(cfg.font  as Font)
           if (cfg.logoUrl) setLogoUrl(cfg.logoUrl)
+          if (typeof cfg.logoX === 'number') setLogoX(cfg.logoX)
+          if (typeof cfg.logoY === 'number') setLogoY(cfg.logoY)
         } catch {
           // image_url が JSON でない場合は無視（旧データ互換）
         }
@@ -667,6 +676,31 @@ export default function PrintCardPage() {
     }
     setLoading(false)
   }
+
+  // ロゴドラッグ（カードプレビュー上でポインタ操作）
+  const handleLogoDragStart = useCallback((e: React.PointerEvent, scale: number) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const startClientX = e.clientX
+    const startClientY = e.clientY
+    const startX = logoX
+    const startY = logoY
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+
+    const handleMove = (ev: PointerEvent) => {
+      const dx = (ev.clientX - startClientX) / scale
+      const dy = (ev.clientY - startClientY) / scale
+      setLogoX(Math.round(Math.max(0, Math.min(W - 90, startX + dx))))
+      setLogoY(Math.round(Math.max(0, Math.min(H - 32, startY + dy))))
+    }
+    const handleUp = (ev: PointerEvent) => {
+      ;(e.target as HTMLElement).releasePointerCapture(ev.pointerId)
+      ;(e.target as HTMLElement).removeEventListener('pointermove', handleMove as EventListener)
+      ;(e.target as HTMLElement).removeEventListener('pointerup', handleUp as EventListener)
+    }
+    ;(e.target as HTMLElement).addEventListener('pointermove', handleMove as EventListener)
+    ;(e.target as HTMLElement).addEventListener('pointerup', handleUp as EventListener)
+  }, [logoX, logoY])
 
   // ロゴをcanvasでリサイズしてbase64に変換
   const handleLogoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -703,7 +737,7 @@ export default function PrintCardPage() {
       const res = await fetch(`/api/card/${cardId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ style_config: { theme: design, font, logoUrl: logoUrl || null } }),
+        body: JSON.stringify({ style_config: { theme: design, font, logoUrl: logoUrl || null, logoX, logoY } }),
       })
       if (res.ok) {
         setSavedBanner(true)
@@ -730,7 +764,7 @@ export default function PrintCardPage() {
     )
   }
 
-  const FrontComponent = (design === 'executive' ? ExecutiveFront : design === 'midnight' ? MidnightFront : VividFront) as React.ComponentType<{ card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string }>
+  const FrontComponent = (design === 'executive' ? ExecutiveFront : design === 'midnight' ? MidnightFront : VividFront) as React.ComponentType<{ card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }>
   const BackComponent  = (design === 'executive' ? ExecutiveBack  : design === 'midnight' ? MidnightBack  : VividBack)  as React.ComponentType<{ card: BusinessCard; fontFamily?: string }>
 
   const currentFontFamily = fontMeta[font].family
@@ -895,7 +929,7 @@ export default function PrintCardPage() {
             {logoUrl && (
               <>
                 <img src={logoUrl} alt="logo preview" style={{ height: 28, maxWidth: 80, objectFit: 'contain', borderRadius: 4, border: '1px solid #EDD9C8', background: 'white', padding: 2 }} />
-                <button onClick={() => setLogoUrl('')} style={{
+                <button onClick={() => { setLogoUrl(''); setLogoX(32); setLogoY(16) }} style={{
                   width: 22, height: 22, borderRadius: '50%', border: '1px solid #EDD9C8',
                   background: 'white', color: '#A08068', cursor: 'pointer', fontSize: 12,
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
@@ -928,8 +962,39 @@ export default function PrintCardPage() {
           disabled={dlState !== 'idle'}
           btnLabel="表面を保存"
           captureRef={frontRef}
+          overlay={logoUrl ? (scale) => (
+            /* ドラッグハンドル — captureRef の外なのでPDFに含まれない */
+            <div
+              onPointerDown={(e) => handleLogoDragStart(e, scale)}
+              style={{
+                position: 'absolute',
+                left: logoX - 3,
+                top: logoY - 3,
+                width: 96,
+                height: 34,
+                cursor: 'move',
+                border: '2px dashed rgba(242,103,34,0.7)',
+                borderRadius: 6,
+                boxSizing: 'border-box',
+                zIndex: 20,
+                touchAction: 'none',
+                userSelect: 'none',
+              }}
+              title="ドラッグしてロゴを移動"
+            >
+              {/* 移動アイコン */}
+              <div style={{
+                position: 'absolute', top: -10, right: -10,
+                width: 18, height: 18, borderRadius: '50%',
+                background: '#F26722', color: 'white',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 10, boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                pointerEvents: 'none',
+              }}>✥</div>
+            </div>
+          ) : undefined}
         >
-          <FrontComponent card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} logoUrl={logoUrl || undefined} />
+          <FrontComponent card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} logoUrl={logoUrl || undefined} logoX={logoX} logoY={logoY} />
         </CardPreview>
 
         {/* 裏面 */}
