@@ -690,16 +690,17 @@ export default function PrintCardPage() {
               戻る
             </a>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 13, fontWeight: 900, color: '#1C0F05', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>名刺デザイン</p>
-              <p style={{ fontSize: 10, color: '#A08068', margin: 0 }}>91×55mm · 表面・裏面</p>
+              <p style={{ fontSize: 13, fontWeight: 900, color: '#1C0F05', margin: 0 }}>名刺デザイン</p>
+              <p style={{ fontSize: 10, color: '#A08068', margin: 0 }}>91×55mm</p>
             </div>
-            {/* 入稿用PDFボタン */}
+            {/* 入稿用PDFボタン（アイコン＋短テキスト） */}
             <button
               onClick={handleDownloadPdf}
               disabled={dlState !== 'idle'}
+              title="入稿用PDFを保存（表面＋裏面）"
               style={{
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                fontSize: 11, fontWeight: 700, padding: '7px 12px', borderRadius: 10,
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                fontSize: 11, fontWeight: 700, padding: '7px 10px', borderRadius: 10,
                 background: dlState === 'pdf' ? '#EDD9C8' : '#1C0F05',
                 color: dlState === 'pdf' ? '#A08068' : '#F0C040',
                 border: 'none', cursor: dlState !== 'idle' ? 'not-allowed' : 'pointer',
@@ -708,23 +709,18 @@ export default function PrintCardPage() {
               }}
             >
               {dlState === 'pdf' ? (
-                <>
-                  <span style={{ width: 10, height: 10, border: '2px solid #A08068', borderTopColor: '#F26722', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.8s linear infinite' }} />
-                  作成中...
-                </>
+                <span style={{ width: 10, height: 10, border: '2px solid #A08068', borderTopColor: '#F26722', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.8s linear infinite' }} />
               ) : (
-                <>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-                    <line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
-                  </svg>
-                  入稿用PDFを保存
-                </>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                  <line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
+                </svg>
               )}
+              {dlState === 'pdf' ? '作成中...' : 'PDF保存'}
             </button>
-            <button onClick={() => window.print()} style={{
-              display: 'inline-flex', alignItems: 'center', gap: 5,
-              fontSize: 11, fontWeight: 700, padding: '7px 12px', borderRadius: 10,
+            <button onClick={() => window.print()} title="印刷する" style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              fontSize: 11, fontWeight: 700, padding: '7px 10px', borderRadius: 10,
               background: 'linear-gradient(135deg, #F26722, #F59340)', color: 'white',
               border: 'none', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap',
               boxShadow: '0 2px 8px rgba(242,103,34,0.3)',
