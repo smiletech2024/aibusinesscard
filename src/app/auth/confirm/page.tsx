@@ -12,7 +12,7 @@ function ConfirmContent() {
 
   useEffect(() => {
     const tokenHash = searchParams.get('token_hash')
-    const type      = searchParams.get('type') as 'signup' | 'recovery' | 'email_change_current' | 'email_change_new' | null
+    const type      = searchParams.get('type') as 'signup' | 'recovery' | 'email_change' | 'invite' | 'magiclink' | null
 
     if (!tokenHash || !type) {
       setStatus('error')
