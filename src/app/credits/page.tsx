@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { CREDIT_PACKAGES, formatTokens, INPUT_YEN_PER_TOKEN, OUTPUT_YEN_PER_TOKEN } from '@/lib/credits'
+import { CREDIT_PACKAGES, formatTokens, tokensToConversations, INPUT_YEN_PER_TOKEN, OUTPUT_YEN_PER_TOKEN } from '@/lib/credits'
 import Link from 'next/link'
 
 // ─── サーチパラムを読む内部コンポーネント ────────────────────────
@@ -117,9 +117,10 @@ function CreditsContent() {
                   color: balanceEmpty ? '#EF4444' : balanceLow ? '#F59E0B' : '#1C0F05',
                   lineHeight: 1,
                 }}>
-                  {formatTokens(balance ?? 0)}
+                  {tokensToConversations(balance ?? 0)}
                 </span>
-                <span style={{ fontSize: 15, color: '#A08068', fontWeight: 600 }}>トークン</span>
+                <span style={{ fontSize: 15, color: '#A08068', fontWeight: 600 }}>のAI会話</span>
+                <div style={{ fontSize: 12, color: '#A08068', marginTop: 4 }}>{formatTokens(balance ?? 0)}トークン</div>
               </div>
               {balanceEmpty && (
                 <div style={{ marginTop: 8, fontSize: 13, color: '#EF4444', fontWeight: 600 }}>

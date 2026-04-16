@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { PLANS, PLAN_COLORS, TOKEN_RATE_TABLE, type PlanId } from '@/lib/plans'
-import { formatTokens } from '@/lib/credits'
+import { formatTokens, tokensToConversations } from '@/lib/credits'
 import Link from 'next/link'
 
 type PlanInfo = {
@@ -184,7 +184,16 @@ function PricingContent() {
                 <div style={{ fontSize: 11.5, color: '#4A2C1A', lineHeight: 2, borderTop: '1px solid #F5E8DC', paddingTop: 10, marginBottom: 12 }}>
                   <div>名刺 {p.maxCards === -1 ? '無制限' : `${p.maxCards}枚`}</div>
                   <div>月間対話 {p.maxSessionsPerMonth === -1 ? '無制限' : `${p.maxSessionsPerMonth}件`}</div>
-                  <div>月間トークン <strong>{p.monthlyTokens === 0 ? '初回15万' : formatTokens(p.monthlyTokens)}</strong></div>
+                  <div>
+                    月間AI会話 <strong>
+                      {p.monthlyTokens === 0
+                        ? '初回のみ約100回'
+                        : `${tokensToConversations(p.monthlyTokens)}/月`}
+                    </strong>
+                    <span style={{ fontSize: 10, color: '#A08068', marginLeft: 4 }}>
+                      ({p.monthlyTokens === 0 ? '15万' : formatTokens(p.monthlyTokens)}トークン)
+                    </span>
+                  </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                     <span style={{ color: p.showBranding ? '#9CA3AF' : '#10B981' }}>
                       {p.showBranding ? LOCK : CHECK}
@@ -274,7 +283,7 @@ function PricingContent() {
                 { label: 'AI名刺',        val: (p: PlanId) => PLANS[p].maxCards === -1 ? '無制限' : `${PLANS[p].maxCards}枚` },
                 { label: 'ペルソナ',       val: (p: PlanId) => PLANS[p].maxPersonas === -1 ? '無制限' : `${PLANS[p].maxPersonas}個` },
                 { label: '月間対話',       val: (p: PlanId) => PLANS[p].maxSessionsPerMonth === -1 ? '無制限' : `${PLANS[p].maxSessionsPerMonth}件` },
-                { label: '月間トークン',   val: (p: PlanId) => PLANS[p].monthlyTokens === 0 ? '初回のみ' : formatTokens(PLANS[p].monthlyTokens) },
+                { label: '月間AI会話',   val: (p: PlanId) => PLANS[p].monthlyTokens === 0 ? '初回のみ' : tokensToConversations(PLANS[p].monthlyTokens) },
                 { label: 'セッション分析', val: (p: PlanId) => PLANS[p].analysisHistoryLimit === -1 ? 'ok' : '3件のみ' },
                 { label: 'Push通知',      val: (p: PlanId) => PLANS[p].features.pushNotifications ? 'ok' : 'no' },
                 { label: 'ブランド非表示', val: (p: PlanId) => !PLANS[p].showBranding ? 'ok' : 'no' },

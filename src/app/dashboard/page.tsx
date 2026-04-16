@@ -9,7 +9,7 @@ import { BusinessCard, CustomerSession } from '@/types'
 import Link from 'next/link'
 import QRCode from 'qrcode'
 import { Logo } from '@/components/Logo'
-import { formatTokens } from '@/lib/credits'
+import { formatTokens, tokensToConversations } from '@/lib/credits'
 import { PLANS, PLAN_COLORS, type PlanId } from '@/lib/plans'
 
 const statusConfig: Record<string, { label: string; bg: string; color: string; step: number }> = {
@@ -427,8 +427,8 @@ export default function DashboardPage() {
                 {creditBalance === null
                   ? '…'
                   : creditBalance <= 0
-                  ? '残高0'
-                  : `${formatTokens(creditBalance)}`}
+                  ? 'AI会話0回'
+                  : `AI会話${tokensToConversations(creditBalance)}`}
               </span>
             </Link>
 

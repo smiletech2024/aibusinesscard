@@ -74,7 +74,23 @@ export const CREDIT_PACKAGES: CreditPackage[] = [
 ]
 
 /** 新規ユーザー向け初回ボーナストークン数 */
-export const NEW_USER_BONUS_TOKENS = 150_000   // 15万トークン ≈ 50〜100回の会話
+export const NEW_USER_BONUS_TOKENS = 150_000   // 15万トークン ≈ 約100回の会話
+
+/**
+ * 1回の会話あたりの平均トークン消費数
+ * （質問3〜5往復 × 入出力合計 ≈ 約1,500トークン）
+ */
+export const TOKENS_PER_CONVERSATION = 1_500
+
+/** トークン数 → 会話回数目安に変換 */
+export function tokensToConversations(tokens: number): string {
+  if (tokens === 0) return '0'
+  const count = Math.floor(tokens / TOKENS_PER_CONVERSATION)
+  if (count >= 10_000) return `${Math.floor(count / 10_000)}万回以上`
+  if (count >= 1_000)  return `約${Math.round(count / 100) * 100}回`
+  if (count >= 100)    return `約${Math.round(count / 10) * 10}回`
+  return `約${count}回`
+}
 
 // ─── ヘルパー関数 ────────────────────────────────────────────────
 
