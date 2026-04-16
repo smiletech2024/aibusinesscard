@@ -19,29 +19,26 @@ export async function POST(req: NextRequest) {
 
     const admin = getAdmin()
 
-    // ユーザー存在確認
-    const { data: users } = await admin.auth.admin.listUsers()
-    const user = users?.users?.find(u => u.email?.toLowerCase() === email.toLowerCase())
-    if (!user) {
-      // セキュリティのため存在しない場合も成功を返す
+    // Admin API でリカバリーリンク生成（Supabaseのメール送信を使わない）
+    const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
+      type:    'recovery',
+      email,
+      options: { redirectTo: `${SITE_URL}/auth/confirm` },
+    })
+
+    console.log('[send-reset-email] generateLink result:', JSON.stringify({ linkData, linkError }))
+
+    if (linkError) {
+      // ユーザーが存在しない場合もセキュリティのため成功を返す
+      console.log('[send-reset-email] generateLink error (possibly no user):', linkError.message)
       return NextResponse.json({ ok: true })
     }
 
-    // Admin API でリカバリーリンク生成（Supabaseのメール送信を使わない）
-    const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
-      type:       'recovery',
-      email,
-      options: {
-        redirectTo: `${SITE_URL}/auth/confirm`,
-      },
-    })
-
-    if (linkError || !linkData?.properties?.hashed_token) {
-      console.error('[send-reset-email] generateLink error:', linkError)
-      return NextResponse.json({ error: 'Failed to generate link' }, { status: 500 })
+    const token_hash = linkData?.properties?.hashed_token
+    if (!token_hash) {
+      console.error('[send-reset-email] no hashed_token in response:', JSON.stringify(linkData))
+      return NextResponse.json({ error: 'Failed to generate token' }, { status: 500 })
     }
-
-    const token_hash = linkData.properties.hashed_token
     const confirmUrl = `${SITE_URL}/auth/confirm?token_hash=${token_hash}&type=recovery`
 
     // Resend で直接送信
