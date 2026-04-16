@@ -35,7 +35,11 @@ function ConfirmContent() {
           setTimeout(() => { window.location.href = '/auth/update-password' }, 1500)
         } else {
           setMessage('メールアドレスの確認が完了しました！')
-          setTimeout(() => { window.location.href = '/dashboard' }, 2000)
+          // 新規登録ボーナストークンを付与
+          try {
+            await fetch('/api/auth/grant-bonus', { method: 'POST' })
+          } catch { /* ignore */ }
+          setTimeout(() => { window.location.href = '/auth/confirmed' }, 2000)
         }
       }
     }
