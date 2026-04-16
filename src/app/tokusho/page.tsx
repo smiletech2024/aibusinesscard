@@ -17,11 +17,11 @@ export default function TokushoPage() {
         特定商取引法第11条に基づき、以下の事項を表示します。
       </p>
 
-      <Row label="販売事業者名" value="【事業者名・屋号を記入】" />
-      <Row label="運営統括責任者" value="【代表者氏名を記入】" />
-      <Row label="所在地" value="【住所を記入】" />
+      <Row label="販売事業者名" value="スマイルテックエージェント" />
+      <Row label="運営統括責任者" value="後藤鋼" />
+      <Row label="所在地" value="兵庫県加古川市平岡町新在家716-8 ハイタウンD-412" />
       <Row label="電話番号"
-        value={<>【電話番号を記入】<br /><span style={{ fontSize: 12, color: '#A08068' }}>※お問い合わせはメールにてお願いします</span></>}
+        value={<>07-9457-9873<br /><span style={{ fontSize: 12, color: '#A08068' }}>※お問い合わせはメールにてお願いします</span></>}
       />
       <Row label="メールアドレス" value="admin@aimeishi.biz" />
       <Row label="販売URL" value="https://www.aimeishi.biz" />
