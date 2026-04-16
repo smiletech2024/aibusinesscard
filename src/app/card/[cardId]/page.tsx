@@ -384,7 +384,7 @@ export default function CardPage() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
-              AIに相談する
+              本人の分身AIに相談する
             </button>
             <div className="grid grid-cols-3 gap-2">
               {['仕事を頼みたい', '話を聞いてみたい', '実績を知りたい'].map(text => (
