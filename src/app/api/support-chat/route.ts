@@ -232,6 +232,22 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // 運営対応中はAI応答をスキップ
+    if (sessionKey) {
+      const { data: session } = await admin
+        .from('support_sessions')
+        .select('operator_active')
+        .eq('session_key', sessionKey)
+        .single()
+
+      if (session?.operator_active) {
+        // ユーザーメッセージは保存済み、AI応答なし
+        return new Response('', {
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        })
+      }
+    }
+
     const stream = await deepseek.chat.completions.create({
       model: MODEL,
       messages: [

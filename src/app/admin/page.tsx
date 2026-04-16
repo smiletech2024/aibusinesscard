@@ -30,6 +30,7 @@ type SupportSession = {
   updated_at: string
   escalated: boolean
   escalated_at?: string
+  operator_active: boolean
   messages: SupportMsg[]
 }
 
@@ -113,6 +114,16 @@ function SupportBotPanel() {
     }
   }
 
+  const endOperator = async () => {
+    if (!selectedKey) return
+    await fetch('/api/admin/support-sessions', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_key: selectedKey }),
+    })
+    await loadSessions()
+  }
+
   const selected = sessions.find(s => s.session_key === selectedKey)
 
   const roleLabel = (role: string) => {
@@ -170,6 +181,11 @@ function SupportBotPanel() {
                     {s.escalated && (
                       <span style={{ fontSize: 10, fontWeight: 800, background: '#EF4444', color: '#fff', padding: '1px 6px', borderRadius: 99 }}>
                         🆘 対応待ち
+                      </span>
+                    )}
+                    {s.operator_active && (
+                      <span style={{ fontSize: 10, fontWeight: 800, background: '#10B981', color: '#fff', padding: '1px 6px', borderRadius: 99 }}>
+                        💼 対応中
                       </span>
                     )}
                   </div>
@@ -243,7 +259,23 @@ function SupportBotPanel() {
 
           {/* 運営メッセージ入力 */}
           <div style={{ padding: '12px 14px', borderTop: '1px solid #334155', background: '#0F172A' }}>
-            <div style={{ fontSize: 11, color: '#3B82F6', fontWeight: 700, marginBottom: 6 }}>💼 運営として割り込む</div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+              <div style={{ fontSize: 11, color: '#3B82F6', fontWeight: 700 }}>
+                {selected.operator_active ? '💼 運営対応中（AIは停止中）' : '💼 運営として割り込む'}
+              </div>
+              {selected.operator_active && (
+                <button
+                  onClick={endOperator}
+                  style={{
+                    background: '#EF4444', color: '#fff', border: 'none',
+                    borderRadius: 6, padding: '3px 10px', fontSize: 11,
+                    fontWeight: 700, cursor: 'pointer',
+                  }}
+                >
+                  対応終了
+                </button>
+              )}
+            </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <textarea
                 value={input}

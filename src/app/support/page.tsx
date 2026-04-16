@@ -31,6 +31,7 @@ function KaoriChat() {
   const [sessionKey]              = useState(() => getSessionKey())
   const [escalated, setEscalated] = useState(false)
   const [escalating, setEscalating] = useState(false)
+  const [operatorActive, setOperatorActive] = useState(false)
   const lastPollTimeRef           = useRef<string>(new Date().toISOString())
   const bottomRef                 = useRef<HTMLDivElement>(null)
   const pollTimerRef              = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -48,7 +49,8 @@ function KaoriChat() {
         `/api/support-chat/poll?session=${sessionKey}&after=${encodeURIComponent(lastPollTimeRef.current)}`
       )
       if (!res.ok) return
-      const { messages: newMsgs } = await res.json()
+      const { messages: newMsgs, operatorActive: active } = await res.json()
+      setOperatorActive(active ?? false)
       if (newMsgs?.length) {
         lastPollTimeRef.current = newMsgs[newMsgs.length - 1].created_at
         setMessages(prev => [
@@ -208,6 +210,15 @@ function KaoriChat() {
         flexDirection: 'column',
         gap: 12,
       }}>
+        {operatorActive && (
+          <div style={{
+            background: 'linear-gradient(135deg,#1E40AF,#3B82F6)',
+            borderRadius: 10, padding: '8px 12px', margin: '0 0 8px',
+            fontSize: 12, color: '#fff', fontWeight: 700, textAlign: 'center',
+          }}>
+            💼 運営スタッフが対応中です
+          </div>
+        )}
         {messages.map((msg, i) => {
           const isUser     = msg.role === 'user'
           const isOperator = msg.role === 'operator'

@@ -16,15 +16,23 @@ export async function GET(req: NextRequest) {
   const after = searchParams.get('after')
 
   if (!sessionKey) {
-    return NextResponse.json({ messages: [] })
+    return NextResponse.json({ messages: [], operatorActive: false })
   }
 
   const admin = getAdmin()
+
+  // セッションの operator_active 状態を取得
+  const { data: session } = await admin
+    .from('support_sessions')
+    .select('operator_active')
+    .eq('session_key', sessionKey)
+    .maybeSingle()
+
   let query = admin
     .from('support_messages')
     .select('id, role, content, created_at')
     .eq('session_key', sessionKey)
-    .eq('role', 'operator') // 運営メッセージのみ
+    .eq('role', 'operator')
     .order('created_at', { ascending: true })
 
   if (after) {
@@ -33,8 +41,8 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await query
   if (error) {
-    return NextResponse.json({ messages: [] })
+    return NextResponse.json({ messages: [], operatorActive: session?.operator_active ?? false })
   }
 
-  return NextResponse.json({ messages: data ?? [] })
+  return NextResponse.json({ messages: data ?? [], operatorActive: session?.operator_active ?? false })
 }

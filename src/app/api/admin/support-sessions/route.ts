@@ -29,7 +29,7 @@ export async function GET() {
   // 最新50セッション
   const { data: sessions } = await admin
     .from('support_sessions')
-    .select('session_key, created_at, updated_at, escalated, escalated_at')
+    .select('session_key, created_at, updated_at, escalated, escalated_at, operator_active')
     .order('escalated', { ascending: false })
     .order('updated_at', { ascending: false })
     .limit(50)
@@ -80,11 +80,37 @@ export async function POST(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // セッション更新日時を更新
+  // セッション更新日時を更新 & operator_active を true に
   await admin
     .from('support_sessions')
-    .update({ updated_at: new Date().toISOString() })
+    .update({ updated_at: new Date().toISOString(), operator_active: true })
     .eq('session_key', session_key)
 
   return NextResponse.json({ message: data })
+}
+
+// PATCH /api/admin/support-sessions
+// 運営対応終了
+export async function PATCH(req: NextRequest) {
+  const user = await checkAdmin()
+  if (!user) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+  const { session_key } = await req.json()
+  if (!session_key) return NextResponse.json({ error: 'Bad Request' }, { status: 400 })
+
+  const admin = getAdmin()
+
+  await admin
+    .from('support_sessions')
+    .update({ operator_active: false, updated_at: new Date().toISOString() })
+    .eq('session_key', session_key)
+
+  // 終了通知メッセージを挿入
+  await admin.from('support_messages').insert({
+    session_key,
+    role: 'operator',
+    content: '✅ 運営の対応を終了しました。引き続き香里がサポートします。',
+  })
+
+  return NextResponse.json({ ok: true })
 }
