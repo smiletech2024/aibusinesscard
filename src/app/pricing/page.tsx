@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { PLANS, PLAN_COLORS, TOKEN_RATE_TABLE, type PlanId } from '@/lib/plans'
+import { PLANS, PLAN_COLORS, type PlanId } from '@/lib/plans'
 import { formatTokens, tokensToConversations } from '@/lib/credits'
 import SiteFooter from '@/components/SiteFooter'
 import Link from 'next/link'
@@ -304,32 +304,6 @@ function PricingContent() {
             <div>• 分析は直近3件のみ</div>
             <div>• チャット画面に「Powered by AI名刺」表示</div>
           </div>
-        </div>
-
-        {/* ── B: トークン単価比較 ── */}
-        <h2 style={{ fontSize: 15, fontWeight: 800, color: '#1C0F05', margin: '28px 0 12px' }}>
-          📊 トークン単価比較（サブスクが最安）
-        </h2>
-        <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #EDD9C8', overflow: 'hidden' }}>
-          {TOKEN_RATE_TABLE.map((row, i) => {
-            const isSub = row.label.includes('¥') && !row.label.includes('パック')
-            const isMin = i === 0
-            const barWidth = (TOKEN_RATE_TABLE[TOKEN_RATE_TABLE.length - 1].rate / row.rate) * 100
-            return (
-              <div key={row.label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', borderBottom: i < TOKEN_RATE_TABLE.length - 1 ? '1px solid #F5E8DC' : 'none', background: isSub ? '#FFFBF8' : '#fff' }}>
-                <div style={{ width: 110, fontSize: 12, fontWeight: isSub ? 700 : 400, color: isSub ? '#F26722' : '#6B7280', flexShrink: 0 }}>
-                  {row.label}
-                </div>
-                <div style={{ flex: 1, height: 8, background: '#F5E8DC', borderRadius: 99, overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: `${barWidth}%`, background: isSub ? 'linear-gradient(90deg,#F26722,#F59340)' : '#D1D5DB', borderRadius: 99, transition: 'width 0.5s' }} />
-                </div>
-                <div style={{ width: 90, textAlign: 'right', fontSize: 11.5, fontWeight: isSub ? 800 : 400, color: isSub ? '#F26722' : '#6B7280', flexShrink: 0 }}>
-                  ¥{(row.rate * 1000).toFixed(4)}/1K
-                </div>
-                {isSub && <span style={{ fontSize: 10, background: '#FFF0E8', color: '#F26722', padding: '1px 6px', borderRadius: 99, fontWeight: 800, flexShrink: 0 }}>サブスク</span>}
-              </div>
-            )
-          })}
         </div>
 
         {/* 機能比較テーブル */}
