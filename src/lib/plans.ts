@@ -56,7 +56,7 @@ export const PLANS: Record<PlanId, Plan> = {
   },
   solo: {
     id:                   'solo',
-    name:                 'SOLO',
+    name:                 'スタンダード',
     priceJpy:             480,        // B: ¥480（コーヒー1杯）
     maxCards:             2,
     maxPersonas:          2,
@@ -74,7 +74,7 @@ export const PLANS: Record<PlanId, Plan> = {
   },
   growth: {
     id:                   'growth',
-    name:                 'GROWTH',
+    name:                 'ビジネス',
     priceJpy:             2_980,
     maxCards:             5,
     maxPersonas:          5,
@@ -91,7 +91,7 @@ export const PLANS: Record<PlanId, Plan> = {
   },
   scale: {
     id:                   'scale',
-    name:                 'SCALE',
+    name:                 'エンタープライズ',
     priceJpy:             9_800,
     maxCards:             -1,
     maxPersonas:          -1,
@@ -110,9 +110,9 @@ export const PLANS: Record<PlanId, Plan> = {
 
 /** トークン単価比較（全プランでサブスクがパックより安い） */
 export const TOKEN_RATE_TABLE = [
-  { label: 'SCALE ¥9,800',  rate: 9_800  / 8_000_000 },
-  { label: 'GROWTH ¥2,980', rate: 2_980  / 2_200_000 },
-  { label: 'SOLO ¥480',     rate: 480    / 600_000   },
+  { label: 'エンタープライズ ¥9,800', rate: 9_800  / 8_000_000 },
+  { label: 'ビジネス ¥2,980',        rate: 2_980  / 2_200_000 },
+  { label: 'スタンダード ¥480',       rate: 480    / 600_000   },
   { label: '¥5,000パック',   rate: 5_000  / 3_600_000 },
   { label: '¥3,000パック',   rate: 3_000  / 2_000_000 },
   { label: '¥1,000パック',   rate: 1_000  / 620_000   },
