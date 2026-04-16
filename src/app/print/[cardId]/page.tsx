@@ -13,6 +13,37 @@ import jsPDF from 'jspdf'
 
 type Design = 'executive' | 'midnight' | 'vivid' | 'ocean' | 'forest' | 'crimson' | 'gold' | 'pink'
 type Font   = 'sans' | 'serif' | 'rounded' | 'mono' | 'display' | 'elegant' | 'yumin'
+type Layout = 'standard' | 'centered' | 'split'
+
+const layoutMeta: Record<Layout, { label: string; desc: string }> = {
+  standard: { label: 'スタンダード', desc: '左揃え・定番' },
+  centered: { label: 'センター',    desc: '中央揃え・洗練' },
+  split:    { label: 'スプリット',  desc: 'パネル分割・モダン' },
+}
+
+/* テーマカラー設定 — レイアウト共通コンポーネントに渡す */
+type TC = {
+  frontBg: string       // 表面の背景
+  panelBg: string       // スプリット左パネル背景
+  textName: string      // 氏名の色
+  textCompany: string   // 会社名の色
+  textContact: string   // 連絡先テキストの色
+  accent: string        // アクセントカラー
+  isDark: boolean       // 背景が暗いか（ロゴフィルター用）
+  qrWrap: React.CSSProperties  // QRコンテナのスタイル
+}
+const TC: Record<Design, TC> = {
+  executive: { frontBg:'#FFFFFF', panelBg:'linear-gradient(180deg,#C4511A,#F26722)', textName:'#1C0F05', textCompany:'#F26722', textContact:'#4A2C1A', accent:'#F26722', isDark:false, qrWrap:{ border:'1.5px solid #E0E7FF', borderRadius:8 } },
+  midnight:  { frontBg:'#0D0C2A', panelBg:'linear-gradient(180deg,#060520,#150E3A)', textName:'#FFFFFF', textCompany:'#F5A47A', textContact:'rgba(255,255,255,0.55)', accent:'#F5A47A', isDark:true, qrWrap:{ background:'white', padding:5, borderRadius:10, boxShadow:'0 0 20px rgba(242,103,34,0.3)' } },
+  vivid:     { frontBg:'linear-gradient(135deg,#C4511A 0%,#F26722 40%,#F59340 100%)', panelBg:'linear-gradient(180deg,#8B3010,#C4511A)', textName:'#FFFFFF', textCompany:'rgba(255,255,255,0.8)', textContact:'rgba(255,255,255,0.75)', accent:'#FFFFFF', isDark:true, qrWrap:{ background:'white', padding:5, borderRadius:10, boxShadow:'0 4px 16px rgba(0,0,0,0.25)' } },
+  ocean:     { frontBg:'linear-gradient(135deg,#0B2A4A 0%,#0B4F7A 50%,#0D7A7A 100%)', panelBg:'linear-gradient(180deg,#062033,#0B4F7A)', textName:'#FFFFFF', textCompany:'#7EF2E8', textContact:'rgba(255,255,255,0.6)', accent:'#7EF2E8', isDark:true, qrWrap:{ background:'white', padding:5, borderRadius:10, boxShadow:'0 0 20px rgba(13,212,200,0.4)' } },
+  forest:    { frontBg:'linear-gradient(135deg,#0A2A1C 0%,#0F3D2E 50%,#145A3E 100%)', panelBg:'linear-gradient(180deg,#051510,#0F3D2E)', textName:'#FFFFFF', textCompany:'#6EE7B7', textContact:'rgba(255,255,255,0.6)', accent:'#6EE7B7', isDark:true, qrWrap:{ background:'white', padding:5, borderRadius:10, boxShadow:'0 0 18px rgba(52,211,153,0.35)' } },
+  crimson:   { frontBg:'linear-gradient(135deg,#3D0010 0%,#7A0B2A 50%,#A01040 100%)', panelBg:'linear-gradient(180deg,#1A0008,#7A0B2A)', textName:'#FFFFFF', textCompany:'#FECDD3', textContact:'rgba(255,255,255,0.65)', accent:'#FECDD3', isDark:true, qrWrap:{ background:'white', padding:5, borderRadius:10, boxShadow:'0 0 18px rgba(244,63,94,0.4)' } },
+  gold:      { frontBg:'#0A0A0A', panelBg:'linear-gradient(180deg,#040400,#1A1200)', textName:'#F5E6A3', textCompany:'#D4AF37', textContact:'rgba(245,230,163,0.6)', accent:'#D4AF37', isDark:true, qrWrap:{ background:'white', padding:5, borderRadius:10, boxShadow:'0 0 20px rgba(212,175,55,0.4)' } },
+  pink:      { frontBg:'linear-gradient(135deg,#FDF2F8 0%,#FCE7F3 50%,#FBD5EA 100%)', panelBg:'linear-gradient(180deg,#9D174D,#EC4899)', textName:'#831843', textCompany:'#BE185D', textContact:'#9D174D', accent:'#EC4899', isDark:false, qrWrap:{ border:'1.5px solid #FBCFE8', borderRadius:8 } },
+}
+
+const SPLIT_X = 210  // スプリットレイアウトの左パネル幅 (px)
 
 const designMeta: Record<Design, { label: string; desc: string; preview: string }> = {
   executive: { label: '白藍',   desc: '上質な白 × インディゴ',  preview: '#FFFFFF' },
@@ -813,6 +844,103 @@ function PinkBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: strin
 }
 
 /* ══════════════════════════════════════════
+   CENTERED — 中央揃えレイアウト（全テーマ共通）
+══════════════════════════════════════════ */
+function CenteredFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14, tc }: {
+  card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number; tc: TC
+}) {
+  const { frontBg, textName, textCompany, textContact, accent, isDark, qrWrap } = tc
+  return (
+    <div className="print-card" style={{ width: W, height: H, background: frontBg, position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
+      {/* 装飾 orb */}
+      <div style={{ position: 'absolute', top: -60, left: -60, width: 200, height: 200, borderRadius: '50%', background: `radial-gradient(circle, ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'} 0%, transparent 70%)` }} />
+      <div style={{ position: 'absolute', bottom: -40, right: -40, width: 150, height: 150, borderRadius: '50%', background: `radial-gradient(circle, ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'} 0%, transparent 70%)` }} />
+      {/* 上下アクセントライン */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }} />
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }} />
+      {/* ロゴ */}
+      {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 24, maxWidth: 80, objectFit: 'contain', objectPosition: 'left', filter: isDark ? 'brightness(0) invert(1)' : undefined, opacity: 0.85, pointerEvents: 'none' }} />}
+      {/* センター本文 */}
+      <div style={{ position: 'absolute', left: 28, right: 112, top: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+        {card.company && <p style={{ fontSize: 8, color: textCompany, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' as const, margin: '0 0 14px' }}>{card.company}</p>}
+        <h2 style={{ fontSize: 28, fontWeight: 900, color: textName, margin: '0 0 7px', lineHeight: 1.05, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
+        {card.title && <p style={{ fontSize: 11, color: accent, fontWeight: 600, margin: '0 0 18px' }}>{card.title}</p>}
+        <div style={{ width: 50, height: 1, background: `linear-gradient(90deg, transparent, ${accent}, transparent)`, marginBottom: 16 }} />
+        {/* 連絡先：縦並び（中央揃え） */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center' }}>
+          {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: textContact, fontSize: 9.5 }}><span style={{ color: accent }}><IconMail /></span>{card.email}</div>}
+          {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: textContact, fontSize: 9.5 }}><span style={{ color: accent }}><IconPhone /></span>{card.phone}</div>}
+          {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: textContact, fontSize: 9.5 }}><span style={{ color: accent }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
+        </div>
+      </div>
+      {/* QR + ブランド — 右下 */}
+      {qrUrl && (
+        <div style={{ position: 'absolute', right: 18, bottom: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 2 }}>
+            <LogoIcon size={11} /><span style={{ fontSize: 6.5, fontWeight: 800, color: accent, letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
+          </div>
+          <div style={qrWrap}><QRCodeSVG url={qrUrl} size={64} /></div>
+          <p style={{ fontSize: 6.5, color: accent, margin: 0, fontWeight: 700, whiteSpace: 'nowrap' }}>スキャンしてAI相談</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════
+   SPLIT — 左パネル分割レイアウト（全テーマ共通）
+══════════════════════════════════════════ */
+function SplitFront({ card, qrUrl, fontFamily, logoUrl, logoX = SPLIT_X + 18, logoY = 16, tc }: {
+  card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number; tc: TC
+}) {
+  const { panelBg, textCompany, textContact, accent, qrWrap } = tc
+  const rightBg = tc.isDark ? '#F8F4F0' : '#FFFFFF'
+  const rightText = '#1C0F05'
+  const rightSecondary = '#4A2C1A'
+  return (
+    <div className="print-card" style={{ width: W, height: H, background: rightBg, position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
+      {/* 左パネル */}
+      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: SPLIT_X, background: panelBg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        {/* 大きな頭文字ウォーターマーク */}
+        <div style={{ position: 'absolute', fontSize: 150, fontWeight: 900, color: 'rgba(255,255,255,0.07)', lineHeight: 1, userSelect: 'none' as const, top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }}>
+          {card.full_name[0]}
+        </div>
+        {/* 氏名・役職 */}
+        <div style={{ position: 'relative', textAlign: 'center', padding: '0 14px' }}>
+          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#FFFFFF', margin: 0, lineHeight: 1.25, letterSpacing: '-0.01em', wordBreak: 'break-all' as const }}>{card.full_name}</h2>
+          {card.title && <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.6)', margin: '6px 0 0', fontWeight: 600, lineHeight: 1.4 }}>{card.title}</p>}
+        </div>
+        {/* パネル下部ブランドマーク */}
+        <div style={{ position: 'absolute', bottom: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <LogoIcon size={10} />
+          <span style={{ fontSize: 6.5, color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>AI名刺</span>
+        </div>
+      </div>
+      {/* 右パネル */}
+      <div style={{ position: 'absolute', left: SPLIT_X, top: 0, right: 0, bottom: 0, background: rightBg, padding: '22px 16px 18px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div>
+          {card.company && <p style={{ fontSize: 8, color: accent, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, margin: '0 0 10px' }}>{card.company}</p>}
+          <div style={{ width: 22, height: 2.5, background: accent, borderRadius: 2, marginBottom: 14 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+            {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: rightSecondary, fontSize: 9.5 }}><span style={{ color: accent }}><IconMail /></span>{card.email}</div>}
+            {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: rightSecondary, fontSize: 9.5 }}><span style={{ color: accent }}><IconPhone /></span>{card.phone}</div>}
+            {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: rightSecondary, fontSize: 9.5 }}><span style={{ color: accent }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
+          </div>
+        </div>
+        {qrUrl && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3 }}>
+            <div style={qrWrap}><QRCodeSVG url={qrUrl} size={60} /></div>
+            <p style={{ fontSize: 6.5, color: accent, margin: 0, fontWeight: 700, whiteSpace: 'nowrap' }}>スキャンしてAI相談</p>
+          </div>
+        )}
+      </div>
+      {/* ロゴ（右パネル上部） */}
+      {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 22, maxWidth: 76, objectFit: 'contain', objectPosition: 'left', pointerEvents: 'none' }} />}
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════
    カードプレビュー（レスポンシブ対応）
 ══════════════════════════════════════════ */
 function CardPreview({
@@ -892,6 +1020,7 @@ export default function PrintCardPage() {
   const [loading, setLoading] = useState(true)
   const [design, setDesign] = useState<Design>('executive')
   const [font, setFont] = useState<Font>('sans')
+  const [layout, setLayout] = useState<Layout>('standard')
   const [logoUrl, setLogoUrl] = useState<string>('')
   const [logoX, setLogoX] = useState(32)
   const [logoY, setLogoY] = useState(16)
@@ -1009,8 +1138,9 @@ export default function PrintCardPage() {
       if (data.image_url) {
         try {
           const cfg = JSON.parse(data.image_url)
-          if (cfg.theme && cfg.theme in designMeta) setDesign(cfg.theme as Design)
-          if (cfg.font  && cfg.font  in fontMeta)   setFont(cfg.font  as Font)
+          if (cfg.theme  && cfg.theme  in designMeta) setDesign(cfg.theme  as Design)
+          if (cfg.font   && cfg.font   in fontMeta)   setFont(cfg.font   as Font)
+          if (cfg.layout && cfg.layout in layoutMeta) setLayout(cfg.layout as Layout)
           if (cfg.logoUrl) setLogoUrl(cfg.logoUrl)
           if (typeof cfg.logoX === 'number') setLogoX(cfg.logoX)
           if (typeof cfg.logoY === 'number') setLogoY(cfg.logoY)
@@ -1082,7 +1212,7 @@ export default function PrintCardPage() {
       const res = await fetch(`/api/card/${cardId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ style_config: { theme: design, font, logoUrl: logoUrl || null, logoX, logoY } }),
+        body: JSON.stringify({ style_config: { theme: design, font, layout, logoUrl: logoUrl || null, logoX, logoY } }),
       })
       if (res.ok) {
         setSavedBanner(true)
@@ -1109,16 +1239,26 @@ export default function PrintCardPage() {
     )
   }
 
-  const frontMap: Record<Design, React.ComponentType<{ card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }>> = {
-    executive: ExecutiveFront, midnight: MidnightFront, vivid: VividFront,
-    ocean: OceanFront, forest: ForestFront, crimson: CrimsonFront, gold: GoldFront, pink: PinkFront,
-  }
   const backMap: Record<Design, React.ComponentType<{ card: BusinessCard; fontFamily?: string }>> = {
     executive: ExecutiveBack, midnight: MidnightBack, vivid: VividBack,
     ocean: OceanBack, forest: ForestBack, crimson: CrimsonBack, gold: GoldBack, pink: PinkBack,
   }
-  const FrontComponent = frontMap[design]
-  const BackComponent  = backMap[design]
+  const BackComponent = backMap[design]
+
+  // レイアウト × カラー でフロントコンポーネントを決定
+  const standardMap: Record<Design, React.ComponentType<{ card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }>> = {
+    executive: ExecutiveFront, midnight: MidnightFront, vivid: VividFront,
+    ocean: OceanFront, forest: ForestFront, crimson: CrimsonFront, gold: GoldFront, pink: PinkFront,
+  }
+  const tc = TC[design]
+  const FrontComponent = layout === 'standard'
+    ? standardMap[design]
+    : (layout === 'centered'
+        ? (p: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) =>
+            <CenteredFront {...p} tc={tc} />
+        : (p: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) =>
+            <SplitFront {...p} tc={tc} />
+      )
 
   const currentFontFamily = fontMeta[font].family
 
@@ -1228,7 +1368,56 @@ export default function PrintCardPage() {
             </div>
           </div>
 
-          {/* 行3: フォント選択（7書体グリッド） + 保存ボタン */}
+          {/* 行3: レイアウト選択 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#A08068', whiteSpace: 'nowrap', letterSpacing: '0.06em', minWidth: 36 }}>配置</span>
+            <div style={{ display: 'flex', gap: 4, flex: 1 }}>
+              {(Object.entries(layoutMeta) as [Layout, typeof layoutMeta[Layout]][]).map(([key, meta]) => (
+                <button key={key} onClick={() => setLayout(key)} style={{
+                  flex: 1, padding: '6px 4px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+                  background: layout === key ? '#1C0F05' : 'white',
+                  color: layout === key ? 'white' : '#4A2C1A',
+                  border: `1.5px solid ${layout === key ? 'transparent' : '#EDD9C8'}`,
+                  cursor: 'pointer', whiteSpace: 'nowrap',
+                  boxShadow: layout === key ? '0 2px 8px rgba(0,0,0,0.2)' : 'none',
+                  transition: 'all 0.15s',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+                }}>
+                  {/* ミニプレビューアイコン */}
+                  {key === 'standard' && (
+                    <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
+                      <rect x="1" y="1" width="13" height="12" rx="1.5" fill={layout === key ? 'rgba(255,255,255,0.15)' : '#F0E8E0'} stroke={layout === key ? 'rgba(255,255,255,0.3)' : '#DEC4AD'} strokeWidth="0.8"/>
+                      <rect x="16" y="1" width="5" height="5" rx="1" fill={layout === key ? 'rgba(255,255,255,0.15)' : '#F0E8E0'} stroke={layout === key ? 'rgba(255,255,255,0.3)' : '#DEC4AD'} strokeWidth="0.8"/>
+                      <line x1="3" y1="4.5" x2="12" y2="4.5" stroke={layout === key ? 'rgba(255,255,255,0.5)' : '#C4A882'} strokeWidth="1.2" strokeLinecap="round"/>
+                      <line x1="3" y1="7" x2="10" y2="7" stroke={layout === key ? 'rgba(255,255,255,0.3)' : '#D4B894'} strokeWidth="1" strokeLinecap="round"/>
+                      <line x1="3" y1="9.5" x2="11" y2="9.5" stroke={layout === key ? 'rgba(255,255,255,0.3)' : '#D4B894'} strokeWidth="1" strokeLinecap="round"/>
+                    </svg>
+                  )}
+                  {key === 'centered' && (
+                    <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
+                      <rect x="1" y="1" width="20" height="12" rx="1.5" fill={layout === key ? 'rgba(255,255,255,0.15)' : '#F0E8E0'} stroke={layout === key ? 'rgba(255,255,255,0.3)' : '#DEC4AD'} strokeWidth="0.8"/>
+                      <line x1="5" y1="4.5" x2="17" y2="4.5" stroke={layout === key ? 'rgba(255,255,255,0.5)' : '#C4A882'} strokeWidth="1.2" strokeLinecap="round"/>
+                      <line x1="7" y1="7" x2="15" y2="7" stroke={layout === key ? 'rgba(255,255,255,0.3)' : '#D4B894'} strokeWidth="1" strokeLinecap="round"/>
+                      <line x1="6" y1="9.5" x2="16" y2="9.5" stroke={layout === key ? 'rgba(255,255,255,0.3)' : '#D4B894'} strokeWidth="1" strokeLinecap="round"/>
+                    </svg>
+                  )}
+                  {key === 'split' && (
+                    <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
+                      <rect x="1" y="1" width="20" height="12" rx="1.5" fill={layout === key ? 'rgba(255,255,255,0.15)' : '#F0E8E0'} stroke={layout === key ? 'rgba(255,255,255,0.3)' : '#DEC4AD'} strokeWidth="0.8"/>
+                      <rect x="1" y="1" width="8" height="12" rx="1.5" fill={layout === key ? 'rgba(255,255,255,0.25)' : '#D4B894'} stroke="none"/>
+                      <line x1="9" y1="1" x2="9" y2="13" stroke={layout === key ? 'rgba(255,255,255,0.2)' : '#C4A882'} strokeWidth="0.8"/>
+                      <line x1="11" y1="4.5" x2="19" y2="4.5" stroke={layout === key ? 'rgba(255,255,255,0.4)' : '#C4A882'} strokeWidth="1.2" strokeLinecap="round"/>
+                      <line x1="11" y1="7" x2="18" y2="7" stroke={layout === key ? 'rgba(255,255,255,0.25)' : '#D4B894'} strokeWidth="1" strokeLinecap="round"/>
+                      <line x1="11" y1="9.5" x2="17" y2="9.5" stroke={layout === key ? 'rgba(255,255,255,0.25)' : '#D4B894'} strokeWidth="1" strokeLinecap="round"/>
+                    </svg>
+                  )}
+                  <span style={{ fontSize: 9 }}>{meta.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 行4: フォント選択（7書体グリッド） + 保存ボタン */}
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
             <span style={{ fontSize: 10, fontWeight: 800, color: '#A08068', whiteSpace: 'nowrap', letterSpacing: '0.06em', minWidth: 36, paddingTop: 7 }}>書体</span>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4, flex: 1 }}>
