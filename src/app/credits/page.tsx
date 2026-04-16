@@ -144,13 +144,9 @@ function CreditsContent() {
 
         {/* ── 料金体系の説明 ── */}
         <div style={{ marginTop: 24, padding: '14px 16px', background: '#FFF0E8', borderRadius: 12, fontSize: 12.5, color: '#4A2C1A', lineHeight: 1.7 }}>
-          <div style={{ fontWeight: 700, marginBottom: 4 }}>📌 料金体系について</div>
-          <div>ChatGPT-4o API標準価格の2.5倍を請求単価として設定しています。</div>
-          <div style={{ marginTop: 4, display: 'flex', gap: 16 }}>
-            <span>入力: ¥{(INPUT_YEN_PER_TOKEN * 1000).toFixed(4)}/1Kトークン</span>
-            <span>出力: ¥{(OUTPUT_YEN_PER_TOKEN * 1000).toFixed(4)}/1Kトークン</span>
-          </div>
-          <div style={{ marginTop: 4, opacity: 0.75 }}>※ 1回の会話交換で約1,000〜2,000トークンを消費します</div>
+          <div style={{ fontWeight: 700, marginBottom: 4 }}>📌 トークンとは？</div>
+          <div>1トークン ≈ 日本語で<strong>約0.5〜1文字</strong>（英語では約4文字）</div>
+          <div style={{ marginTop: 4, opacity: 0.75 }}>※ 短い返答でも数十文字分を消費するため、会話1回あたり約1,500トークンが目安です</div>
         </div>
 
         {/* ── 購入パッケージ ── */}
