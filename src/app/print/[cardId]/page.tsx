@@ -96,17 +96,36 @@ function QRCodeSVG({ url, size, style }: { url: string; size: number; style?: Re
       type: 'svg',
       width: size,
       margin: 1,
+      errorCorrectionLevel: 'H',   // 30%訂正 — ロゴ重ねてもスキャン可能
       color: { dark: '#1C0F05', light: '#FFFFFF' },
     }).then(svgStr => {
-      // SVG固有のwidth/heightをコンテナに合わせる
       setSvg(svgStr.replace(/(<svg[^>]*)\swidth="[^"]*"\sheight="[^"]*"/, '$1 width="100%" height="100%"'))
     }).catch(() => {})
   }, [url, size])
+
+  const logoSize = Math.round(size * 0.22)   // QRサイズの22%
+  const bgSize   = logoSize + 6              // 白丸の余白
+
   return (
-    <div
-      style={{ width: size, height: size, display: 'block', flexShrink: 0, ...style }}
-      dangerouslySetInnerHTML={{ __html: svg }}
-    />
+    <div style={{ width: size, height: size, display: 'block', flexShrink: 0, position: 'relative', ...style }}>
+      {/* QR本体 */}
+      <div style={{ width: size, height: size }} dangerouslySetInnerHTML={{ __html: svg }} />
+      {/* 中央ロゴ */}
+      {svg && (
+        <div style={{
+          position: 'absolute', top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: bgSize, height: bgSize,
+          borderRadius: '50%',
+          background: 'white',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 0 0 1.5px rgba(0,0,0,0.07)',
+          pointerEvents: 'none',
+        }}>
+          <LogoIcon size={logoSize} />
+        </div>
+      )}
+    </div>
   )
 }
 
