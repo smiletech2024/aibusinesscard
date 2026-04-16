@@ -130,7 +130,10 @@ export default function ChatPage() {
     } finally { setSummarizing(false) }
   }
 
-  const ownerName = session?.business_cards?.full_name || '担当者'
+  const ownerName    = session?.business_cards?.full_name || '担当者'
+  const ownerCard    = session?.business_cards ?? null
+  const ownerInitial = ownerName[0] || '?'
+  const [profileExpanded, setProfileExpanded] = useState(false)
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#09081A' }}>
@@ -144,16 +147,21 @@ export default function ChatPage() {
         }}
       >
         <div className="max-w-2xl mx-auto px-4 py-3.5 flex items-center gap-3">
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm flex-shrink-0"
+          {/* アバター（タップでプロフィール展開） */}
+          <button
+            onClick={() => setProfileExpanded(v => !v)}
             style={{
+              width: 40, height: 40, borderRadius: 12, flexShrink: 0,
               background: 'linear-gradient(135deg, #E05A18, #F5843A)',
-              color: 'white',
+              border: '2px solid rgba(242,103,34,0.4)',
               boxShadow: '0 0 12px rgba(242,103,34,0.3)',
+              overflow: 'hidden', cursor: 'pointer', padding: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'white', fontWeight: 900, fontSize: 15,
             }}
           >
-            AI
-          </div>
+            {ownerInitial}
+          </button>
           <div className="flex-1 min-w-0">
             <h1 className="font-bold text-sm leading-tight" style={{ color: '#FFF0E8' }}>
               {ownerName}の分身AI
@@ -161,7 +169,7 @@ export default function ChatPage() {
             <div className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#34D399' }} />
               <p className="text-xs truncate" style={{ color: '#6B4030' }}>
-                本人監修のAI · 会話は後で本人に届きます
+                {ownerCard?.title ? `${ownerCard.title}` : '本人監修のAI'}{ownerCard?.company ? ` · ${ownerCard.company}` : ''}
               </p>
             </div>
           </div>
@@ -181,6 +189,58 @@ export default function ChatPage() {
             </button>
           )}
         </div>
+
+        {/* プロフィール展開パネル */}
+        {profileExpanded && ownerCard && (
+          <div
+            style={{
+              borderTop: '1px solid rgba(242,103,34,0.1)',
+              background: '#130F22',
+              padding: '14px 16px 16px',
+            }}
+          >
+            <div className="max-w-2xl mx-auto flex gap-4 items-start">
+              {/* アバター大 */}
+              <div style={{
+                width: 56, height: 56, borderRadius: 14, flexShrink: 0,
+                background: 'linear-gradient(135deg, #E05A18, #F5843A)',
+                border: '2px solid rgba(242,103,34,0.3)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'white', fontWeight: 900, fontSize: 22,
+              }}>
+                {ownerInitial}
+              </div>
+              {/* テキスト */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ color: '#FFF0E8', fontWeight: 800, fontSize: 16, lineHeight: 1.3 }}>{ownerName}</div>
+                {ownerCard.title && (
+                  <div style={{ color: '#F5843A', fontSize: 12, fontWeight: 600, marginTop: 2 }}>{ownerCard.title}</div>
+                )}
+                {ownerCard.company && (
+                  <div style={{ color: '#A08068', fontSize: 12, marginTop: 1 }}>{ownerCard.company}</div>
+                )}
+                {ownerCard.short_intro && (
+                  <div style={{
+                    marginTop: 8, color: '#A08068', fontSize: 12, lineHeight: 1.7,
+                    background: 'rgba(242,103,34,0.06)', borderLeft: '2px solid rgba(242,103,34,0.4)',
+                    padding: '6px 10px', borderRadius: '0 6px 6px 0',
+                  }}>
+                    {ownerCard.short_intro}
+                  </div>
+                )}
+              </div>
+            </div>
+            <button
+              onClick={() => setProfileExpanded(false)}
+              style={{
+                display: 'block', margin: '10px auto 0', fontSize: 11,
+                color: '#6B4030', background: 'none', border: 'none', cursor: 'pointer',
+              }}
+            >
+              閉じる ▲
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 注意書き */}
