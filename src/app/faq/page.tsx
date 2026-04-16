@@ -26,8 +26,8 @@ const items: { q: string; a: string }[] = [
 
   // トラブル
   { q: 'AIが反応しません', a: 'まずトークン残高を確認してください（ダッシュボード→残高バッジ）。残高0の場合はトークンパックを購入するか月額プランへの加入をご検討ください。それでも解決しない場合はサポートへご連絡ください。' },
-  { q: '決済ができません', a: 'カード番号・有効期限・CVCが正しいかご確認ください。3Dセキュア認証が求められる場合があります。それでも解決しない場合は admin@aimeishi.biz へご連絡ください。' },
-  { q: 'プランを変更したのに反映されません', a: 'ページを再読み込みしてください。それでも反映されない場合は5分ほどお待ちの上、再度確認してください。解決しない場合は admin@aimeishi.biz までご連絡ください。' },
+  { q: '決済ができません', a: 'カード番号・有効期限・CVCが正しいかご確認ください。3Dセキュア認証が求められる場合があります。それでも解決しない場合はサポートBOTの香里またはメール（admin@aimeishi.biz）へご連絡ください。' },
+  { q: 'プランを変更したのに反映されません', a: 'ページを再読み込みしてください。それでも反映されない場合は5分ほどお待ちの上、再度確認してください。解決しない場合はサポートBOTの香里にご相談ください。' },
 ]
 
 const categories = [
@@ -62,9 +62,11 @@ export default function FaqPage() {
       ))}
 
       <div style={{ marginTop: 40, background: 'linear-gradient(135deg,#C4511A,#F26722)', borderRadius: 16, padding: '20px 24px', textAlign: 'center' }}>
-        <div style={{ fontSize: 14, fontWeight: 800, color: '#fff', marginBottom: 8 }}>解決しない場合はサポートへ</div>
-        <a href="/support" style={{ display: 'inline-block', background: '#fff', color: '#F26722', fontWeight: 800, fontSize: 13, padding: '8px 24px', borderRadius: 99, textDecoration: 'none' }}>
-          サポートページへ →
+        <div style={{ fontSize: 22, marginBottom: 6 }}>👩</div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: '#fff', marginBottom: 4 }}>解決しない場合は香里に相談！</div>
+        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', marginBottom: 16 }}>AIサポートスタッフが24時間即答します</div>
+        <a href="/support" style={{ display: 'inline-block', background: '#fff', color: '#F26722', fontWeight: 800, fontSize: 13, padding: '10px 28px', borderRadius: 99, textDecoration: 'none' }}>
+          👩 香里に聞く →
         </a>
       </div>
     </LegalLayout>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { PLANS } from '@/lib/plans'
 import { formatTokens, tokensToConversations } from '@/lib/credits'
@@ -23,6 +23,14 @@ type Feedback = {
   profiles: { email: string; full_name: string | null } | null
 }
 
+type SupportMsg = { id?: string; role: 'user' | 'assistant' | 'operator'; content: string; created_at?: string }
+type SupportSession = {
+  session_key: string
+  created_at: string
+  updated_at: string
+  messages: SupportMsg[]
+}
+
 const PLAN_LABELS: Record<string, string> = { free: 'フリー', solo: 'スタンダード', growth: 'ビジネス', scale: 'エンタープライズ' }
 const PLAN_COLORS: Record<string, string> = { free: '#6B7280', solo: '#F26722', growth: '#7C3AED', scale: '#F59E0B' }
 const CAT_LABELS: Record<string, string> = { general: '💬 意見', feature: '✨ 機能要望', bug: '🐛 不具合' }
@@ -42,7 +50,6 @@ function KpiCard({ label, value, sub, color, alert }: { label: string; value: st
   )
 }
 
-// ミニスパークライン
 function Sparkline({ data }: { data: { day: string; count: number }[] }) {
   if (!data.length) return null
   const max = Math.max(...data.map(d => d.count), 1)
@@ -59,11 +66,210 @@ function Sparkline({ data }: { data: { day: string; count: number }[] }) {
   )
 }
 
+// ── サポートBOT管理パネル ──────────────────────────────────────
+function SupportBotPanel() {
+  const [sessions, setSessions]       = useState<SupportSession[]>([])
+  const [loading, setLoading]         = useState(true)
+  const [selectedKey, setSelectedKey] = useState<string | null>(null)
+  const [input, setInput]             = useState('')
+  const [sending, setSending]         = useState(false)
+  const bottomRef                     = useRef<HTMLDivElement>(null)
+  const pollRef                       = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const loadSessions = useCallback(async () => {
+    const res = await fetch('/api/admin/support-sessions')
+    if (res.ok) {
+      const { sessions: data } = await res.json()
+      setSessions(data ?? [])
+    }
+    setLoading(false)
+  }, [])
+
+  useEffect(() => {
+    loadSessions()
+    pollRef.current = setInterval(loadSessions, 5000)
+    return () => { if (pollRef.current) clearInterval(pollRef.current) }
+  }, [loadSessions])
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [selectedKey, sessions])
+
+  const sendOperator = async () => {
+    if (!selectedKey || !input.trim() || sending) return
+    setSending(true)
+    try {
+      await fetch('/api/admin/support-sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_key: selectedKey, content: input.trim() }),
+      })
+      setInput('')
+      await loadSessions()
+    } finally {
+      setSending(false)
+    }
+  }
+
+  const selected = sessions.find(s => s.session_key === selectedKey)
+
+  const roleLabel = (role: string) => {
+    if (role === 'user')      return { label: 'ユーザー', color: '#F26722' }
+    if (role === 'operator')  return { label: '💼 運営', color: '#3B82F6' }
+    return { label: '👩 香里', color: '#10B981' }
+  }
+
+  const shortKey = (key: string) => key.slice(0, 8) + '…'
+  const lastMsg  = (s: SupportSession) => s.messages[s.messages.length - 1]
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: selected ? '320px 1fr' : '1fr', gap: 12, minHeight: 500 }}>
+      {/* セッション一覧 */}
+      <div style={{ background: '#1E293B', borderRadius: 16, overflow: 'hidden' }}>
+        <div style={{ padding: '14px 16px', borderBottom: '1px solid #334155', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#F1F5F9' }}>チャット履歴</div>
+          <div style={{ fontSize: 11, color: '#64748B' }}>{sessions.length}件</div>
+        </div>
+        {loading && <div style={{ padding: 20, color: '#64748B', fontSize: 12 }}>読み込み中…</div>}
+        {!loading && sessions.length === 0 && (
+          <div style={{ padding: 20, color: '#64748B', fontSize: 12, textAlign: 'center' }}>
+            まだチャット履歴がありません
+          </div>
+        )}
+        <div style={{ maxHeight: 520, overflowY: 'auto' }}>
+          {sessions.map(s => {
+            const last = lastMsg(s)
+            const isSelected = s.session_key === selectedKey
+            return (
+              <div key={s.session_key}
+                onClick={() => setSelectedKey(isSelected ? null : s.session_key)}
+                style={{
+                  padding: '12px 16px',
+                  borderBottom: '1px solid #263147',
+                  cursor: 'pointer',
+                  background: isSelected ? '#263147' : 'transparent',
+                  borderLeft: isSelected ? '3px solid #F26722' : '3px solid transparent',
+                  transition: 'background 0.15s',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', fontFamily: 'monospace' }}>
+                    {shortKey(s.session_key)}
+                  </span>
+                  <span style={{ fontSize: 10, color: '#475569' }}>
+                    {new Date(s.updated_at).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+                {last && (
+                  <div style={{ fontSize: 11.5, color: '#94A3B8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span style={{ color: roleLabel(last.role).color, fontWeight: 700, marginRight: 4 }}>
+                      {last.role === 'user' ? 'U:' : last.role === 'operator' ? 'OP:' : 'AI:'}
+                    </span>
+                    {last.content}
+                  </div>
+                )}
+                <div style={{ fontSize: 10, color: '#475569', marginTop: 4 }}>
+                  {s.messages.length}件のメッセージ
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* 会話詳細 */}
+      {selected && (
+        <div style={{ background: '#1E293B', borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ padding: '14px 18px', borderBottom: '1px solid #334155', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#F1F5F9' }}>会話詳細</div>
+              <div style={{ fontSize: 10, color: '#475569', fontFamily: 'monospace', marginTop: 2 }}>{selected.session_key}</div>
+            </div>
+            <button onClick={() => setSelectedKey(null)}
+              style={{ background: '#334155', color: '#94A3B8', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 11, cursor: 'pointer' }}>
+              閉じる
+            </button>
+          </div>
+
+          {/* メッセージ一覧 */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '16px', maxHeight: 400, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {selected.messages.map((m, i) => {
+              const { label, color } = roleLabel(m.role)
+              const isUser = m.role === 'user'
+              return (
+                <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: isUser ? 'flex-end' : 'flex-start', gap: 2 }}>
+                  <div style={{ fontSize: 10, color, fontWeight: 700 }}>{label}</div>
+                  <div style={{
+                    maxWidth: '85%',
+                    background: isUser ? '#334155' : m.role === 'operator' ? '#1E3A5F' : '#263147',
+                    border: `1px solid ${isUser ? '#475569' : m.role === 'operator' ? '#3B82F6' : '#334155'}`,
+                    color: '#E2E8F0',
+                    borderRadius: 10,
+                    padding: '8px 12px',
+                    fontSize: 12.5,
+                    lineHeight: 1.7,
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                  }}>
+                    {m.content}
+                  </div>
+                  {m.created_at && (
+                    <div style={{ fontSize: 9, color: '#475569' }}>
+                      {new Date(m.created_at).toLocaleTimeString('ja-JP')}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+            <div ref={bottomRef} />
+          </div>
+
+          {/* 運営メッセージ入力 */}
+          <div style={{ padding: '12px 14px', borderTop: '1px solid #334155', background: '#0F172A' }}>
+            <div style={{ fontSize: 11, color: '#3B82F6', fontWeight: 700, marginBottom: 6 }}>💼 運営として割り込む</div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <textarea
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendOperator() } }}
+                placeholder="ユーザーへのメッセージを入力…"
+                rows={2}
+                style={{
+                  flex: 1, resize: 'none',
+                  border: '1.5px solid #3B82F6', borderRadius: 8,
+                  padding: '8px 10px', fontSize: 12,
+                  fontFamily: 'inherit', outline: 'none',
+                  lineHeight: 1.5, background: '#1E293B',
+                  color: '#E2E8F0',
+                }}
+              />
+              <button
+                onClick={sendOperator}
+                disabled={!input.trim() || sending}
+                style={{
+                  background: input.trim() && !sending ? '#3B82F6' : '#334155',
+                  color: '#fff', border: 'none', borderRadius: 8,
+                  padding: '0 16px', fontSize: 12, fontWeight: 700,
+                  cursor: input.trim() && !sending ? 'pointer' : 'not-allowed',
+                  flexShrink: 0,
+                }}
+              >
+                {sending ? '送信中…' : '送信'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── メインページ ───────────────────────────────────────────────
 export default function AdminPage() {
   const [stats, setStats]       = useState<Stats | null>(null)
   const [feedback, setFeedback] = useState<Feedback[]>([])
   const [loading, setLoading]   = useState(true)
-  const [tab, setTab]           = useState<'kpi' | 'users' | 'feedback'>('kpi')
+  const [tab, setTab]           = useState<'kpi' | 'users' | 'feedback' | 'support'>('kpi')
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -111,23 +317,31 @@ export default function AdminPage() {
       </div>
 
       {/* タブ */}
-      <div style={{ background: '#1E293B', borderBottom: '1px solid #334155', padding: '0 24px', display: 'flex', gap: 4 }}>
-        {([['kpi', 'KPI ダッシュボード'], ['users', '最近の登録者'], ['feedback', `意見箱${stats?.unreadFeedback ? ` (${stats.unreadFeedback})` : ''}`]] as const).map(([key, label]) => (
+      <div style={{ background: '#1E293B', borderBottom: '1px solid #334155', padding: '0 24px', display: 'flex', gap: 4, overflowX: 'auto' }}>
+        {([
+          ['kpi',      'KPI ダッシュボード'],
+          ['users',    '最近の登録者'],
+          ['feedback', `意見箱${stats?.unreadFeedback ? ` (${stats.unreadFeedback})` : ''}`],
+          ['support',  '👩 香里サポート'],
+        ] as const).map(([key, label]) => (
           <button key={key} onClick={() => setTab(key)}
-            style={{ padding: '12px 16px', fontSize: 13, fontWeight: tab === key ? 800 : 400, background: 'none', border: 'none', cursor: 'pointer',
-              color: tab === key ? '#F26722' : '#64748B', borderBottom: tab === key ? '2px solid #F26722' : '2px solid transparent' }}>
+            style={{
+              padding: '12px 16px', fontSize: 13, whiteSpace: 'nowrap',
+              fontWeight: tab === key ? 800 : 400, background: 'none', border: 'none', cursor: 'pointer',
+              color: tab === key ? '#F26722' : '#64748B',
+              borderBottom: tab === key ? '2px solid #F26722' : '2px solid transparent',
+            }}>
             {label}
           </button>
         ))}
       </div>
 
-      <div style={{ padding: '24px', maxWidth: 1100, margin: '0 auto' }}>
-        {loading && <div style={{ color: '#64748B', textAlign: 'center', padding: 40 }}>読み込み中…</div>}
+      <div style={{ padding: '24px', maxWidth: 1200, margin: '0 auto' }}>
+        {loading && tab !== 'support' && <div style={{ color: '#64748B', textAlign: 'center', padding: 40 }}>読み込み中…</div>}
 
         {/* ── KPIダッシュボード ── */}
         {!loading && stats && tab === 'kpi' && (
           <>
-            {/* 行1: ユーザー */}
             <div style={{ fontSize: 12, color: '#64748B', fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10 }}>ユーザー</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 24 }}>
               <KpiCard label="総ユーザー数" value={stats.users.total.toLocaleString('ja-JP')} sub="累計登録数" />
@@ -140,24 +354,22 @@ export default function AdminPage() {
               <KpiCard label="有料ユーザー数" value={stats.subscriptions.totalPaying} sub={`全体の${Math.round(stats.subscriptions.totalPaying / Math.max(stats.users.total, 1) * 100)}%`} color="#F26722" />
             </div>
 
-            {/* 行2: 収益 */}
             <div style={{ fontSize: 12, color: '#64748B', fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10 }}>収益</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 24 }}>
-              <KpiCard label="MRR（月次経常収益）"
-                value={`¥${stats.subscriptions.mrr.toLocaleString('ja-JP')}`}
-                sub="サブスク合計"
-                color="#10B981"
-              />
+              <KpiCard label="MRR（月次経常収益）" value={`¥${stats.subscriptions.mrr.toLocaleString('ja-JP')}`} sub="サブスク合計" color="#10B981" />
               {(['solo', 'growth', 'scale'] as const).map(plan => (
                 <div key={plan} style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #EDD9C8', padding: '16px 20px' }}>
                   <div style={{ fontSize: 11, color: '#A08068', fontWeight: 700, marginBottom: 6 }}>{PLAN_LABELS[plan]}</div>
-                  <div style={{ fontSize: 28, fontWeight: 900, color: PLAN_COLORS[plan], lineHeight: 1 }}>{stats.subscriptions.byPlan[plan] ?? 0}<span style={{ fontSize: 13, color: '#A08068', fontWeight: 400 }}>人</span></div>
-                  <div style={{ fontSize: 11, color: '#A08068', marginTop: 6 }}>¥{((stats.subscriptions.byPlan[plan] ?? 0) * PLANS[plan].priceJpy).toLocaleString('ja-JP')}/月</div>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: PLAN_COLORS[plan], lineHeight: 1 }}>
+                    {stats.subscriptions.byPlan[plan] ?? 0}<span style={{ fontSize: 13, color: '#A08068', fontWeight: 400 }}>人</span>
+                  </div>
+                  <div style={{ fontSize: 11, color: '#A08068', marginTop: 6 }}>
+                    ¥{((stats.subscriptions.byPlan[plan] ?? 0) * PLANS[plan].priceJpy).toLocaleString('ja-JP')}/月
+                  </div>
                 </div>
               ))}
             </div>
 
-            {/* 行3: セッション */}
             <div style={{ fontSize: 12, color: '#64748B', fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10 }}>AI会話</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 24 }}>
               <KpiCard label="累計セッション数" value={stats.sessions.total.toLocaleString('ja-JP')} />
@@ -169,7 +381,6 @@ export default function AdminPage() {
               <KpiCard label="アクティブ名刺" value={stats.cards} sub={`ペルソナ ${stats.personas}個`} />
             </div>
 
-            {/* 行4: トークン */}
             <div style={{ fontSize: 12, color: '#64748B', fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10 }}>トークン</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 24 }}>
               <KpiCard label="累計消費トークン" value={formatTokens(stats.tokens.totalConsumed)} sub={`≈ ${tokensToConversations(stats.tokens.totalConsumed)}会話`} />
@@ -178,11 +389,7 @@ export default function AdminPage() {
                 value={formatTokens(stats.tokens.totalSubBalance + stats.tokens.totalPaidBalance)}
                 sub={`サブスク ${formatTokens(stats.tokens.totalSubBalance)} + 購入済 ${formatTokens(stats.tokens.totalPaidBalance)}`}
               />
-              <KpiCard label="未読フィードバック"
-                value={stats.unreadFeedback}
-                sub={stats.unreadFeedback > 0 ? '要確認' : '全件確認済み'}
-                alert={stats.unreadFeedback > 0}
-              />
+              <KpiCard label="未読フィードバック" value={stats.unreadFeedback} sub={stats.unreadFeedback > 0 ? '要確認' : '全件確認済み'} alert={stats.unreadFeedback > 0} />
             </div>
           </>
         )}
@@ -248,6 +455,9 @@ export default function AdminPage() {
             ))}
           </div>
         )}
+
+        {/* ── 香里サポートBOT ── */}
+        {tab === 'support' && <SupportBotPanel />}
       </div>
     </div>
   )

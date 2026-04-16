@@ -84,6 +84,39 @@ export default function CardPage() {
     setExistingSession(null)
   }
 
+  const saveVCard = () => {
+    if (!card) return
+
+    // 姓名を分割（スペース区切り）
+    const nameParts = (card.full_name ?? '').trim().split(/\s+/)
+    const familyName = nameParts[0] ?? ''
+    const givenName  = nameParts.slice(1).join(' ')
+
+    const lines = [
+      'BEGIN:VCARD',
+      'VERSION:3.0',
+      `FN:${card.full_name ?? ''}`,
+      `N:${familyName};${givenName};;;`,
+    ]
+    if (card.company)     lines.push(`ORG:${card.company}`)
+    if (card.title)       lines.push(`TITLE:${card.title}`)
+    if (card.phone)       lines.push(`TEL;TYPE=CELL:${card.phone}`)
+    if (card.email)       lines.push(`EMAIL;TYPE=INTERNET:${card.email}`)
+    if (card.website)     lines.push(`URL:${card.website}`)
+    if (card.short_intro) lines.push(`NOTE:${card.short_intro.replace(/\n/g, '\\n')}`)
+    lines.push(`X-AI-MEISHI:https://www.aimeishi.biz/card/${card.id}`)
+    lines.push('END:VCARD')
+
+    const vcfContent = lines.join('\r\n')
+    const blob = new Blob([vcfContent], { type: 'text/vcard;charset=utf-8' })
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a')
+    a.href     = url
+    a.download = `${card.full_name ?? 'contact'}.vcf`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#07060F' }}>
@@ -248,6 +281,38 @@ export default function CardPage() {
                 </a>
               )}
             </div>
+
+            {/* 連絡先を保存 */}
+            {(card.email || card.phone) && (
+              <button
+                onClick={saveVCard}
+                style={{
+                  marginTop: 20,
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  padding: '11px 0',
+                  borderRadius: 14,
+                  background: 'transparent',
+                  border: '1px solid rgba(242,103,34,0.3)',
+                  color: '#F5843A',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'background 0.2s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(242,103,34,0.08)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                連絡先に保存
+              </button>
+            )}
           </div>
         </div>
 
