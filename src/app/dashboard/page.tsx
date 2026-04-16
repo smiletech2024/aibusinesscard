@@ -9,6 +9,7 @@ import { BusinessCard, CustomerSession } from '@/types'
 import Link from 'next/link'
 import QRCode from 'qrcode'
 import { Logo } from '@/components/Logo'
+import { formatTokens, getBalanceLevel } from '@/lib/credits'
 
 const statusConfig: Record<string, { label: string; bg: string; color: string; step: number }> = {
   ai_chat:    { label: 'AIと会話中',    bg: 'rgba(242,103,34,0.1)',  color: '#F5A47A', step: 2 },
@@ -46,10 +47,17 @@ export default function DashboardPage() {
   const [deleteSessionConfirm, setDeleteSessionConfirm] = useState<{ id: string; name: string } | null>(null)
   const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null)
   const [notifications, setNotifications] = useState<{ id: string; customerName: string; sessionId: string }[]>([])
+  const [creditBalance, setCreditBalance] = useState<number | null>(null)
   const personaIdsRef = useRef<string[]>([])
   const supabase = createClient()
 
   useEffect(() => { checkAuth() }, [])
+  useEffect(() => {
+    fetch('/api/credits/balance')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setCreditBalance(d.balance) })
+      .catch(() => {})
+  }, [])
 
   const checkAuth = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -363,13 +371,56 @@ export default function DashboardPage() {
       >
         <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between">
           <Logo size={28} variant="dark" />
-          <button
-            onClick={handleLogout}
-            className="text-xs font-medium px-3 py-1.5 rounded-full transition hover:bg-red-50"
-            style={{ color: '#A08068' }}
-          >
-            ログアウト
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {/* トークン残高バッジ */}
+            <Link
+              href="/credits"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                padding: '5px 12px', borderRadius: 99,
+                background: creditBalance !== null && creditBalance <= 0
+                  ? 'rgba(239,68,68,0.1)'
+                  : creditBalance !== null && creditBalance < 50_000
+                  ? 'rgba(245,158,11,0.1)'
+                  : 'rgba(242,103,34,0.08)',
+                border: '1.5px solid',
+                borderColor: creditBalance !== null && creditBalance <= 0
+                  ? '#EF4444'
+                  : creditBalance !== null && creditBalance < 50_000
+                  ? '#F59E0B'
+                  : '#F26722',
+                textDecoration: 'none',
+                transition: 'all 0.2s',
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                stroke={creditBalance !== null && creditBalance <= 0 ? '#EF4444' : creditBalance !== null && creditBalance < 50_000 ? '#F59E0B' : '#F26722'}
+                strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/>
+                <path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+                <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+              </svg>
+              <span style={{
+                fontSize: 12, fontWeight: 700,
+                color: creditBalance !== null && creditBalance <= 0 ? '#EF4444'
+                  : creditBalance !== null && creditBalance < 50_000 ? '#F59E0B'
+                  : '#F26722',
+              }}>
+                {creditBalance === null
+                  ? '…'
+                  : creditBalance <= 0
+                  ? '残高0'
+                  : `${formatTokens(creditBalance)}トークン`}
+              </span>
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="text-xs font-medium px-3 py-1.5 rounded-full transition hover:bg-red-50"
+              style={{ color: '#A08068' }}
+            >
+              ログアウト
+            </button>
+          </div>
         </div>
       </header>
 
