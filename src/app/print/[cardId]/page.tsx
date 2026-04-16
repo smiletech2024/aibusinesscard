@@ -11,7 +11,7 @@ import QRCode from 'qrcode'
 import { LogoIcon } from '@/components/Logo'
 import jsPDF from 'jspdf'
 
-type Design = 'executive' | 'midnight' | 'vivid' | 'ocean' | 'forest' | 'crimson' | 'gold'
+type Design = 'executive' | 'midnight' | 'vivid' | 'ocean' | 'forest' | 'crimson' | 'gold' | 'pink'
 type Font   = 'sans' | 'serif' | 'rounded' | 'mono' | 'display' | 'elegant' | 'yumin'
 
 const designMeta: Record<Design, { label: string; desc: string; preview: string }> = {
@@ -22,6 +22,7 @@ const designMeta: Record<Design, { label: string; desc: string; preview: string 
   forest:    { label: '翠緑',   desc: '深森グリーン × エメラルド', preview: '#0F3D2E' },
   crimson:   { label: '深紅',   desc: 'ディープレッド × ローズ', preview: '#7A0B2A' },
   gold:      { label: '金黒',   desc: '漆黒 × プレミアムゴールド', preview: '#0A0A0A' },
+  pink:      { label: '桜',     desc: 'チェリーブロッサム × ピンク', preview: '#F472B6' },
 }
 
 const fontMeta: Record<Font, { label: string; desc: string; family: string }> = {
@@ -747,6 +748,71 @@ function GoldBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: strin
 }
 
 /* ══════════════════════════════════════════
+   PINK — チェリーブロッサム × ホットピンク
+══════════════════════════════════════════ */
+function PinkFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) {
+  return (
+    <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 50%, #FBD5EA 100%)', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
+      {/* Petal orbs */}
+      <div style={{ position: 'absolute', top: -60, right: -60, width: 220, height: 220, borderRadius: '50%', background: 'radial-gradient(circle, rgba(244,114,182,0.22) 0%, transparent 70%)' }} />
+      <div style={{ position: 'absolute', bottom: -40, left: -40, width: 160, height: 160, borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.15) 0%, transparent 70%)' }} />
+      <div style={{ position: 'absolute', top: 60, left: 180, width: 80, height: 80, borderRadius: '50%', background: 'rgba(244,114,182,0.08)' }} />
+      {/* Top pink border */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: 'linear-gradient(90deg, #F9A8D4, #EC4899, #F472B6, #F9A8D4)' }} />
+      {/* Left accent */}
+      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 5, background: 'linear-gradient(180deg, #EC4899, #F472B6, #FBCFE8)' }} />
+      {/* Decorative petals */}
+      {[...Array(6)].map((_, i) => (
+        <div key={i} style={{ position: 'absolute', width: 6, height: 6, borderRadius: '50%', background: 'rgba(236,72,153,0.12)', top: 20 + i * 52, right: 108 + (i % 2) * 8 }} />
+      ))}
+      {/* User logo */}
+      {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', pointerEvents: 'none' }} />}
+      {/* Content */}
+      <div style={{ position: 'absolute', left: 32, top: 0, bottom: 0, right: 112, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
+        {card.company && <p style={{ fontSize: 9, color: '#BE185D', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, margin: '0 0 8px' }}>{card.company}</p>}
+        <h2 style={{ fontSize: 26, fontWeight: 900, color: '#831843', margin: '0 0 4px', lineHeight: 1.1, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
+        {card.title && <p style={{ fontSize: 11, color: '#EC4899', fontWeight: 600, margin: '0 0 18px' }}>{card.title}</p>}
+        <div style={{ width: 36, height: 2, background: 'linear-gradient(90deg, #EC4899, #F9A8D4)', borderRadius: 2, marginBottom: 16 }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+          {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#9D174D', fontSize: 10 }}><span style={{ color: '#EC4899' }}><IconMail /></span>{card.email}</div>}
+          {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#9D174D', fontSize: 10 }}><span style={{ color: '#EC4899' }}><IconPhone /></span>{card.phone}</div>}
+          {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#9D174D', fontSize: 10 }}><span style={{ color: '#EC4899' }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
+        </div>
+      </div>
+      {qrUrl && (
+        <div style={{ position: 'absolute', right: 18, bottom: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
+            <LogoIcon size={12} /><span style={{ fontSize: 7, fontWeight: 800, color: '#BE185D', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
+          </div>
+          <QRCodeSVG url={qrUrl} size={74} style={{ border: '1.5px solid #FBCFE8', borderRadius: 8 }} />
+          <p style={{ fontSize: 7, color: '#F472B6', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンしてAI相談</p>
+        </div>
+      )}
+      <div style={{ position: 'absolute', bottom: 0, left: 5, right: 0, height: 3, background: 'linear-gradient(90deg, #EC4899 0%, #F472B6 50%, transparent 100%)' }} />
+    </div>
+  )
+}
+function PinkBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: string }) {
+  return (
+    <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(160deg, #831843 0%, #9D174D 40%, #BE185D 100%)', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
+      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 380, height: 280, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(249,168,212,0.18) 0%, transparent 70%)' }} />
+      <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
+      <div style={{ position: 'absolute', bottom: -30, left: -30, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(249,168,212,0.5), transparent)' }} />
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(249,168,212,0.5), transparent)' }} />
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 40px', textAlign: 'center' }}>
+        <div style={{ marginBottom: 14 }}><LogoIcon size={40} /></div>
+        <p style={{ fontSize: 8, color: '#FBCFE8', fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 10px' }}>分身AI搭載名刺</p>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: '0 0 14px', lineHeight: 1.25 }}>QRをスキャンして<br />分身AIと話してください</h3>
+        {card.short_intro && <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.6)', margin: '0 0 18px', lineHeight: 1.6, maxWidth: 300 }}>{card.short_intro}</p>}
+        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #F9A8D4, transparent)', marginBottom: 16 }} />
+        <div style={{ marginTop: 12 }}><BackBrandLogo /></div>
+      </div>
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════
    カードプレビュー（レスポンシブ対応）
 ══════════════════════════════════════════ */
 function CardPreview({
@@ -1045,11 +1111,11 @@ export default function PrintCardPage() {
 
   const frontMap: Record<Design, React.ComponentType<{ card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }>> = {
     executive: ExecutiveFront, midnight: MidnightFront, vivid: VividFront,
-    ocean: OceanFront, forest: ForestFront, crimson: CrimsonFront, gold: GoldFront,
+    ocean: OceanFront, forest: ForestFront, crimson: CrimsonFront, gold: GoldFront, pink: PinkFront,
   }
   const backMap: Record<Design, React.ComponentType<{ card: BusinessCard; fontFamily?: string }>> = {
     executive: ExecutiveBack, midnight: MidnightBack, vivid: VividBack,
-    ocean: OceanBack, forest: ForestBack, crimson: CrimsonBack, gold: GoldBack,
+    ocean: OceanBack, forest: ForestBack, crimson: CrimsonBack, gold: GoldBack, pink: PinkBack,
   }
   const FrontComponent = frontMap[design]
   const BackComponent  = backMap[design]
