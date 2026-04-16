@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
 export default function ResetPasswordPage() {
@@ -15,21 +14,20 @@ export default function ResetPasswordPage() {
     setLoading(true)
     setError('')
     try {
-      const supabase = createClient()
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/confirm`,
+      // Supabaseのレートリミットをバイパスして直接Resend送信
+      const res = await fetch('/api/auth/send-reset-email', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ email }),
       })
-      if (error) throw error
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Failed')
+      }
       setSent(true)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : ''
-      if (msg.includes('rate limit') || msg.includes('429')) {
-        setError('送信回数の上限に達しました。しばらく時間をおいてから再度お試しください。')
-      } else if (msg.includes('User not found') || msg.includes('unable to find')) {
-        setError('このメールアドレスは登録されていません。')
-      } else {
-        setError(msg || 'エラーが発生しました。再度お試しください。')
-      }
+      setError(msg || 'エラーが発生しました。再度お試しください。')
     } finally {
       setLoading(false)
     }
