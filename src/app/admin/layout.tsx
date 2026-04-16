@@ -1,13 +1,12 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
-const ADMIN_EMAIL = 'admin@aimeishi.biz'
-
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const adminEmail = process.env.ADMIN_EMAIL
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user || user.email !== ADMIN_EMAIL) {
+  if (!user || !adminEmail || user.email !== adminEmail) {
     redirect('/dashboard')
   }
 

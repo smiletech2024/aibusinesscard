@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { PLANS, type PlanId } from '@/lib/plans'
 
-const ADMIN_EMAIL = 'admin@aimeishi.biz'
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? ""
 
 function getAdmin() {
   return createServiceClient(
