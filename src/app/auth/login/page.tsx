@@ -2,24 +2,57 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Logo } from '@/components/Logo'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
+  const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [isSignUp, setIsSignUp] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [message, setMessage] = useState('')
-  const router = useRouter()
+  const [loading, setLoading]   = useState(false)
+  const [error, setError]       = useState('')
+  const [message, setMessage]   = useState('')
+  // レート制限
+  const [attempts, setAttempts]         = useState(0)
+  const [lockedUntil, setLockedUntil]   = useState<Date | null>(null)
+  const [countdown, setCountdown]       = useState(0)
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const router   = useRouter()
   const supabase = createClient()
+
+  // カウントダウンタイマー
+  useEffect(() => {
+    if (!lockedUntil) return
+    const tick = () => {
+      const remaining = Math.ceil((lockedUntil.getTime() - Date.now()) / 1000)
+      if (remaining <= 0) {
+        setLockedUntil(null)
+        setCountdown(0)
+        setAttempts(0)
+        if (countdownRef.current) clearInterval(countdownRef.current)
+      } else {
+        setCountdown(remaining)
+      }
+    }
+    tick()
+    countdownRef.current = setInterval(tick, 1000)
+    return () => { if (countdownRef.current) clearInterval(countdownRef.current) }
+  }, [lockedUntil])
+
+  const isLocked = lockedUntil !== null && lockedUntil > new Date()
+
+  const formatCountdown = (sec: number) => {
+    const m = Math.floor(sec / 60)
+    const s = sec % 60
+    return m > 0 ? `${m}分${s}秒` : `${s}秒`
+  }
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isLocked) return
     setLoading(true)
     setError('')
     setMessage('')
@@ -33,8 +66,41 @@ export default function LoginPage() {
         if (error) throw error
         setMessage('📩 確認メールをお送りしました。\nメール内の「メールアドレスを確認する」をタップすると、あなたの分身AI作成が始まります。\n（届かない場合は迷惑メールフォルダもご確認ください）')
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password })
-        if (error) throw error
+        // レート制限付きログイン API を使用
+        const res  = await fetch('/api/auth/login', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ email, password }),
+        })
+        const data = await res.json()
+
+        if (res.status === 429) {
+          // ロック
+          setLockedUntil(new Date(data.lockedUntil))
+          setAttempts(5)
+          setError('')
+          return
+        }
+
+        if (!res.ok) {
+          const remaining = data.remaining ?? 0
+          setAttempts(data.attempts ?? attempts + 1)
+          if (remaining === 1) {
+            setError(`メールアドレスまたはパスワードが違います。あと${remaining}回失敗するとアカウントが一時ロックされます。`)
+          } else if (remaining > 1) {
+            setError(`メールアドレスまたはパスワードが違います。（残り${remaining}回）`)
+          } else {
+            setError('メールアドレスまたはパスワードが違います。')
+          }
+          return
+        }
+
+        // 成功 → セッションをセット
+        await supabase.auth.setSession({
+          access_token:  data.access_token,
+          refresh_token: data.refresh_token,
+        })
+        setAttempts(0)
         router.push('/dashboard')
         router.refresh()
       }
@@ -163,7 +229,33 @@ export default function LoginPage() {
               />
             </div>
 
-            {error && (
+            {/* ロックアウト表示 */}
+            {isLocked && (
+              <div style={{ background: '#FFF1F2', border: '1.5px solid #FECDD3', borderRadius: 14, padding: '16px', textAlign: 'center' }}>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>🔒</div>
+                <div style={{ color: '#E11D48', fontWeight: 800, fontSize: 14, marginBottom: 4 }}>
+                  アカウントが一時ロックされました
+                </div>
+                <div style={{ color: '#9F1239', fontSize: 13, marginBottom: 10 }}>
+                  ログイン試行が{5}回失敗したため、一時的にロックしました
+                </div>
+                <div style={{ background: '#FECDD3', borderRadius: 8, padding: '10px', fontSize: 20, fontWeight: 900, color: '#E11D48', fontVariantNumeric: 'tabular-nums' }}>
+                  {formatCountdown(countdown)}
+                </div>
+                <div style={{ color: '#9F1239', fontSize: 11, marginTop: 6 }}>
+                  経過後に自動解除されます
+                </div>
+              </div>
+            )}
+
+            {/* 残り試行回数警告 */}
+            {!isLocked && attempts >= 3 && attempts < 5 && (
+              <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#92400E' }}>
+                ⚠️ あと{5 - attempts}回失敗すると15分間ロックされます
+              </div>
+            )}
+
+            {error && !isLocked && (
               <div style={{ background: '#FFF1F2', color: '#E11D48', border: '1px solid #FECDD3', borderRadius: 12, padding: '12px 14px', fontSize: 14, fontWeight: 500 }}>
                 {error}
               </div>
@@ -176,17 +268,18 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || isLocked}
               style={{
                 width: '100%', padding: '15px', fontSize: 16, fontWeight: 700,
-                background: loading ? '#F5C09A' : 'linear-gradient(135deg, #F26722, #F59340)',
-                color: 'white', border: 'none', borderRadius: 14, cursor: loading ? 'not-allowed' : 'pointer',
+                background: (loading || isLocked) ? '#F5C09A' : 'linear-gradient(135deg, #F26722, #F59340)',
+                color: 'white', border: 'none', borderRadius: 14, cursor: (loading || isLocked) ? 'not-allowed' : 'pointer',
                 boxShadow: '0 4px 20px rgba(242,103,34,0.4)', marginTop: 4,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 transition: 'all 0.2s',
+                opacity: isLocked ? 0.5 : 1,
               }}
             >
-              {loading ? '準備中...' : isSignUp ? '分身AIを作り始める →' : 'ログイン'}
+              {loading ? '確認中...' : isLocked ? `🔒 ${formatCountdown(countdown)}後に解除` : isSignUp ? '分身AIを作り始める →' : 'ログイン'}
             </button>
           </form>
 
