@@ -138,7 +138,7 @@ export async function POST(req: NextRequest) {
 
     // 確認URL（/auth/confirm ページへ）
     const base       = site_url || SITE_URL
-    const confirmUrl = `${base}/auth/confirm?token_hash=${encodeURIComponent(token_hash)}&type=${encodeURIComponent(type)}`
+    const confirmUrl = `${base}/auth/confirm?token_hash=${token_hash}&type=${type}`
 
     const { subject, html } = buildEmail(type, confirmUrl)
 
