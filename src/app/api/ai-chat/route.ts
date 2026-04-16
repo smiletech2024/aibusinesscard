@@ -25,17 +25,23 @@ export async function POST(req: NextRequest) {
 
     const ownerId = persona.user_id as string
 
-    // ── トークン残高チェック ──────────────────────────────────────
+    // ── トークン残高チェック（サブスク残高 + 購入残高）────────────
     const { data: credits } = await admin
       .from('user_credits')
-      .select('balance')
+      .select('balance, sub_balance')
       .eq('user_id', ownerId)
       .maybeSingle()
 
-    const balance = credits?.balance ?? 0
-    if (balance <= 0) {
+    const subBalance      = credits?.sub_balance ?? 0
+    const purchasedBalance = credits?.balance    ?? 0
+    const totalBalance     = subBalance + purchasedBalance
+
+    if (totalBalance <= 0) {
       return NextResponse.json(
-        { error: 'INSUFFICIENT_CREDITS', message: 'トークン残高が不足しています。オーナーがトークンを追加するまでしばらくお待ちください。' },
+        {
+          error:   'INSUFFICIENT_CREDITS',
+          message: 'トークン残高が不足しています。オーナーがトークンを追加するまでしばらくお待ちください。',
+        },
         { status: 402 }
       )
     }
@@ -48,10 +54,9 @@ export async function POST(req: NextRequest) {
 
     const ownerName  = card?.full_name || (persona.profiles as { full_name?: string } | null)?.full_name || 'オーナー'
     const ownerTitle = card?.title || ''
-
     const systemPrompt = getAvatarSystemPrompt(persona, ownerName, ownerTitle)
 
-    // ユーザーメッセージをサービスロールで保存
+    // ユーザーメッセージを保存
     if (sessionId && userMessage) {
       await admin.from('ai_conversations').insert({
         session_id: sessionId,
@@ -61,18 +66,18 @@ export async function POST(req: NextRequest) {
     }
 
     const stream = await deepseek.chat.completions.create({
-      model: MODEL,
-      max_tokens: 1024,
-      stream: true,
-      stream_options: { include_usage: true },   // 使用量を最終チャンクで受け取る
+      model:          MODEL,
+      max_tokens:     1024,
+      stream:         true,
+      stream_options: { include_usage: true },
       messages: [
         { role: 'system', content: systemPrompt },
         ...messages,
       ],
     })
 
-    let fullText      = ''
-    let promptTokens  = 0
+    let fullText         = ''
+    let promptTokens     = 0
     let completionTokens = 0
 
     const encoder  = new TextEncoder()
@@ -84,8 +89,6 @@ export async function POST(req: NextRequest) {
             fullText += text
             controller.enqueue(encoder.encode(text))
           }
-
-          // 最終チャンクにusageが含まれる
           if (chunk.usage) {
             promptTokens     = chunk.usage.prompt_tokens     ?? 0
             completionTokens = chunk.usage.completion_tokens ?? 0
@@ -101,31 +104,35 @@ export async function POST(req: NextRequest) {
           })
         }
 
-        // ── トークン消費を記録・残高を減算 ───────────────────────
+        // ── トークン消費：サブスク残高を先に使い、不足分は購入残高から ──
         const consumed = calcTokensConsumed(promptTokens, completionTokens)
         if (consumed > 0) {
-          // 取引ログ
           await admin.from('credit_transactions').insert({
-            user_id:          ownerId,
-            amount:           -consumed,
-            type:             'usage',
-            description:      `分身AI会話 (入力${promptTokens}+出力${completionTokens}トークン)`,
-            prompt_tokens:    promptTokens,
+            user_id:           ownerId,
+            amount:            -consumed,
+            type:              'usage',
+            description:       `分身AI会話 (入力${promptTokens}+出力${completionTokens}トークン)`,
+            prompt_tokens:     promptTokens,
             completion_tokens: completionTokens,
-            persona_id:       personaId,
+            persona_id:        personaId,
           })
 
-          // 残高を更新（0以下にならないようにする）
+          // 最新残高を再取得して更新
           const { data: latest } = await admin
             .from('user_credits')
-            .select('balance, total_used')
+            .select('balance, sub_balance, total_used')
             .eq('user_id', ownerId)
             .maybeSingle()
 
           if (latest) {
+            // サブスク残高から先に消費
+            const fromSub  = Math.min(latest.sub_balance, consumed)
+            const fromPaid = Math.max(0, consumed - fromSub)
+
             await admin.from('user_credits').update({
-              balance:    Math.max(0, latest.balance - consumed),
-              total_used: latest.total_used + consumed,
+              sub_balance: Math.max(0, latest.sub_balance - fromSub),
+              balance:     Math.max(0, latest.balance     - fromPaid),
+              total_used:  latest.total_used + consumed,
             }).eq('user_id', ownerId)
           }
         }

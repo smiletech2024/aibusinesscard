@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { deepseek, MODEL } from '@/lib/anthropic'
+import { PLANS, canAddCard, canAddPersona, type PlanId } from '@/lib/plans'
 
 function getExtractionPrompt(conversations: Array<{ role: string; content: string }>): string {
   const text = conversations.map(c => `${c.role === 'user' ? 'ユーザー' : 'AI'}: ${c.content}`).join('\n')
@@ -29,6 +31,39 @@ export async function POST(req: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const admin = createServiceClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+
+    // ── プラン制限チェック ────────────────────────────────────────
+    const { data: sub } = await admin
+      .from('user_subscriptions')
+      .select('plan')
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    const planId = (sub?.plan ?? 'free') as PlanId
+    const plan   = PLANS[planId]
+
+    // ペルソナ数チェック
+    const { count: personaCount } = await admin
+      .from('personas')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+
+    if (!canAddPersona(planId, personaCount ?? 0)) {
+      return NextResponse.json(
+        {
+          error:   'PLAN_LIMIT_EXCEEDED',
+          message: `${plan.name}プランのペルソナ上限（${plan.maxPersonas}個）に達しています。プランをアップグレードしてください。`,
+          upgradeRequired: true,
+        },
+        { status: 403 }
+      )
     }
 
     const { conversations, cardData, draftSelections } = await req.json()
@@ -79,6 +114,24 @@ export async function POST(req: NextRequest) {
     }
 
     if (cardData) {
+      // 名刺枚数チェック
+      const { count: cardCount } = await admin
+        .from('business_cards')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+
+      if (!canAddCard(planId, cardCount ?? 0)) {
+        return NextResponse.json(
+          {
+            error:   'PLAN_LIMIT_EXCEEDED',
+            message: `${plan.name}プランの名刺上限（${plan.maxCards}枚）に達しています。プランをアップグレードしてください。`,
+            upgradeRequired: true,
+          },
+          { status: 403 }
+        )
+      }
+
       await supabase.from('business_cards').insert({
         user_id: user.id,
         persona_id: persona.id,

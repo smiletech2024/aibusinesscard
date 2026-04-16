@@ -9,7 +9,8 @@ import { BusinessCard, CustomerSession } from '@/types'
 import Link from 'next/link'
 import QRCode from 'qrcode'
 import { Logo } from '@/components/Logo'
-import { formatTokens, getBalanceLevel } from '@/lib/credits'
+import { formatTokens } from '@/lib/credits'
+import { PLANS, PLAN_COLORS, type PlanId } from '@/lib/plans'
 
 const statusConfig: Record<string, { label: string; bg: string; color: string; step: number }> = {
   ai_chat:    { label: 'AIと会話中',    bg: 'rgba(242,103,34,0.1)',  color: '#F5A47A', step: 2 },
@@ -48,14 +49,20 @@ export default function DashboardPage() {
   const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null)
   const [notifications, setNotifications] = useState<{ id: string; customerName: string; sessionId: string }[]>([])
   const [creditBalance, setCreditBalance] = useState<number | null>(null)
+  const [currentPlan, setCurrentPlan]     = useState<PlanId>('free')
   const personaIdsRef = useRef<string[]>([])
   const supabase = createClient()
 
   useEffect(() => { checkAuth() }, [])
   useEffect(() => {
-    fetch('/api/credits/balance')
+    fetch('/api/plan')
       .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d) setCreditBalance(d.balance) })
+      .then(d => {
+        if (d) {
+          setCreditBalance((d.subBalance ?? 0) + (d.purchasedBalance ?? 0))
+          setCurrentPlan(d.plan ?? 'free')
+        }
+      })
       .catch(() => {})
   }, [])
 
@@ -371,48 +378,56 @@ export default function DashboardPage() {
       >
         <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between">
           <Logo size={28} variant="dark" />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* プランバッジ */}
+            <Link
+              href="/pricing"
+              style={{
+                display: 'inline-flex', alignItems: 'center',
+                padding: '4px 10px', borderRadius: 99,
+                background: PLAN_COLORS[currentPlan].bg,
+                border: `1.5px solid ${PLAN_COLORS[currentPlan].border}`,
+                textDecoration: 'none', fontSize: 11, fontWeight: 800,
+                color: PLAN_COLORS[currentPlan].text, letterSpacing: '0.04em',
+              }}
+            >
+              {PLANS[currentPlan].name}
+            </Link>
+
             {/* トークン残高バッジ */}
             <Link
               href="/credits"
               style={{
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                padding: '5px 12px', borderRadius: 99,
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                padding: '4px 10px', borderRadius: 99,
                 background: creditBalance !== null && creditBalance <= 0
                   ? 'rgba(239,68,68,0.1)'
-                  : creditBalance !== null && creditBalance < 50_000
+                  : creditBalance !== null && creditBalance < 30_000
                   ? 'rgba(245,158,11,0.1)'
                   : 'rgba(242,103,34,0.08)',
                 border: '1.5px solid',
                 borderColor: creditBalance !== null && creditBalance <= 0
                   ? '#EF4444'
-                  : creditBalance !== null && creditBalance < 50_000
+                  : creditBalance !== null && creditBalance < 30_000
                   ? '#F59E0B'
                   : '#F26722',
                 textDecoration: 'none',
-                transition: 'all 0.2s',
               }}
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-                stroke={creditBalance !== null && creditBalance <= 0 ? '#EF4444' : creditBalance !== null && creditBalance < 50_000 ? '#F59E0B' : '#F26722'}
-                strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/>
-                <path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
-                <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
-              </svg>
               <span style={{
-                fontSize: 12, fontWeight: 700,
+                fontSize: 11, fontWeight: 700,
                 color: creditBalance !== null && creditBalance <= 0 ? '#EF4444'
-                  : creditBalance !== null && creditBalance < 50_000 ? '#F59E0B'
+                  : creditBalance !== null && creditBalance < 30_000 ? '#F59E0B'
                   : '#F26722',
               }}>
                 {creditBalance === null
                   ? '…'
                   : creditBalance <= 0
                   ? '残高0'
-                  : `${formatTokens(creditBalance)}トークン`}
+                  : `${formatTokens(creditBalance)}`}
               </span>
             </Link>
+
             <button
               onClick={handleLogout}
               className="text-xs font-medium px-3 py-1.5 rounded-full transition hover:bg-red-50"
