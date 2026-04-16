@@ -73,6 +73,28 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "AI名刺",
+  "url": BASE_URL,
+  "description": "名刺のQRコードをスキャンするだけで分身AIが24時間365日顧客対応。月額¥480から使えるAI名刺サービス。",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "JPY",
+    "description": "フリープラン無料。有料プランは月額¥480から。"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "スマイルテックエージェント",
+    "url": BASE_URL,
+    "email": "admin@aimeishi.biz"
+  }
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -80,6 +102,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" className={`${geistSans.variable} antialiased`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body>{children}</body>
     </html>
   );
