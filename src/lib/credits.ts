@@ -45,13 +45,13 @@ export type CreditPackage = {
 export const CREDIT_PACKAGES: CreditPackage[] = [
   {
     id:       'starter',
-    name:     'スターター',
+    name:     'S',
     priceJpy: 500,
     tokens:   280_000,          // 28万トークン
   },
   {
     id:       'standard',
-    name:     'スタンダード',
+    name:     'M',
     priceJpy: 1_000,
     tokens:   620_000,          // 62万トークン (+10%ボーナス)
     bonusLabel: '+10%',
@@ -59,14 +59,14 @@ export const CREDIT_PACKAGES: CreditPackage[] = [
   },
   {
     id:       'pro',
-    name:     'プロ',
+    name:     'L',
     priceJpy: 3_000,
     tokens:   2_000_000,        // 200万トークン (+19%ボーナス)
     bonusLabel: '+19%',
   },
   {
     id:       'business',
-    name:     'ビジネス',
+    name:     'LL',
     priceJpy: 5_000,
     tokens:   3_600_000,        // 360万トークン (+28%ボーナス)
     bonusLabel: '+28%',
