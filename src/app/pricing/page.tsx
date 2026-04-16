@@ -97,6 +97,28 @@ function PricingContent() {
           </div>
         )}
 
+        {/* 解約済みバナー（目立つ位置に） */}
+        {!loading && planInfo && currentPlan !== 'free' && planInfo.cancelAtPeriodEnd && (
+          <div style={{ background: '#FEF2F2', border: '1.5px solid #FECACA', borderRadius: 14, padding: '14px 18px', marginTop: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: '#DC2626', marginBottom: 4 }}>🚫 解約済み</div>
+              <div style={{ fontSize: 13, color: '#4A2C1A', lineHeight: 1.6 }}>
+                {planInfo.currentPeriodEnd
+                  ? <><strong>{new Date(planInfo.currentPeriodEnd).toLocaleDateString('ja-JP')}</strong>まで{PLANS[currentPlan].name}プランが使えます。それ以降はフリープランに戻ります。</>
+                  : <>現在の契約期間終了後、フリープランに戻ります。</>
+                }
+              </div>
+            </div>
+            <button
+              onClick={handlePortal}
+              disabled={!!processing}
+              style={{ padding: '8px 16px', borderRadius: 99, fontSize: 13, fontWeight: 700, background: '#F26722', color: '#fff', border: 'none', cursor: 'pointer', opacity: processing ? 0.6 : 1, whiteSpace: 'nowrap', flexShrink: 0 }}
+            >
+              {processing === 'portal' ? '…' : '解約を取り消す'}
+            </button>
+          </div>
+        )}
+
         {/* 現在のプランステータス */}
         {!loading && planInfo && (
           <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #EDD9C8', padding: '16px 20px', marginTop: 20 }}>
@@ -104,10 +126,12 @@ function PricingContent() {
               <div>
                 <div style={{ fontSize: 11, color: '#A08068', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>現在のプラン</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 18, fontWeight: 800, color: PLAN_COLORS[currentPlan].text }}>{PLANS[currentPlan].name}</span>
-                  {planInfo.cancelAtPeriodEnd && planInfo.currentPeriodEnd && (
+                  <span style={{ fontSize: 18, fontWeight: 800, color: planInfo.cancelAtPeriodEnd ? '#9CA3AF' : PLAN_COLORS[currentPlan].text }}>
+                    {PLANS[currentPlan].name}
+                  </span>
+                  {planInfo.cancelAtPeriodEnd && (
                     <span style={{ fontSize: 11, background: '#FEF2F2', color: '#EF4444', padding: '2px 8px', borderRadius: 99, fontWeight: 700 }}>
-                      {new Date(planInfo.currentPeriodEnd).toLocaleDateString('ja-JP')}に終了予定
+                      解約済み
                     </span>
                   )}
                 </div>
@@ -131,7 +155,7 @@ function PricingContent() {
               </div>
             </div>
 
-            {/* 解約セクション（有料プランのみ） */}
+            {/* 解約ボタン（有料プラン・未解約のみ） */}
             {currentPlan !== 'free' && !planInfo.cancelAtPeriodEnd && (
               <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #F5E8DC' }}>
                 {!showCancelConfirm ? (
@@ -163,22 +187,11 @@ function PricingContent() {
                         onClick={() => setShowCancelConfirm(false)}
                         style={{ padding: '8px 18px', borderRadius: 99, fontSize: 13, fontWeight: 600, background: '#F5E8DC', color: '#4A2C1A', border: 'none', cursor: 'pointer' }}
                       >
-                        キャンセル
+                        やめておく
                       </button>
                     </div>
                   </div>
                 )}
-              </div>
-            )}
-
-            {/* 解約済みの場合のメッセージ */}
-            {currentPlan !== 'free' && planInfo.cancelAtPeriodEnd && planInfo.currentPeriodEnd && (
-              <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #F5E8DC', fontSize: 12, color: '#6B7280' }}>
-                解約済みです。{new Date(planInfo.currentPeriodEnd).toLocaleDateString('ja-JP')}まで利用できます。
-                <button onClick={handlePortal} disabled={!!processing}
-                  style={{ marginLeft: 8, fontSize: 12, color: '#F26722', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>
-                  再開する
-                </button>
               </div>
             )}
           </div>
