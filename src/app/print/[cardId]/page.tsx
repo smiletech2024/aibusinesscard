@@ -13,12 +13,13 @@ import jsPDF from 'jspdf'
 
 type Design = 'executive' | 'midnight' | 'vivid' | 'ocean' | 'forest' | 'crimson' | 'gold' | 'pink'
 type Font   = 'sans' | 'serif' | 'rounded' | 'mono' | 'display' | 'elegant' | 'yumin'
-type Layout = 'standard' | 'centered' | 'split'
+type Layout = 'standard' | 'centered' | 'split' | 'pulse'
 
 const layoutMeta: Record<Layout, { label: string; desc: string }> = {
   standard: { label: 'スタンダード', desc: '左揃え・定番' },
   centered: { label: 'センター',    desc: '中央揃え・洗練' },
   split:    { label: 'スプリット',  desc: 'パネル分割・モダン' },
+  pulse:    { label: 'PULSE',       desc: 'AI前面・生きた名刺' },
 }
 
 /* テーマカラー設定 — レイアウト共通コンポーネントに渡す */
@@ -959,6 +960,176 @@ function SplitFront({ card, qrUrl, fontFamily, logoUrl, logoX = SPLIT_X + 18, lo
   )
 }
 
+/* ══════════════════════════════════════════════════════════
+   PULSE — QR主役 × EKG鼓動 × AI LIVE（全テーマ共通・常時ダーク）
+══════════════════════════════════════════════════════════ */
+// EKG心拍パス（viewBox 0 0 220 20）
+const EKG_PATH = 'M 0 10 L 22 10 L 28 10 L 34 5 L 40 15 L 46 1 L 52 19 L 58 10 L 64 10 L 220 10'
+
+function PulseFront({ card, qrUrl, fontFamily, logoUrl, logoX = 238, logoY = 13, tc }: {
+  card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number; tc: TC
+}) {
+  const { accent } = tc
+  return (
+    <div className="print-card" style={{ width: W, height: H, background: '#060614', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
+
+      {/* ── 背景グリッド ── */}
+      {[...Array(12)].map((_, i) => (
+        <div key={`v${i}`} style={{ position: 'absolute', left: i * 47, top: 0, bottom: 0, width: 1, background: 'rgba(255,255,255,0.022)' }} />
+      ))}
+      {[...Array(8)].map((_, i) => (
+        <div key={`h${i}`} style={{ position: 'absolute', top: i * 48, left: 0, right: 0, height: 1, background: 'rgba(255,255,255,0.022)' }} />
+      ))}
+
+      {/* ── 左グロー ── */}
+      <div style={{ position: 'absolute', left: -40, top: '50%', transform: 'translateY(-50%)', width: 300, height: 300, borderRadius: '50%', background: `radial-gradient(circle, ${accent}28 0%, transparent 65%)`, pointerEvents: 'none' }} />
+
+      {/* ── TOP バー ── */}
+      {/* AI LIVE バッジ */}
+      <div style={{ position: 'absolute', top: 14, left: 20, display: 'flex', alignItems: 'center', gap: 5 }}>
+        <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80', boxShadow: '0 0 8px #4ADE8088' }} />
+        <span style={{ fontSize: 7.5, color: 'rgba(255,255,255,0.45)', fontWeight: 800, letterSpacing: '0.16em' }}>AI LIVE</span>
+      </div>
+      {/* 会社名 */}
+      {card.company && (
+        <div style={{ position: 'absolute', top: 13, right: 18 }}>
+          <span style={{ fontSize: 7.5, color: accent, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase' as const, opacity: 0.9 }}>{card.company}</span>
+        </div>
+      )}
+
+      {/* ── 左ゾーン: QRコード（主役） ── */}
+      <div style={{ position: 'absolute', left: 16, top: 0, bottom: 0, width: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+        {/* QR グロー台座 */}
+        <div style={{ position: 'relative' }}>
+          <div style={{ position: 'absolute', inset: -12, borderRadius: 22, background: `radial-gradient(circle, ${accent}20 0%, transparent 72%)`, pointerEvents: 'none' }} />
+          <div style={{
+            background: 'white', padding: 7, borderRadius: 14, position: 'relative',
+            boxShadow: `0 0 0 1px ${accent}50, 0 0 24px ${accent}35, 0 8px 32px rgba(0,0,0,0.5)`,
+          }}>
+            <QRCodeSVG url={qrUrl} size={128} style={{ borderRadius: 6 }} />
+          </div>
+        </div>
+        {/* SCAN CTA */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <span style={{ fontSize: 7.5, color: accent, fontWeight: 900, letterSpacing: '0.14em' }}>SCAN</span>
+          <svg width="14" height="8" viewBox="0 0 14 8" fill="none">
+            <path d="M0 4h12M9 1l3 3-3 3" stroke={accent} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span style={{ fontSize: 7.5, color: 'rgba(255,255,255,0.4)', fontWeight: 600, letterSpacing: '0.06em' }}>分身AIと対話</span>
+        </div>
+      </div>
+
+      {/* ── 縦分割線 ── */}
+      <div style={{ position: 'absolute', left: 222, top: 20, bottom: 20, width: 1, background: `linear-gradient(180deg, transparent, ${accent}70 30%, ${accent}70 70%, transparent)` }} />
+
+      {/* ── 右ゾーン: 名前・連絡先 ── */}
+      <div style={{ position: 'absolute', left: 236, right: 18, top: 0, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        {/* 氏名 */}
+        <h2 style={{ fontSize: 26, fontWeight: 900, color: '#FFFFFF', margin: '0 0 5px', lineHeight: 1.05, letterSpacing: '-0.025em' }}>{card.full_name}</h2>
+        {/* 役職 */}
+        {card.title && (
+          <p style={{ fontSize: 10.5, color: accent, fontWeight: 700, margin: '0 0 16px', letterSpacing: '0.02em' }}>{card.title}</p>
+        )}
+        {/* EKG 鼓動ライン */}
+        <div style={{ marginBottom: 14, overflow: 'visible' }}>
+          <svg width="220" height="20" viewBox="0 0 220 20" fill="none" style={{ overflow: 'visible' }}>
+            {/* グロー層 */}
+            <path d={EKG_PATH} stroke={accent} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" opacity="0.12"/>
+            {/* メイン線 */}
+            <path d={EKG_PATH} stroke={accent} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.85"/>
+            {/* スパイク頂点のドット */}
+            <circle cx="46" cy="1" r="2" fill={accent} opacity="0.9"/>
+          </svg>
+        </div>
+        {/* 連絡先 */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+          {card.email && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: 'rgba(255,255,255,0.5)', fontSize: 9.5 }}>
+              <span style={{ color: accent, opacity: 0.9 }}><IconMail /></span>{card.email}
+            </div>
+          )}
+          {card.phone && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: 'rgba(255,255,255,0.5)', fontSize: 9.5 }}>
+              <span style={{ color: accent, opacity: 0.9 }}><IconPhone /></span>{card.phone}
+            </div>
+          )}
+          {card.website && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: 'rgba(255,255,255,0.5)', fontSize: 9.5 }}>
+              <span style={{ color: accent, opacity: 0.9 }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── ロゴ ── */}
+      {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 20, maxWidth: 76, objectFit: 'contain', objectPosition: 'left', filter: 'brightness(0) invert(1)', opacity: 0.55, pointerEvents: 'none' }} />}
+
+      {/* ── 下ボーダー ── */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${accent}90, ${accent}, ${accent}90, transparent)` }} />
+    </div>
+  )
+}
+
+function PulseBack({ card, fontFamily, tc }: { card: BusinessCard; fontFamily?: string; tc: TC }) {
+  const { accent } = tc
+  return (
+    <div className="print-card" style={{ width: W, height: H, background: '#060614', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
+      {/* 背景グリッド */}
+      {[...Array(12)].map((_, i) => (
+        <div key={`v${i}`} style={{ position: 'absolute', left: i * 47, top: 0, bottom: 0, width: 1, background: 'rgba(255,255,255,0.018)' }} />
+      ))}
+      {[...Array(8)].map((_, i) => (
+        <div key={`h${i}`} style={{ position: 'absolute', top: i * 48, left: 0, right: 0, height: 1, background: 'rgba(255,255,255,0.018)' }} />
+      ))}
+      {/* センターグロー */}
+      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 360, height: 260, borderRadius: '50%', background: `radial-gradient(ellipse, ${accent}18 0%, transparent 70%)`, pointerEvents: 'none' }} />
+      {/* 上下ライン */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${accent}80, ${accent}, ${accent}80, transparent)` }} />
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${accent}80, ${accent}, ${accent}80, transparent)` }} />
+
+      {/* 本文 */}
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 48px', textAlign: 'center' }}>
+        {/* ブランドロゴ */}
+        <div style={{ marginBottom: 18, filter: `drop-shadow(0 0 12px ${accent}80)` }}>
+          <LogoIcon size={44} />
+        </div>
+        {/* キャッチコピー */}
+        <p style={{ fontSize: 8, color: accent, fontWeight: 800, letterSpacing: '0.2em', margin: '0 0 12px', textTransform: 'uppercase' as const }}>分身AI搭載名刺</p>
+        <h3 style={{ fontSize: 19, fontWeight: 900, color: '#FFFFFF', margin: '0 0 8px', lineHeight: 1.3, letterSpacing: '-0.01em' }}>
+          名刺をスキャンすると<br />私のAIと話せます
+        </h3>
+        {card.short_intro && (
+          <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.4)', margin: '0 0 18px', lineHeight: 1.65, maxWidth: 300 }}>{card.short_intro}</p>
+        )}
+        {/* EKG ライン */}
+        <div style={{ width: '100%', maxWidth: 320, marginBottom: 16 }}>
+          <svg width="100%" height="16" viewBox="0 0 320 16" fill="none" preserveAspectRatio="none">
+            <path d="M 0 8 L 100 8 L 106 8 L 112 4 L 118 12 L 124 1 L 130 15 L 136 8 L 142 8 L 320 8" stroke={accent} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"/>
+            <path d="M 0 8 L 100 8 L 106 8 L 112 4 L 118 12 L 124 1 L 130 15 L 136 8 L 142 8 L 320 8" stroke={accent} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" opacity="0.1"/>
+            <circle cx="124" cy="1" r="2" fill={accent} opacity="0.85"/>
+          </svg>
+        </div>
+        {/* AI LIVE バッジ */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: `${accent}18`, borderRadius: 20, padding: '6px 14px', border: `1px solid ${accent}35` }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80', boxShadow: '0 0 8px #4ADE8088', flexShrink: 0 }} />
+          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.7)', fontWeight: 700, letterSpacing: '0.06em' }}>24時間 / 365日 / オンライン待機中</span>
+        </div>
+      </div>
+
+      {/* ブランドロゴ */}
+      <div style={{ position: 'absolute', bottom: 14, right: 20 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <LogoIcon size={16} />
+          <div>
+            <div style={{ fontSize: 9, fontWeight: 900, color: accent, letterSpacing: '-0.01em', lineHeight: 1 }}>AI名刺</div>
+            <div style={{ fontSize: 6, color: 'rgba(255,255,255,0.3)', fontWeight: 600, letterSpacing: '0.08em', marginTop: 1 }}>次世代名刺</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ══════════════════════════════════════════
    カードプレビュー（レスポンシブ対応）
 ══════════════════════════════════════════ */
@@ -1258,26 +1429,30 @@ export default function PrintCardPage() {
     )
   }
 
-  const backMap: Record<Design, React.ComponentType<{ card: BusinessCard; fontFamily?: string }>> = {
+  const standardBackMap: Record<Design, React.ComponentType<{ card: BusinessCard; fontFamily?: string }>> = {
     executive: ExecutiveBack, midnight: MidnightBack, vivid: VividBack,
     ocean: OceanBack, forest: ForestBack, crimson: CrimsonBack, gold: GoldBack, pink: PinkBack,
   }
-  const BackComponent = backMap[design]
+  const tc = TC[design]
+  const BackComponent = layout === 'pulse'
+    ? (p: { card: BusinessCard; fontFamily?: string }) => <PulseBack {...p} tc={tc} />
+    : standardBackMap[design]
 
   // レイアウト × カラー でフロントコンポーネントを決定
   const standardMap: Record<Design, React.ComponentType<{ card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }>> = {
     executive: ExecutiveFront, midnight: MidnightFront, vivid: VividFront,
     ocean: OceanFront, forest: ForestFront, crimson: CrimsonFront, gold: GoldFront, pink: PinkFront,
   }
-  const tc = TC[design]
   const FrontComponent = layout === 'standard'
     ? standardMap[design]
-    : (layout === 'centered'
+    : layout === 'centered'
+      ? (p: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) =>
+          <CenteredFront {...p} tc={tc} />
+      : layout === 'split'
         ? (p: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) =>
-            <CenteredFront {...p} tc={tc} />
-        : (p: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) =>
             <SplitFront {...p} tc={tc} />
-      )
+        : (p: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) =>
+            <PulseFront {...p} tc={tc} />
 
   const currentFontFamily = fontMeta[font].family
 
@@ -1428,6 +1603,23 @@ export default function PrintCardPage() {
                       <line x1="11" y1="4.5" x2="19" y2="4.5" stroke={layout === key ? 'rgba(255,255,255,0.4)' : '#C4A882'} strokeWidth="1.2" strokeLinecap="round"/>
                       <line x1="11" y1="7" x2="18" y2="7" stroke={layout === key ? 'rgba(255,255,255,0.25)' : '#D4B894'} strokeWidth="1" strokeLinecap="round"/>
                       <line x1="11" y1="9.5" x2="17" y2="9.5" stroke={layout === key ? 'rgba(255,255,255,0.25)' : '#D4B894'} strokeWidth="1" strokeLinecap="round"/>
+                    </svg>
+                  )}
+                  {key === 'pulse' && (
+                    <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
+                      {/* 暗背景 */}
+                      <rect x="1" y="1" width="20" height="12" rx="1.5" fill={layout === key ? '#1a1a3a' : '#1C1C2E'} stroke={layout === key ? 'rgba(255,255,255,0.3)' : '#3A3A5C'} strokeWidth="0.8"/>
+                      {/* QR枠（左） */}
+                      <rect x="2.5" y="2.5" width="7" height="9" rx="1" fill="none" stroke={layout === key ? '#F26722' : '#6060A0'} strokeWidth="0.9"/>
+                      <rect x="4" y="4" width="2" height="2" rx="0.3" fill={layout === key ? '#F26722' : '#6060A0'} opacity="0.7"/>
+                      <rect x="4" y="8" width="2" height="2" rx="0.3" fill={layout === key ? '#F26722' : '#6060A0'} opacity="0.7"/>
+                      <rect x="6.5" y="4" width="2" height="2" rx="0.3" fill={layout === key ? '#F26722' : '#6060A0'} opacity="0.7"/>
+                      {/* 縦線 */}
+                      <line x1="11" y1="2" x2="11" y2="12" stroke={layout === key ? 'rgba(242,103,34,0.5)' : 'rgba(100,100,180,0.4)'} strokeWidth="0.6"/>
+                      {/* EKGライン */}
+                      <path d="M 12 7 L 14 7 L 15 5.5 L 16 8.5 L 17 4.5 L 18 9.5 L 19 7 L 21 7" stroke={layout === key ? '#F26722' : '#8080C0'} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" opacity="0.9"/>
+                      {/* スパイク頂点ドット */}
+                      <circle cx="17" cy="4.5" r="0.9" fill={layout === key ? '#F26722' : '#8080C0'} opacity="0.9"/>
                     </svg>
                   )}
                   <span style={{ fontSize: 9 }}>{meta.label}</span>
