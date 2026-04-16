@@ -12,13 +12,13 @@ interface CardData {
 }
 
 const cardFields = [
-  { key: 'full_name',   label: '氏名',     placeholder: '山田 太郎',                  required: true },
-  { key: 'title',       label: '肩書き',   placeholder: 'マーケティングコンサルタント', required: false },
-  { key: 'company',     label: '会社名',   placeholder: '株式会社 Example',            required: false },
-  { key: 'short_intro', label: '一言紹介', placeholder: 'ROI改善が得意なWebマーケター', required: false },
-  { key: 'email',       label: 'メール',   placeholder: 'you@example.com',             required: false },
-  { key: 'phone',       label: '電話番号', placeholder: '090-xxxx-xxxx',               required: false },
-  { key: 'website',     label: 'Web',      placeholder: 'https://yoursite.com',        required: false },
+  { key: 'full_name',   label: '氏名',     placeholder: '山田 太郎',                  required: true,  multiline: false },
+  { key: 'title',       label: '肩書き',   placeholder: 'マーケティングコンサルタント', required: false, multiline: false },
+  { key: 'company',     label: '会社名',   placeholder: '株式会社 Example',            required: false, multiline: false },
+  { key: 'short_intro', label: '自己紹介', placeholder: '例）Webマーケティング歴10年。ROI改善・新規顧客開拓を得意とし、累計50社以上の支援実績があります。お気軽にご相談ください！', required: false, multiline: true },
+  { key: 'email',       label: 'メール',   placeholder: 'you@example.com',             required: false, multiline: false },
+  { key: 'phone',       label: '電話番号', placeholder: '090-xxxx-xxxx',               required: false, multiline: false },
+  { key: 'website',     label: 'Web',      placeholder: 'https://yoursite.com',        required: false, multiline: false },
 ]
 
 export default function EditCardPage() {
@@ -114,33 +114,59 @@ export default function EditCardPage() {
 
       <div className="max-w-lg mx-auto px-4 py-6">
         <div className="card p-6 space-y-4">
-          {cardFields.map(({ key, label, placeholder, required }) => (
+          {cardFields.map(({ key, label, placeholder, required, multiline }) => (
             <div key={key}>
               <label className="block text-sm font-semibold mb-1.5" style={{ color: '#4A2C1A' }}>
                 {label}{required && <span style={{ color: '#EF4444', marginLeft: 4 }}>*</span>}
               </label>
-              <input
-                type={key === 'email' ? 'email' : 'text'}
-                value={cardData[key as keyof CardData]}
-                onChange={e => setCardData(p => ({ ...p, [key]: e.target.value }))}
-                placeholder={placeholder}
-                style={{
-                  width: '100%', padding: '11px 14px', fontSize: 14,
-                  border: '1.5px solid #DEC4AD', borderRadius: 10,
-                  background: '#FAF5F0', color: '#1C0F05', outline: 'none',
-                  boxSizing: 'border-box',
-                }}
-                onFocus={e => {
-                  e.target.style.borderColor = '#F26722'
-                  e.target.style.background = '#fff'
-                  e.target.style.boxShadow = '0 0 0 3px rgba(242,103,34,0.12)'
-                }}
-                onBlur={e => {
-                  e.target.style.borderColor = '#DEC4AD'
-                  e.target.style.background = '#FAF5F0'
-                  e.target.style.boxShadow = 'none'
-                }}
-              />
+              {multiline ? (
+                <textarea
+                  value={cardData[key as keyof CardData]}
+                  onChange={e => setCardData(p => ({ ...p, [key]: e.target.value }))}
+                  placeholder={placeholder}
+                  rows={4}
+                  style={{
+                    width: '100%', padding: '11px 14px', fontSize: 14,
+                    border: '1.5px solid #DEC4AD', borderRadius: 10,
+                    background: '#FAF5F0', color: '#1C0F05', outline: 'none',
+                    boxSizing: 'border-box', resize: 'vertical',
+                    fontFamily: 'inherit', lineHeight: 1.7,
+                  }}
+                  onFocus={e => {
+                    e.target.style.borderColor = '#F26722'
+                    e.target.style.background = '#fff'
+                    e.target.style.boxShadow = '0 0 0 3px rgba(242,103,34,0.12)'
+                  }}
+                  onBlur={e => {
+                    e.target.style.borderColor = '#DEC4AD'
+                    e.target.style.background = '#FAF5F0'
+                    e.target.style.boxShadow = 'none'
+                  }}
+                />
+              ) : (
+                <input
+                  type={key === 'email' ? 'email' : 'text'}
+                  value={cardData[key as keyof CardData]}
+                  onChange={e => setCardData(p => ({ ...p, [key]: e.target.value }))}
+                  placeholder={placeholder}
+                  style={{
+                    width: '100%', padding: '11px 14px', fontSize: 14,
+                    border: '1.5px solid #DEC4AD', borderRadius: 10,
+                    background: '#FAF5F0', color: '#1C0F05', outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={e => {
+                    e.target.style.borderColor = '#F26722'
+                    e.target.style.background = '#fff'
+                    e.target.style.boxShadow = '0 0 0 3px rgba(242,103,34,0.12)'
+                  }}
+                  onBlur={e => {
+                    e.target.style.borderColor = '#DEC4AD'
+                    e.target.style.background = '#FAF5F0'
+                    e.target.style.boxShadow = 'none'
+                  }}
+                />
+              )}
             </div>
           ))}
 
