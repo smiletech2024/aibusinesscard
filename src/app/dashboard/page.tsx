@@ -48,8 +48,10 @@ export default function DashboardPage() {
   const [deleteSessionConfirm, setDeleteSessionConfirm] = useState<{ id: string; name: string } | null>(null)
   const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null)
   const [notifications, setNotifications] = useState<{ id: string; customerName: string; sessionId: string }[]>([])
-  const [creditBalance, setCreditBalance] = useState<number | null>(null)
-  const [currentPlan, setCurrentPlan]     = useState<PlanId>('free')
+  const [creditBalance, setCreditBalance]         = useState<number | null>(null)
+  const [currentPlan, setCurrentPlan]             = useState<PlanId>('free')
+  const [monthlySessionCount, setMonthlySessionCount] = useState(0)
+  const [maxSessions, setMaxSessions]             = useState(-1)
   const personaIdsRef = useRef<string[]>([])
   const supabase = createClient()
 
@@ -61,6 +63,8 @@ export default function DashboardPage() {
         if (d) {
           setCreditBalance((d.subBalance ?? 0) + (d.purchasedBalance ?? 0))
           setCurrentPlan(d.plan ?? 'free')
+          setMonthlySessionCount(d.monthlySessionCount ?? 0)
+          setMaxSessions(d.maxSessionsPerMonth ?? -1)
         }
       })
       .catch(() => {})
@@ -497,6 +501,30 @@ export default function DashboardPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* フリープランの対話上限バナー */}
+      {maxSessions !== -1 && monthlySessionCount >= maxSessions && (
+        <div style={{ background: '#FEF2F2', borderBottom: '1px solid #FECACA', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 18 }}>🚨</span>
+            <div>
+              <div style={{ fontWeight: 800, fontSize: 13, color: '#991B1B' }}>今月のAI対話（{maxSessions}件）に達しました</div>
+              <div style={{ fontSize: 12, color: '#B91C1C' }}>新しい顧客がQRを読んでもAIが応答できない状態です</div>
+            </div>
+          </div>
+          <Link href="/pricing" style={{ background: '#EF4444', color: '#fff', fontSize: 12, fontWeight: 700, padding: '8px 16px', borderRadius: 99, textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            今すぐアップグレード →
+          </Link>
+        </div>
+      )}
+      {maxSessions !== -1 && monthlySessionCount === maxSessions - 1 && (
+        <div style={{ background: '#FFFBEB', borderBottom: '1px solid #FDE68A', padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ fontSize: 12, color: '#92400E' }}>
+            ⚠️ 今月の対話残り<strong>1件</strong>です（{monthlySessionCount}/{maxSessions}件使用）
+          </div>
+          <Link href="/pricing" style={{ fontSize: 12, color: '#F59E0B', fontWeight: 700, textDecoration: 'none' }}>アップグレードする →</Link>
         </div>
       )}
 

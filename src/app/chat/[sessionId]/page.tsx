@@ -25,6 +25,7 @@ export default function ChatPage() {
   const [showSummaryPrompt, setShowSummaryPrompt] = useState(false)
   const [pushEnabled, setPushEnabled] = useState(false)
   const [pushAsked, setPushAsked] = useState(false)
+  const [showBranding, setShowBranding] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
@@ -41,6 +42,14 @@ export default function ChatPage() {
       .eq('id', sessionId).single()
     if (!sessionData) return
     setSession(sessionData as CustomerSession)
+    // オーナーのプランに応じてブランド表示を決定
+    const ownerId = (sessionData as CustomerSession & { personas?: { user_id?: string } }).personas?.user_id
+    if (ownerId) {
+      fetch(`/api/plan/branding?userId=${ownerId}`)
+        .then(r => r.ok ? r.json() : null)
+        .then(d => { if (d) setShowBranding(d.showBranding) })
+        .catch(() => {})
+    }
     const res = await fetch(`/api/conversations?sessionId=${sessionId}`)
     const json = await res.json()
     const convs: AiConversation[] = json.conversations ?? []
@@ -371,6 +380,31 @@ export default function ChatPage() {
           </button>
         </div>
       </div>}
+
+      {/* ブランドウォーターマーク（フリープランのみ表示）*/}
+      {showBranding && (
+        <div style={{
+          textAlign: 'center', padding: '6px 0 10px',
+          background: '#09081A',
+          borderTop: '1px solid rgba(255,255,255,0.04)',
+        }}>
+          <a
+            href="https://ai-meishi.jp"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              fontSize: 10, color: 'rgba(160,128,104,0.5)',
+              textDecoration: 'none', letterSpacing: '0.05em',
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+            }}
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5 }}>
+              <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+            </svg>
+            Powered by AI名刺
+          </a>
+        </div>
+      )}
     </div>
   )
 }

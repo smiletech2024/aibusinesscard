@@ -15,49 +15,59 @@ export async function GET() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  // サブスクリプション情報を取得
-  const { data: sub } = await admin
-    .from('user_subscriptions')
-    .select('*')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  // トークン残高を取得
-  const { data: credits } = await admin
-    .from('user_credits')
-    .select('balance, sub_balance, total_used')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  // 名刺・ペルソナ数を取得
-  const [{ count: cardCount }, { count: personaCount }] = await Promise.all([
-    admin.from('business_cards').select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id).eq('is_active', true),
-    admin.from('personas').select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id).eq('is_active', true),
+  const [subResult, creditsResult, cardResult, personaResult] = await Promise.all([
+    admin.from('user_subscriptions').select('*').eq('user_id', user.id).maybeSingle(),
+    admin.from('user_credits').select('balance, sub_balance, total_used').eq('user_id', user.id).maybeSingle(),
+    admin.from('business_cards').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_active', true),
+    admin.from('personas').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_active', true),
   ])
 
-  const planId = (sub?.plan ?? 'free') as PlanId
+  // 今月のセッション数（ペルソナ経由でカウント）
+  const { data: personaIds } = await admin
+    .from('personas')
+    .select('id')
+    .eq('user_id', user.id)
+
+  let monthlySessionCount = 0
+  if (personaIds && personaIds.length > 0) {
+    const startOfMonth = new Date()
+    startOfMonth.setDate(1)
+    startOfMonth.setHours(0, 0, 0, 0)
+
+    const { count } = await admin
+      .from('customer_sessions')
+      .select('*', { count: 'exact', head: true })
+      .in('persona_id', personaIds.map(p => p.id))
+      .gte('created_at', startOfMonth.toISOString())
+
+    monthlySessionCount = count ?? 0
+  }
+
+  const planId = (subResult.data?.plan ?? 'free') as PlanId
   const plan   = PLANS[planId]
 
   return NextResponse.json({
     plan:               planId,
     planName:           plan.name,
-    status:             sub?.status ?? 'active',
-    cancelAtPeriodEnd:  sub?.cancel_at_period_end ?? false,
-    currentPeriodEnd:   sub?.current_period_end ?? null,
+    status:             subResult.data?.status ?? 'active',
+    cancelAtPeriodEnd:  subResult.data?.cancel_at_period_end ?? false,
+    currentPeriodEnd:   subResult.data?.current_period_end ?? null,
     // トークン
-    subBalance:         credits?.sub_balance    ?? 0,
-    purchasedBalance:   credits?.balance        ?? 0,
-    totalBalance:       (credits?.sub_balance ?? 0) + (credits?.balance ?? 0),
-    totalUsed:          credits?.total_used     ?? 0,
+    subBalance:         creditsResult.data?.sub_balance    ?? 0,
+    purchasedBalance:   creditsResult.data?.balance        ?? 0,
+    totalBalance:       (creditsResult.data?.sub_balance ?? 0) + (creditsResult.data?.balance ?? 0),
+    totalUsed:          creditsResult.data?.total_used     ?? 0,
     // 使用量
-    cardCount:          cardCount  ?? 0,
-    personaCount:       personaCount ?? 0,
+    cardCount:          cardResult.count  ?? 0,
+    personaCount:       personaResult.count ?? 0,
+    monthlySessionCount,
     // プラン制限
     maxCards:           plan.maxCards,
     maxPersonas:        plan.maxPersonas,
+    maxSessionsPerMonth: plan.maxSessionsPerMonth,
     monthlyTokens:      plan.monthlyTokens,
+    showBranding:       plan.showBranding,
+    analysisHistoryLimit: plan.analysisHistoryLimit,
     features:           plan.features,
   })
 }
