@@ -27,11 +27,16 @@ function ConfirmContent() {
       if (error) {
         console.error('[confirm]', error)
         setStatus('error')
-        setMessage('リンクが無効または期限切れです。再度登録をお試しください。')
+        setMessage('リンクが無効または期限切れです。再度お試しください。')
       } else {
         setStatus('success')
-        setMessage('メールアドレスの確認が完了しました！')
-        setTimeout(() => router.push('/dashboard'), 2500)
+        if (type === 'recovery') {
+          setMessage('本人確認が完了しました。新しいパスワードを設定してください。')
+          setTimeout(() => router.push('/auth/update-password'), 1500)
+        } else {
+          setMessage('メールアドレスの確認が完了しました！')
+          setTimeout(() => router.push('/dashboard'), 2500)
+        }
       }
     }
 

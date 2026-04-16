@@ -190,13 +190,19 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div style={{ marginTop: 24, textAlign: 'center' }}>
+          <div style={{ marginTop: 24, textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 12 }}>
             <button
               onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage('') }}
               style={{ fontSize: 14, fontWeight: 600, color: '#F26722', background: 'none', border: 'none', cursor: 'pointer' }}
             >
               {isSignUp ? 'すでにアカウントをお持ちの方はこちら →' : 'アカウントをお持ちでない方 →'}
             </button>
+            {!isSignUp && (
+              <Link href="/auth/reset-password"
+                style={{ fontSize: 13, color: '#A08068', textDecoration: 'none' }}>
+                パスワードを忘れた方はこちら
+              </Link>
+            )}
           </div>
         </div>
       </div>
