@@ -11,8 +11,8 @@ export default function LegalLayout({ title, children }: Props) {
       {/* ヘッダー */}
       <div style={{ background: 'linear-gradient(135deg,#C4511A,#F26722)', padding: '20px 20px 32px' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
-          <Link href="/" style={{ color: 'rgba(255,255,255,0.75)', fontSize: 13, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4, marginBottom: 12 }}>
-            ← トップへ戻る
+          <Link href="/dashboard" style={{ color: 'rgba(255,255,255,0.75)', fontSize: 13, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4, marginBottom: 12 }}>
+            ← ダッシュボードへ戻る
           </Link>
           <h1 style={{ fontSize: 22, fontWeight: 900, color: '#fff', margin: 0 }}>{title}</h1>
         </div>
