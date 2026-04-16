@@ -133,11 +133,10 @@ export default function ChatPage() {
   const ownerName    = session?.business_cards?.full_name || '担当者'
   const ownerCard    = session?.business_cards ?? null
   const ownerInitial = ownerName[0] || '?'
-  const [profileExpanded, setProfileExpanded] = useState(false)
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#09081A' }}>
-      {/* Header */}
+      {/* Header — シンプルなスティッキーバー */}
       <div
         className="sticky top-0 z-10"
         style={{
@@ -146,30 +145,26 @@ export default function ChatPage() {
           boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
         }}
       >
-        <div className="max-w-2xl mx-auto px-4 py-3.5 flex items-center gap-3">
-          {/* アバター（タップでプロフィール展開） */}
-          <button
-            onClick={() => setProfileExpanded(v => !v)}
+        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
+          <div
             style={{
-              width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+              width: 34, height: 34, borderRadius: 10, flexShrink: 0,
               background: 'linear-gradient(135deg, #E05A18, #F5843A)',
-              border: '2px solid rgba(242,103,34,0.4)',
-              boxShadow: '0 0 12px rgba(242,103,34,0.3)',
-              overflow: 'hidden', cursor: 'pointer', padding: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'white', fontWeight: 900, fontSize: 15,
+              color: 'white', fontWeight: 900, fontSize: 13,
+              boxShadow: '0 0 10px rgba(242,103,34,0.3)',
             }}
           >
             {ownerInitial}
-          </button>
+          </div>
           <div className="flex-1 min-w-0">
-            <h1 className="font-bold text-sm leading-tight" style={{ color: '#FFF0E8' }}>
+            <h1 className="font-bold text-sm leading-tight truncate" style={{ color: '#FFF0E8' }}>
               {ownerName}の分身AI
             </h1>
             <div className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#34D399' }} />
               <p className="text-xs truncate" style={{ color: '#6B4030' }}>
-                {ownerCard?.title ? `${ownerCard.title}` : '本人監修のAI'}{ownerCard?.company ? ` · ${ownerCard.company}` : ''}
+                {ownerCard?.title || '本人監修のAI'}{ownerCard?.company ? ` · ${ownerCard.company}` : ''}
               </p>
             </div>
           </div>
@@ -177,7 +172,7 @@ export default function ChatPage() {
             <button
               onClick={createSummary}
               disabled={summarizing}
-              className="text-xs font-bold px-3 py-1.5 rounded-full flex-shrink-0 transition"
+              className="text-xs font-bold px-3 py-1.5 rounded-full flex-shrink-0"
               style={{
                 background: 'rgba(242,103,34,0.15)',
                 color: '#F59340',
@@ -189,75 +184,71 @@ export default function ChatPage() {
             </button>
           )}
         </div>
+      </div>
 
-        {/* プロフィール展開パネル */}
-        {profileExpanded && ownerCard && (
-          <div
-            style={{
-              borderTop: '1px solid rgba(242,103,34,0.1)',
-              background: '#130F22',
-              padding: '14px 16px 16px',
-            }}
-          >
-            <div className="max-w-2xl mx-auto flex gap-4 items-start">
-              {/* アバター大 */}
+      {/* メッセージ */}
+      <div className="flex-1 overflow-y-auto px-4 pt-5 pb-4 space-y-4 max-w-2xl mx-auto w-full">
+
+        {/* ── プロフィールカード（常時表示・スクロールで流れる） ── */}
+        {ownerCard && (
+          <div style={{
+            background: '#0F0E20',
+            border: '1px solid rgba(242,103,34,0.2)',
+            borderRadius: 16,
+            padding: '16px',
+            marginBottom: 4,
+          }}>
+            <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+              {/* アバター */}
               <div style={{
-                width: 56, height: 56, borderRadius: 14, flexShrink: 0,
+                width: 52, height: 52, borderRadius: 14, flexShrink: 0,
                 background: 'linear-gradient(135deg, #E05A18, #F5843A)',
-                border: '2px solid rgba(242,103,34,0.3)',
+                border: '2px solid rgba(242,103,34,0.35)',
+                boxShadow: '0 0 18px rgba(242,103,34,0.2)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'white', fontWeight: 900, fontSize: 22,
+                color: 'white', fontWeight: 900, fontSize: 20,
               }}>
                 {ownerInitial}
               </div>
               {/* テキスト */}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ color: '#FFF0E8', fontWeight: 800, fontSize: 16, lineHeight: 1.3 }}>{ownerName}</div>
+                <div style={{ color: '#FFF0E8', fontWeight: 800, fontSize: 16 }}>{ownerName}</div>
                 {ownerCard.title && (
                   <div style={{ color: '#F5843A', fontSize: 12, fontWeight: 600, marginTop: 2 }}>{ownerCard.title}</div>
                 )}
                 {ownerCard.company && (
                   <div style={{ color: '#A08068', fontSize: 12, marginTop: 1 }}>{ownerCard.company}</div>
                 )}
-                {ownerCard.short_intro && (
-                  <div style={{
-                    marginTop: 8, color: '#A08068', fontSize: 12, lineHeight: 1.7,
-                    background: 'rgba(242,103,34,0.06)', borderLeft: '2px solid rgba(242,103,34,0.4)',
-                    padding: '6px 10px', borderRadius: '0 6px 6px 0',
-                  }}>
-                    {ownerCard.short_intro}
-                  </div>
-                )}
+                {/* オンラインバッジ */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 6 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#34D399', display: 'inline-block' }} />
+                  <span style={{ fontSize: 10, color: '#34D399', fontWeight: 700 }}>分身AI オンライン</span>
+                </div>
               </div>
             </div>
-            <button
-              onClick={() => setProfileExpanded(false)}
-              style={{
-                display: 'block', margin: '10px auto 0', fontSize: 11,
-                color: '#6B4030', background: 'none', border: 'none', cursor: 'pointer',
-              }}
-            >
-              閉じる ▲
-            </button>
+            {/* 自己紹介 */}
+            {ownerCard.short_intro && (
+              <div style={{
+                marginTop: 12,
+                color: '#A08068',
+                fontSize: 12.5,
+                lineHeight: 1.75,
+                background: 'rgba(242,103,34,0.05)',
+                borderLeft: '3px solid rgba(242,103,34,0.4)',
+                padding: '8px 12px',
+                borderRadius: '0 8px 8px 0',
+              }}>
+                {ownerCard.short_intro}
+              </div>
+            )}
+            <div style={{
+              marginTop: 10, fontSize: 11, color: '#3D2517', textAlign: 'center',
+              borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 8,
+            }}>
+              このAIは{ownerName}本人が学習させた分身です
+            </div>
           </div>
         )}
-      </div>
-
-      {/* 注意書き */}
-      <div
-        className="px-4 py-2.5 text-center"
-        style={{
-          background: 'rgba(242,103,34,0.08)',
-          borderBottom: '1px solid rgba(242,103,34,0.2)',
-        }}
-      >
-        <p className="text-xs font-medium" style={{ color: '#A08068' }}>
-          このAIは{ownerName}本人が学習させた分身です。具体的な契約・金額は本人が対応します
-        </p>
-      </div>
-
-      {/* メッセージ */}
-      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-4 max-w-2xl mx-auto w-full">
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-2.5 fade-up ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
