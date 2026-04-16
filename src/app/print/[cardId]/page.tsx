@@ -11,19 +11,27 @@ import QRCode from 'qrcode'
 import { LogoIcon } from '@/components/Logo'
 import jsPDF from 'jspdf'
 
-type Design = 'executive' | 'midnight' | 'vivid'
-type Font   = 'sans' | 'serif' | 'rounded'
+type Design = 'executive' | 'midnight' | 'vivid' | 'ocean' | 'forest' | 'crimson' | 'gold'
+type Font   = 'sans' | 'serif' | 'rounded' | 'mono' | 'display' | 'elegant' | 'yumin'
 
 const designMeta: Record<Design, { label: string; desc: string; preview: string }> = {
-  executive: { label: 'エグゼクティブ', desc: '上質な白 × インディゴ', preview: '#FFFFFF' },
-  midnight:  { label: 'ミッドナイト',   desc: '漆黒 × バイオレット',   preview: '#0D0C2A' },
-  vivid:     { label: 'ビビッド',       desc: 'フルグラデーション',     preview: '#F26722' },
+  executive: { label: '白藍',   desc: '上質な白 × インディゴ',  preview: '#FFFFFF' },
+  midnight:  { label: '黒紫',   desc: '漆黒 × バイオレット',    preview: '#0D0C2A' },
+  vivid:     { label: '炎橙',   desc: 'オレンジグラデ',          preview: '#F26722' },
+  ocean:     { label: '海碧',   desc: '深海ブルー × ティール',  preview: '#0B4F7A' },
+  forest:    { label: '翠緑',   desc: '深森グリーン × エメラルド', preview: '#0F3D2E' },
+  crimson:   { label: '深紅',   desc: 'ディープレッド × ローズ', preview: '#7A0B2A' },
+  gold:      { label: '金黒',   desc: '漆黒 × プレミアムゴールド', preview: '#0A0A0A' },
 }
 
 const fontMeta: Record<Font, { label: string; desc: string; family: string }> = {
-  sans:    { label: 'ゴシック',  desc: '現代的・読みやすい',  family: "'Helvetica Neue', 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif" },
-  serif:   { label: '明朝体',    desc: '格調・クラシック',    family: "'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif" },
-  rounded: { label: '丸ゴシック', desc: '親しみやすい・柔らか', family: "'Hiragino Maru Gothic ProN', 'M PLUS Rounded 1c', 'Rounded Mplus 1c', system-ui, sans-serif" },
+  sans:    { label: 'ゴシック',   desc: '現代的・読みやすい',    family: "'Helvetica Neue', 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif" },
+  serif:   { label: '明朝',       desc: '格調・クラシック',      family: "'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif" },
+  rounded: { label: '丸ゴシ',    desc: '親しみやすい・柔らか',   family: "'Hiragino Maru Gothic ProN', 'M PLUS Rounded 1c', system-ui, sans-serif" },
+  mono:    { label: '等幅',       desc: 'テック・エンジニア',    family: "'SFMono-Regular', 'Menlo', 'Consolas', 'Courier New', monospace" },
+  display: { label: '太字',       desc: '力強い・インパクト',    family: "'Arial Black', 'Impact', 'Hiragino Sans', sans-serif" },
+  elegant: { label: '細身',       desc: '上品・洗練・スリム',    family: "'Optima', 'Candara', 'Century Gothic', 'Gill Sans', sans-serif" },
+  yumin:   { label: '游明朝',     desc: '和の格式・重厚',        family: "'Yu Mincho', 'YuMincho', 'Hiragino Mincho ProN', 'MS PMincho', serif" },
 }
 
 /* ─── SVGアイコン ─── */
@@ -468,6 +476,277 @@ function VividBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: stri
 }
 
 /* ══════════════════════════════════════════
+   OCEAN — 深海ブルー × ティール
+══════════════════════════════════════════ */
+function OceanFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) {
+  return (
+    <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(135deg, #0B2A4A 0%, #0B4F7A 50%, #0D7A7A 100%)', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
+      {/* Wave decorations */}
+      <div style={{ position: 'absolute', top: -60, right: -60, width: 240, height: 240, borderRadius: '50%', background: 'radial-gradient(circle, rgba(13,200,200,0.18) 0%, transparent 70%)' }} />
+      <div style={{ position: 'absolute', bottom: -40, left: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(13,122,122,0.25) 0%, transparent 70%)' }} />
+      {[...Array(10)].map((_, i) => (
+        <div key={i} style={{ position: 'absolute', left: 0, right: 0, top: i * 34, height: 1, background: 'rgba(255,255,255,0.04)' }} />
+      ))}
+      {/* Top cyan line */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg, transparent, #0DD4C8, #7EF2E8, transparent)' }} />
+      {/* User logo */}
+      {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', filter: 'brightness(0) invert(1)', opacity: 0.8, pointerEvents: 'none' }} />}
+      {/* Content */}
+      <div style={{ position: 'absolute', left: 32, top: 30, bottom: 36, right: 120, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div>
+          {card.company && <p style={{ fontSize: 8, color: '#7EF2E8', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 10px' }}>{card.company}</p>}
+          <h2 style={{ fontSize: 28, fontWeight: 900, color: '#FFFFFF', margin: '0 0 6px', lineHeight: 1.05, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
+          {card.title && <p style={{ fontSize: 11, color: '#7EF2E8', fontWeight: 600, margin: 0 }}>{card.title}</p>}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 9.5 }}><span style={{ color: '#7EF2E8' }}><IconMail /></span>{card.email}</div>}
+          {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 9.5 }}><span style={{ color: '#7EF2E8' }}><IconPhone /></span>{card.phone}</div>}
+          {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 9.5 }}><span style={{ color: '#7EF2E8' }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
+        </div>
+      </div>
+      {qrUrl && (
+        <div style={{ position: 'absolute', right: 20, bottom: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
+            <LogoIcon size={12} /><span style={{ fontSize: 7, fontWeight: 800, color: '#7EF2E8', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
+          </div>
+          <div style={{ background: 'white', padding: 5, borderRadius: 10, boxShadow: '0 0 20px rgba(13,212,200,0.4)' }}>
+            <QRCodeSVG url={qrUrl} size={68} />
+          </div>
+          <p style={{ fontSize: 7, color: '#7EF2E8', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンしてAI相談</p>
+        </div>
+      )}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, #0DD4C8, transparent)' }} />
+    </div>
+  )
+}
+function OceanBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: string }) {
+  return (
+    <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(160deg, #071828 0%, #0B2A4A 60%, #0B4F7A 100%)', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
+      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 400, height: 300, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(13,212,200,0.12) 0%, transparent 70%)' }} />
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(126,242,232,0.4), transparent)' }} />
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(126,242,232,0.4), transparent)' }} />
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 40px', textAlign: 'center' }}>
+        <div style={{ marginBottom: 14 }}><LogoIcon size={40} /></div>
+        <p style={{ fontSize: 8, color: '#7EF2E8', fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 10px' }}>分身AI搭載名刺</p>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: '0 0 14px', lineHeight: 1.25 }}>QRをスキャンして<br />分身AIと話してください</h3>
+        {card.short_intro && <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.5)', margin: '0 0 18px', lineHeight: 1.6, maxWidth: 300 }}>{card.short_intro}</p>}
+        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #7EF2E8, transparent)', marginBottom: 16 }} />
+        <div style={{ marginTop: 12 }}><BackBrandLogo /></div>
+      </div>
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════
+   FOREST — 深森グリーン × エメラルド
+══════════════════════════════════════════ */
+function ForestFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) {
+  return (
+    <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(135deg, #0A2A1C 0%, #0F3D2E 50%, #145A3E 100%)', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
+      {/* Nature orbs */}
+      <div style={{ position: 'absolute', top: -50, right: -50, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,211,153,0.15) 0%, transparent 70%)' }} />
+      <div style={{ position: 'absolute', bottom: -30, left: -30, width: 150, height: 150, borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,185,129,0.18) 0%, transparent 70%)' }} />
+      {[...Array(9)].map((_, i) => (
+        <div key={i} style={{ position: 'absolute', left: 0, right: 0, top: i * 38, height: 1, background: 'rgba(255,255,255,0.03)' }} />
+      ))}
+      {/* Top emerald line */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg, transparent, #34D399, #A7F3D0, transparent)' }} />
+      {/* Left accent */}
+      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 5, background: 'linear-gradient(180deg, #34D399, #10B981)' }} />
+      {/* User logo */}
+      {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', filter: 'brightness(0) invert(1)', opacity: 0.8, pointerEvents: 'none' }} />}
+      {/* Content */}
+      <div style={{ position: 'absolute', left: 36, top: 30, bottom: 36, right: 118, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div>
+          {card.company && <p style={{ fontSize: 8, color: '#6EE7B7', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 10px' }}>{card.company}</p>}
+          <h2 style={{ fontSize: 27, fontWeight: 900, color: '#FFFFFF', margin: '0 0 6px', lineHeight: 1.05, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
+          {card.title && <p style={{ fontSize: 11, color: '#6EE7B7', fontWeight: 600, margin: 0 }}>{card.title}</p>}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 9.5 }}><span style={{ color: '#6EE7B7' }}><IconMail /></span>{card.email}</div>}
+          {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 9.5 }}><span style={{ color: '#6EE7B7' }}><IconPhone /></span>{card.phone}</div>}
+          {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 9.5 }}><span style={{ color: '#6EE7B7' }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
+        </div>
+      </div>
+      {qrUrl && (
+        <div style={{ position: 'absolute', right: 20, bottom: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
+            <LogoIcon size={12} /><span style={{ fontSize: 7, fontWeight: 800, color: '#6EE7B7', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
+          </div>
+          <div style={{ background: 'white', padding: 5, borderRadius: 10, boxShadow: '0 0 18px rgba(52,211,153,0.35)' }}>
+            <QRCodeSVG url={qrUrl} size={68} />
+          </div>
+          <p style={{ fontSize: 7, color: '#6EE7B7', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンしてAI相談</p>
+        </div>
+      )}
+      <div style={{ position: 'absolute', bottom: 0, left: 5, right: 0, height: 2, background: 'linear-gradient(90deg, #34D399, #A7F3D0 60%, transparent)' }} />
+    </div>
+  )
+}
+function ForestBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: string }) {
+  return (
+    <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(160deg, #061610 0%, #0A2A1C 60%, #0F3D2E 100%)', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
+      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 380, height: 280, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(52,211,153,0.1) 0%, transparent 70%)' }} />
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(110,231,183,0.4), transparent)' }} />
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(110,231,183,0.4), transparent)' }} />
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 40px', textAlign: 'center' }}>
+        <div style={{ marginBottom: 14 }}><LogoIcon size={40} /></div>
+        <p style={{ fontSize: 8, color: '#6EE7B7', fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 10px' }}>分身AI搭載名刺</p>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: '0 0 14px', lineHeight: 1.25 }}>QRをスキャンして<br />分身AIと話してください</h3>
+        {card.short_intro && <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.5)', margin: '0 0 18px', lineHeight: 1.6, maxWidth: 300 }}>{card.short_intro}</p>}
+        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #6EE7B7, transparent)', marginBottom: 16 }} />
+        <div style={{ marginTop: 12 }}><BackBrandLogo /></div>
+      </div>
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════
+   CRIMSON — ディープレッド × ローズ
+══════════════════════════════════════════ */
+function CrimsonFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) {
+  return (
+    <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(135deg, #3D0010 0%, #7A0B2A 50%, #A01040 100%)', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
+      {/* Rose glow */}
+      <div style={{ position: 'absolute', top: -50, right: -50, width: 220, height: 220, borderRadius: '50%', background: 'radial-gradient(circle, rgba(251,113,133,0.2) 0%, transparent 70%)' }} />
+      <div style={{ position: 'absolute', bottom: -40, left: -40, width: 160, height: 160, borderRadius: '50%', background: 'radial-gradient(circle, rgba(244,63,94,0.18) 0%, transparent 70%)' }} />
+      {[...Array(9)].map((_, i) => (
+        <div key={i} style={{ position: 'absolute', left: 0, right: 0, top: i * 38, height: 1, background: 'rgba(255,255,255,0.04)' }} />
+      ))}
+      {/* Top rose line */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg, transparent, #FB7185, #FECDD3, transparent)' }} />
+      {/* Right accent */}
+      <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 5, background: 'linear-gradient(180deg, #FB7185, #F43F5E)' }} />
+      {/* User logo */}
+      {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', filter: 'brightness(0) invert(1)', opacity: 0.8, pointerEvents: 'none' }} />}
+      {/* Content */}
+      <div style={{ position: 'absolute', left: 32, top: 30, bottom: 36, right: 125, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div>
+          {card.company && <p style={{ fontSize: 8, color: '#FECDD3', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 10px' }}>{card.company}</p>}
+          <h2 style={{ fontSize: 27, fontWeight: 900, color: '#FFFFFF', margin: '0 0 6px', lineHeight: 1.05, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
+          {card.title && <p style={{ fontSize: 11, color: '#FECDD3', fontWeight: 600, margin: 0 }}>{card.title}</p>}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.65)', fontSize: 9.5 }}><span style={{ color: '#FECDD3' }}><IconMail /></span>{card.email}</div>}
+          {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.65)', fontSize: 9.5 }}><span style={{ color: '#FECDD3' }}><IconPhone /></span>{card.phone}</div>}
+          {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.65)', fontSize: 9.5 }}><span style={{ color: '#FECDD3' }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
+        </div>
+      </div>
+      {qrUrl && (
+        <div style={{ position: 'absolute', right: 22, bottom: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
+            <LogoIcon size={12} /><span style={{ fontSize: 7, fontWeight: 800, color: '#FECDD3', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
+          </div>
+          <div style={{ background: 'white', padding: 5, borderRadius: 10, boxShadow: '0 0 18px rgba(244,63,94,0.4)' }}>
+            <QRCodeSVG url={qrUrl} size={68} />
+          </div>
+          <p style={{ fontSize: 7, color: '#FECDD3', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンしてAI相談</p>
+        </div>
+      )}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 5, height: 2, background: 'linear-gradient(90deg, transparent 20%, #FB7185, #FECDD3)' }} />
+    </div>
+  )
+}
+function CrimsonBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: string }) {
+  return (
+    <div className="print-card" style={{ width: W, height: H, background: 'linear-gradient(160deg, #1C0008 0%, #3D0010 60%, #7A0B2A 100%)', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
+      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 380, height: 280, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(244,63,94,0.12) 0%, transparent 70%)' }} />
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(254,205,211,0.4), transparent)' }} />
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(254,205,211,0.4), transparent)' }} />
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 40px', textAlign: 'center' }}>
+        <div style={{ marginBottom: 14 }}><LogoIcon size={40} /></div>
+        <p style={{ fontSize: 8, color: '#FECDD3', fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 10px' }}>分身AI搭載名刺</p>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: '0 0 14px', lineHeight: 1.25 }}>QRをスキャンして<br />分身AIと話してください</h3>
+        {card.short_intro && <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.5)', margin: '0 0 18px', lineHeight: 1.6, maxWidth: 300 }}>{card.short_intro}</p>}
+        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #FECDD3, transparent)', marginBottom: 16 }} />
+        <div style={{ marginTop: 12 }}><BackBrandLogo /></div>
+      </div>
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════
+   GOLD — 漆黒 × プレミアムゴールド
+══════════════════════════════════════════ */
+function GoldFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) {
+  return (
+    <div className="print-card" style={{ width: W, height: H, background: '#0A0A0A', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
+      {/* Gold shimmer */}
+      <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(212,175,55,0.2) 0%, transparent 70%)' }} />
+      <div style={{ position: 'absolute', bottom: -30, left: 100, width: 160, height: 160, borderRadius: '50%', background: 'radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 70%)' }} />
+      {/* Grid lines */}
+      {[...Array(8)].map((_, i) => (
+        <div key={i} style={{ position: 'absolute', left: i * 70, top: 0, bottom: 0, width: 1, background: 'rgba(212,175,55,0.05)' }} />
+      ))}
+      {[...Array(5)].map((_, i) => (
+        <div key={i} style={{ position: 'absolute', top: i * 70, left: 0, right: 0, height: 1, background: 'rgba(212,175,55,0.05)' }} />
+      ))}
+      {/* Gold top border */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, #B8960C, #F0D060, #D4AF37, transparent)' }} />
+      {/* Left gold accent */}
+      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: 'linear-gradient(180deg, #B8960C, #F0D060, #B8960C)' }} />
+      {/* User logo */}
+      {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', filter: 'sepia(1) saturate(2) hue-rotate(5deg) brightness(1.2)', opacity: 0.9, pointerEvents: 'none' }} />}
+      {/* Content */}
+      <div style={{ position: 'absolute', left: 32, top: 0, bottom: 0, right: 112, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        {card.company && <p style={{ fontSize: 8, color: '#D4AF37', fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', margin: '0 0 12px' }}>{card.company}</p>}
+        <h2 style={{ fontSize: 27, fontWeight: 900, color: '#F5E6A3', margin: '0 0 4px', lineHeight: 1.05, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
+        {card.title && <p style={{ fontSize: 11, color: '#D4AF37', fontWeight: 600, margin: '0 0 18px' }}>{card.title}</p>}
+        <div style={{ width: 36, height: 1, background: 'linear-gradient(90deg, #D4AF37, transparent)', marginBottom: 16 }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+          {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(245,230,163,0.6)', fontSize: 9.5 }}><span style={{ color: '#D4AF37' }}><IconMail /></span>{card.email}</div>}
+          {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(245,230,163,0.6)', fontSize: 9.5 }}><span style={{ color: '#D4AF37' }}><IconPhone /></span>{card.phone}</div>}
+          {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(245,230,163,0.6)', fontSize: 9.5 }}><span style={{ color: '#D4AF37' }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
+        </div>
+      </div>
+      {qrUrl && (
+        <div style={{ position: 'absolute', right: 18, bottom: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
+            <LogoIcon size={12} /><span style={{ fontSize: 7, fontWeight: 800, color: '#D4AF37', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
+          </div>
+          <div style={{ background: 'white', padding: 5, borderRadius: 10, boxShadow: '0 0 20px rgba(212,175,55,0.4)' }}>
+            <QRCodeSVG url={qrUrl} size={68} />
+          </div>
+          <p style={{ fontSize: 7, color: '#D4AF37', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンしてAI相談</p>
+        </div>
+      )}
+      <div style={{ position: 'absolute', bottom: 0, left: 4, right: 0, height: 1, background: 'linear-gradient(90deg, #B8960C, #F0D060 60%, transparent)' }} />
+    </div>
+  )
+}
+function GoldBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: string }) {
+  return (
+    <div className="print-card" style={{ width: W, height: H, background: '#050505', position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
+      {[...Array(8)].map((_, i) => (
+        <div key={i} style={{ position: 'absolute', left: i * 70, top: 0, bottom: 0, width: 1, background: 'rgba(212,175,55,0.04)' }} />
+      ))}
+      {[...Array(5)].map((_, i) => (
+        <div key={i} style={{ position: 'absolute', top: i * 70, left: 0, right: 0, height: 1, background: 'rgba(212,175,55,0.04)' }} />
+      ))}
+      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 360, height: 260, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(212,175,55,0.1) 0%, transparent 70%)' }} />
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, #B8960C, #F0D060, #D4AF37, transparent)' }} />
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, #B8960C, #F0D060, #D4AF37, transparent)' }} />
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 40px', textAlign: 'center' }}>
+        <div style={{ marginBottom: 14 }}><LogoIcon size={40} /></div>
+        <p style={{ fontSize: 8, color: '#D4AF37', fontWeight: 700, letterSpacing: '0.22em', margin: '0 0 10px' }}>分身AI搭載名刺</p>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#F5E6A3', margin: '0 0 14px', lineHeight: 1.25 }}>QRをスキャンして<br />分身AIと話してください</h3>
+        {card.short_intro && <p style={{ fontSize: 9.5, color: 'rgba(212,175,55,0.5)', margin: '0 0 18px', lineHeight: 1.6, maxWidth: 300 }}>{card.short_intro}</p>}
+        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #D4AF37, transparent)', marginBottom: 16 }} />
+        <div style={{ marginTop: 12 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <LogoIcon size={20} />
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 900, color: '#D4AF37', letterSpacing: '-0.01em', lineHeight: 1 }}>AI名刺</div>
+              <div style={{ fontSize: 6.5, color: 'rgba(212,175,55,0.5)', fontWeight: 600, letterSpacing: '0.08em', marginTop: 1 }}>次世代名刺</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════
    カードプレビュー（レスポンシブ対応）
 ══════════════════════════════════════════ */
 function CardPreview({
@@ -764,8 +1043,16 @@ export default function PrintCardPage() {
     )
   }
 
-  const FrontComponent = (design === 'executive' ? ExecutiveFront : design === 'midnight' ? MidnightFront : VividFront) as React.ComponentType<{ card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }>
-  const BackComponent  = (design === 'executive' ? ExecutiveBack  : design === 'midnight' ? MidnightBack  : VividBack)  as React.ComponentType<{ card: BusinessCard; fontFamily?: string }>
+  const frontMap: Record<Design, React.ComponentType<{ card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }>> = {
+    executive: ExecutiveFront, midnight: MidnightFront, vivid: VividFront,
+    ocean: OceanFront, forest: ForestFront, crimson: CrimsonFront, gold: GoldFront,
+  }
+  const backMap: Record<Design, React.ComponentType<{ card: BusinessCard; fontFamily?: string }>> = {
+    executive: ExecutiveBack, midnight: MidnightBack, vivid: VividBack,
+    ocean: OceanBack, forest: ForestBack, crimson: CrimsonBack, gold: GoldBack,
+  }
+  const FrontComponent = frontMap[design]
+  const BackComponent  = backMap[design]
 
   const currentFontFamily = fontMeta[font].family
 
@@ -853,14 +1140,14 @@ export default function PrintCardPage() {
             </button>
           </div>
 
-          {/* 行2: カラー選択（1行に収まる・スクロール不要） */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 10, fontWeight: 800, color: '#A08068', whiteSpace: 'nowrap', letterSpacing: '0.06em', minWidth: 36 }}>カラー</span>
-            <div style={{ display: 'flex', gap: 5, flex: 1 }}>
+          {/* 行2: カラー選択（7色グリッド） */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#A08068', whiteSpace: 'nowrap', letterSpacing: '0.06em', minWidth: 36, paddingTop: 7 }}>カラー</span>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4, flex: 1 }}>
               {(Object.entries(designMeta) as [Design, typeof designMeta[Design]][]).map(([key, meta]) => (
                 <button key={key} onClick={() => setDesign(key)} style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-                  flex: 1, padding: '6px 4px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+                  padding: '6px 4px', borderRadius: 8, fontSize: 11, fontWeight: 700,
                   background: design === key ? '#F26722' : 'white',
                   color: design === key ? 'white' : '#4A2C1A',
                   border: `1.5px solid ${design === key ? 'transparent' : '#EDD9C8'}`,
@@ -868,20 +1155,20 @@ export default function PrintCardPage() {
                   boxShadow: design === key ? '0 2px 8px rgba(242,103,34,0.3)' : 'none',
                   transition: 'all 0.15s',
                 }}>
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: meta.preview, border: '1.5px solid rgba(0,0,0,0.12)', flexShrink: 0 }} />
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: meta.preview, border: design === key ? '1.5px solid rgba(255,255,255,0.5)' : '1.5px solid rgba(0,0,0,0.15)', flexShrink: 0 }} />
                   {meta.label}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* 行3: フォント選択 + 保存ボタン */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 10, fontWeight: 800, color: '#A08068', whiteSpace: 'nowrap', letterSpacing: '0.06em', minWidth: 36 }}>書体</span>
-            <div style={{ display: 'flex', gap: 5, flex: 1 }}>
+          {/* 行3: フォント選択（7書体グリッド） + 保存ボタン */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#A08068', whiteSpace: 'nowrap', letterSpacing: '0.06em', minWidth: 36, paddingTop: 7 }}>書体</span>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4, flex: 1 }}>
               {(Object.entries(fontMeta) as [Font, typeof fontMeta[Font]][]).map(([key, meta]) => (
                 <button key={key} onClick={() => setFont(key)} style={{
-                  flex: 1, padding: '6px 4px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+                  padding: '6px 4px', borderRadius: 8, fontSize: 11, fontWeight: 700,
                   background: font === key ? '#1C0F05' : 'white',
                   color: font === key ? 'white' : '#4A2C1A',
                   border: `1.5px solid ${font === key ? 'transparent' : '#EDD9C8'}`,
@@ -905,6 +1192,7 @@ export default function PrintCardPage() {
                 color: saving ? '#A08068' : '#C4511A',
                 border: '1.5px solid #FDD5B5',
                 cursor: saving ? 'not-allowed' : 'pointer', flexShrink: 0, whiteSpace: 'nowrap',
+                alignSelf: 'flex-start', marginTop: 1,
               }}
             >
               {saving ? '保存中...' : '保存'}

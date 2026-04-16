@@ -28,7 +28,8 @@
       "Bash(vercel ls:*)",
       "Bash(npx vercel:*)",
       "WebSearch",
-      "Bash(gh deployment:*)"
+      "Bash(gh deployment:*)",
+      "Bash(python3 -)"
     ]
   }
 }
