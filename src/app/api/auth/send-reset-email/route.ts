@@ -29,9 +29,9 @@ export async function POST(req: NextRequest) {
     console.log('[send-reset-email] generateLink result:', JSON.stringify({ linkData, linkError }))
 
     if (linkError) {
-      // ユーザーが存在しない場合もセキュリティのため成功を返す
-      console.log('[send-reset-email] generateLink error (possibly no user):', linkError.message)
-      return NextResponse.json({ ok: true })
+      console.error('[send-reset-email] generateLink error:', linkError.message, linkError.status)
+      // デバッグ用：エラーを返す（本番では { ok: true } に戻す）
+      return NextResponse.json({ error: `generateLink failed: ${linkError.message}` }, { status: 500 })
     }
 
     // action_link を使用（supabase.co のverifyエンドポイント経由で認証後 redirectTo へ）
