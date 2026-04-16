@@ -32,6 +32,8 @@ type SupportSession = {
   escalated_at?: string
   operator_active: boolean
   messages: SupportMsg[]
+  customer_name?: string
+  meeting_context?: string
 }
 
 const PLAN_LABELS: Record<string, string> = { free: 'フリー', solo: 'スタンダード', growth: 'ビジネス', scale: 'エンタープライズ' }
@@ -197,8 +199,8 @@ function SupportBotPanel() {
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', fontFamily: 'monospace' }}>
-                        {shortKey(s.session_key)}
+                      <span style={{ fontSize: 11, fontWeight: 700, color: s.customer_name ? '#F1F5F9' : '#94A3B8', fontFamily: s.customer_name ? 'inherit' : 'monospace' }}>
+                        {s.customer_name || shortKey(s.session_key)}
                       </span>
                       {s.escalated && (
                         <span style={{ fontSize: 9, fontWeight: 800, background: '#EF4444', color: '#fff', padding: '1px 5px', borderRadius: 99 }}>
@@ -263,6 +265,23 @@ function SupportBotPanel() {
               </button>
             )}
           </div>
+
+          {/* 接点カード */}
+          {(selected.customer_name || selected.meeting_context) && (
+            <div style={{ padding: '10px 14px', background: '#0F172A', borderBottom: '1px solid #334155', display: 'flex', gap: 12, alignItems: 'center' }}>
+              <div style={{ fontSize: 22 }}>👤</div>
+              <div>
+                {selected.customer_name && (
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#F1F5F9' }}>{selected.customer_name}</div>
+                )}
+                {selected.meeting_context && (
+                  <div style={{ fontSize: 11, color: '#F26722', fontWeight: 600, marginTop: 2 }}>
+                    📍 {selected.meeting_context}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* メッセージ一覧 */}
           <div style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
