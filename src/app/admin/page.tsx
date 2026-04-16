@@ -38,17 +38,28 @@ const PLAN_LABELS: Record<string, string> = { free: 'フリー', solo: 'スタ�
 const PLAN_COLORS: Record<string, string> = { free: '#6B7280', solo: '#F26722', growth: '#7C3AED', scale: '#F59E0B' }
 const CAT_LABELS: Record<string, string> = { general: '💬 意見', feature: '✨ 機能要望', bug: '🐛 不具合' }
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+  return isMobile
+}
+
 function KpiCard({ label, value, sub, color, alert }: { label: string; value: string | number; sub?: string; color?: string; alert?: boolean }) {
   return (
     <div style={{
       background: alert ? '#FEF2F2' : '#fff',
       borderRadius: 16,
       border: `1.5px solid ${alert ? '#FECACA' : '#EDD9C8'}`,
-      padding: '16px 20px',
+      padding: '14px 16px',
     }}>
-      <div style={{ fontSize: 11, color: '#A08068', fontWeight: 700, letterSpacing: '0.06em', marginBottom: 6 }}>{label}</div>
-      <div style={{ fontSize: 28, fontWeight: 900, color: color ?? (alert ? '#DC2626' : '#1C0F05'), lineHeight: 1 }}>{value}</div>
-      {sub && <div style={{ fontSize: 11, color: '#A08068', marginTop: 6 }}>{sub}</div>}
+      <div style={{ fontSize: 11, color: '#A08068', fontWeight: 700, letterSpacing: '0.04em', marginBottom: 4 }}>{label}</div>
+      <div style={{ fontSize: 26, fontWeight: 900, color: color ?? (alert ? '#DC2626' : '#1C0F05'), lineHeight: 1 }}>{value}</div>
+      {sub && <div style={{ fontSize: 10, color: '#A08068', marginTop: 5, lineHeight: 1.4 }}>{sub}</div>}
     </div>
   )
 }
@@ -71,6 +82,7 @@ function Sparkline({ data }: { data: { day: string; count: number }[] }) {
 
 // ── サポートBOT管理パネル ──────────────────────────────────────
 function SupportBotPanel() {
+  const isMobile = useIsMobile()
   const [sessions, setSessions]       = useState<SupportSession[]>([])
   const [loading, setLoading]         = useState(true)
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
@@ -136,96 +148,124 @@ function SupportBotPanel() {
   const lastMsg  = (s: SupportSession) => s.messages[s.messages.length - 1]
   const escalatedCount = sessions.filter(s => s.escalated).length
 
+  // モバイル：詳細表示中はリストを隠す
+  const showList   = !isMobile || !selectedKey
+  const showDetail = !!selectedKey
+
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: selected ? '320px 1fr' : '1fr', gap: 12, minHeight: 500 }}>
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: (!isMobile && selected) ? '300px 1fr' : '1fr',
+      gap: 10,
+      minHeight: 500,
+    }}>
       {/* セッション一覧 */}
-      <div style={{ background: '#1E293B', borderRadius: 16, overflow: 'hidden' }}>
-        <div style={{ padding: '14px 16px', borderBottom: '1px solid #334155', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#F1F5F9' }}>チャット履歴</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ fontSize: 11, color: '#64748B' }}>{sessions.length}件</div>
-            {escalatedCount > 0 && (
-              <span style={{ fontSize: 10, fontWeight: 800, background: '#EF4444', color: '#fff', padding: '2px 8px', borderRadius: 99 }}>
-                🆘 {escalatedCount}件対応待ち
-              </span>
-            )}
+      {showList && (
+        <div style={{ background: '#1E293B', borderRadius: 16, overflow: 'hidden' }}>
+          <div style={{ padding: '12px 14px', borderBottom: '1px solid #334155', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#F1F5F9' }}>チャット履歴</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ fontSize: 11, color: '#64748B' }}>{sessions.length}件</div>
+              {escalatedCount > 0 && (
+                <span style={{ fontSize: 10, fontWeight: 800, background: '#EF4444', color: '#fff', padding: '2px 7px', borderRadius: 99 }}>
+                  🆘 {escalatedCount}件
+                </span>
+              )}
+            </div>
+          </div>
+          {loading && <div style={{ padding: 20, color: '#64748B', fontSize: 12 }}>読み込み中…</div>}
+          {!loading && sessions.length === 0 && (
+            <div style={{ padding: 20, color: '#64748B', fontSize: 12, textAlign: 'center' }}>
+              まだチャット履歴がありません
+            </div>
+          )}
+          <div style={{ maxHeight: isMobile ? 'calc(100vh - 200px)' : 520, overflowY: 'auto' }}>
+            {sessions.map(s => {
+              const last = lastMsg(s)
+              const isSelected = s.session_key === selectedKey
+              return (
+                <div key={s.session_key}
+                  onClick={() => setSelectedKey(isSelected ? null : s.session_key)}
+                  style={{
+                    padding: '12px 14px',
+                    borderBottom: '1px solid #263147',
+                    cursor: 'pointer',
+                    background: isSelected ? '#263147' : 'transparent',
+                    borderLeft: isSelected ? '3px solid #F26722' : '3px solid transparent',
+                    transition: 'background 0.15s',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', fontFamily: 'monospace' }}>
+                        {shortKey(s.session_key)}
+                      </span>
+                      {s.escalated && (
+                        <span style={{ fontSize: 9, fontWeight: 800, background: '#EF4444', color: '#fff', padding: '1px 5px', borderRadius: 99 }}>
+                          🆘 待ち
+                        </span>
+                      )}
+                      {s.operator_active && (
+                        <span style={{ fontSize: 9, fontWeight: 800, background: '#10B981', color: '#fff', padding: '1px 5px', borderRadius: 99 }}>
+                          💼 対応中
+                        </span>
+                      )}
+                    </div>
+                    <span style={{ fontSize: 10, color: '#475569', flexShrink: 0 }}>
+                      {new Date(s.updated_at).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  {last && (
+                    <div style={{ fontSize: 11.5, color: '#94A3B8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <span style={{ color: roleLabel(last.role).color, fontWeight: 700, marginRight: 4 }}>
+                        {last.role === 'user' ? 'U:' : last.role === 'operator' ? 'OP:' : 'AI:'}
+                      </span>
+                      {last.content}
+                    </div>
+                  )}
+                  <div style={{ fontSize: 10, color: '#475569', marginTop: 3 }}>
+                    {s.messages.length}件のメッセージ
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
-        {loading && <div style={{ padding: 20, color: '#64748B', fontSize: 12 }}>読み込み中…</div>}
-        {!loading && sessions.length === 0 && (
-          <div style={{ padding: 20, color: '#64748B', fontSize: 12, textAlign: 'center' }}>
-            まだチャット履歴がありません
-          </div>
-        )}
-        <div style={{ maxHeight: 520, overflowY: 'auto' }}>
-          {sessions.map(s => {
-            const last = lastMsg(s)
-            const isSelected = s.session_key === selectedKey
-            return (
-              <div key={s.session_key}
-                onClick={() => setSelectedKey(isSelected ? null : s.session_key)}
-                style={{
-                  padding: '12px 16px',
-                  borderBottom: '1px solid #263147',
-                  cursor: 'pointer',
-                  background: isSelected ? '#263147' : 'transparent',
-                  borderLeft: isSelected ? '3px solid #F26722' : '3px solid transparent',
-                  transition: 'background 0.15s',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', fontFamily: 'monospace' }}>
-                      {shortKey(s.session_key)}
-                    </span>
-                    {s.escalated && (
-                      <span style={{ fontSize: 10, fontWeight: 800, background: '#EF4444', color: '#fff', padding: '1px 6px', borderRadius: 99 }}>
-                        🆘 対応待ち
-                      </span>
-                    )}
-                    {s.operator_active && (
-                      <span style={{ fontSize: 10, fontWeight: 800, background: '#10B981', color: '#fff', padding: '1px 6px', borderRadius: 99 }}>
-                        💼 対応中
-                      </span>
-                    )}
-                  </div>
-                  <span style={{ fontSize: 10, color: '#475569' }}>
-                    {new Date(s.updated_at).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-                {last && (
-                  <div style={{ fontSize: 11.5, color: '#94A3B8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    <span style={{ color: roleLabel(last.role).color, fontWeight: 700, marginRight: 4 }}>
-                      {last.role === 'user' ? 'U:' : last.role === 'operator' ? 'OP:' : 'AI:'}
-                    </span>
-                    {last.content}
-                  </div>
-                )}
-                <div style={{ fontSize: 10, color: '#475569', marginTop: 4 }}>
-                  {s.messages.length}件のメッセージ
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
+      )}
 
       {/* 会話詳細 */}
-      {selected && (
-        <div style={{ background: '#1E293B', borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ padding: '14px 18px', borderBottom: '1px solid #334155', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#F1F5F9' }}>会話詳細</div>
-              <div style={{ fontSize: 10, color: '#475569', fontFamily: 'monospace', marginTop: 2 }}>{selected.session_key}</div>
+      {showDetail && selected && (
+        <div style={{
+          background: '#1E293B',
+          borderRadius: 16,
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          // モバイルでは画面全体を使う
+          ...(isMobile ? { position: 'fixed', inset: 0, zIndex: 100, borderRadius: 0 } : {}),
+        }}>
+          {/* ヘッダー */}
+          <div style={{ padding: '12px 14px', borderBottom: '1px solid #334155', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button onClick={() => setSelectedKey(null)}
+                style={{ background: '#334155', color: '#94A3B8', border: 'none', borderRadius: 6, padding: '6px 10px', fontSize: 13, cursor: 'pointer', lineHeight: 1 }}>
+                ←
+              </button>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#F1F5F9' }}>会話詳細</div>
+                <div style={{ fontSize: 9, color: '#475569', fontFamily: 'monospace' }}>{selected.session_key.slice(0, 16)}…</div>
+              </div>
             </div>
-            <button onClick={() => setSelectedKey(null)}
-              style={{ background: '#334155', color: '#94A3B8', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 11, cursor: 'pointer' }}>
-              閉じる
-            </button>
+            {selected.operator_active && (
+              <button onClick={endOperator}
+                style={{ background: '#EF4444', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                対応終了
+              </button>
+            )}
           </div>
 
           {/* メッセージ一覧 */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '16px', maxHeight: 400, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
             {selected.messages.map((m, i) => {
               const { label, color } = roleLabel(m.role)
               const isUser = m.role === 'user'
@@ -233,13 +273,13 @@ function SupportBotPanel() {
                 <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: isUser ? 'flex-end' : 'flex-start', gap: 2 }}>
                   <div style={{ fontSize: 10, color, fontWeight: 700 }}>{label}</div>
                   <div style={{
-                    maxWidth: '85%',
+                    maxWidth: '88%',
                     background: isUser ? '#334155' : m.role === 'operator' ? '#1E3A5F' : '#263147',
                     border: `1px solid ${isUser ? '#475569' : m.role === 'operator' ? '#3B82F6' : '#334155'}`,
                     color: '#E2E8F0',
                     borderRadius: 10,
-                    padding: '8px 12px',
-                    fontSize: 12.5,
+                    padding: '8px 11px',
+                    fontSize: 13,
                     lineHeight: 1.7,
                     whiteSpace: 'pre-wrap',
                     wordBreak: 'break-word',
@@ -258,23 +298,9 @@ function SupportBotPanel() {
           </div>
 
           {/* 運営メッセージ入力 */}
-          <div style={{ padding: '12px 14px', borderTop: '1px solid #334155', background: '#0F172A' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-              <div style={{ fontSize: 11, color: '#3B82F6', fontWeight: 700 }}>
-                {selected.operator_active ? '💼 運営対応中（AIは停止中）' : '💼 運営として割り込む'}
-              </div>
-              {selected.operator_active && (
-                <button
-                  onClick={endOperator}
-                  style={{
-                    background: '#EF4444', color: '#fff', border: 'none',
-                    borderRadius: 6, padding: '3px 10px', fontSize: 11,
-                    fontWeight: 700, cursor: 'pointer',
-                  }}
-                >
-                  対応終了
-                </button>
-              )}
+          <div style={{ padding: '10px 12px', borderTop: '1px solid #334155', background: '#0F172A', flexShrink: 0 }}>
+            <div style={{ fontSize: 11, color: selected.operator_active ? '#3B82F6' : '#64748B', fontWeight: 700, marginBottom: 6 }}>
+              {selected.operator_active ? '💼 運営対応中（AIは停止中）' : '💼 運営として割り込む'}
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <textarea
@@ -286,7 +312,7 @@ function SupportBotPanel() {
                 style={{
                   flex: 1, resize: 'none',
                   border: '1.5px solid #3B82F6', borderRadius: 8,
-                  padding: '8px 10px', fontSize: 12,
+                  padding: '8px 10px', fontSize: 14,
                   fontFamily: 'inherit', outline: 'none',
                   lineHeight: 1.5, background: '#1E293B',
                   color: '#E2E8F0',
@@ -298,12 +324,12 @@ function SupportBotPanel() {
                 style={{
                   background: input.trim() && !sending ? '#3B82F6' : '#334155',
                   color: '#fff', border: 'none', borderRadius: 8,
-                  padding: '0 16px', fontSize: 12, fontWeight: 700,
+                  padding: '0 14px', fontSize: 13, fontWeight: 700,
                   cursor: input.trim() && !sending ? 'pointer' : 'not-allowed',
                   flexShrink: 0,
                 }}
               >
-                {sending ? '送信中…' : '送信'}
+                {sending ? '…' : '送信'}
               </button>
             </div>
           </div>
@@ -315,6 +341,7 @@ function SupportBotPanel() {
 
 // ── メインページ ───────────────────────────────────────────────
 export default function AdminPage() {
+  const isMobile = useIsMobile()
   const [stats, setStats]       = useState<Stats | null>(null)
   const [feedback, setFeedback] = useState<Feedback[]>([])
   const [loading, setLoading]   = useState(true)
@@ -342,41 +369,68 @@ export default function AdminPage() {
     setFeedback(prev => prev.map(f => f.id === id ? { ...f, is_read: true } : f))
   }
 
+  const pad = isMobile ? '12px' : '24px'
+  const gridCols = isMobile
+    ? 'repeat(2, 1fr)'
+    : 'repeat(auto-fill, minmax(200px, 1fr))'
+
   return (
     <div style={{ minHeight: '100vh', background: '#0F172A', color: '#F1F5F9' }}>
       {/* ヘッダー */}
-      <div style={{ background: '#1E293B', borderBottom: '1px solid #334155', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{
+        background: '#1E293B',
+        borderBottom: '1px solid #334155',
+        padding: isMobile ? '12px 14px' : '16px 24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}>
         <div>
-          <div style={{ fontSize: 11, color: '#64748B', fontWeight: 700, letterSpacing: '0.1em', marginBottom: 2 }}>ADMIN CONSOLE</div>
-          <div style={{ fontSize: 20, fontWeight: 900, color: '#F1F5F9' }}>AI名刺 管理画面</div>
+          {!isMobile && <div style={{ fontSize: 11, color: '#64748B', fontWeight: 700, letterSpacing: '0.1em', marginBottom: 2 }}>ADMIN CONSOLE</div>}
+          <div style={{ fontSize: isMobile ? 16 : 20, fontWeight: 900, color: '#F1F5F9' }}>
+            {isMobile ? '管理画面' : 'AI名刺 管理画面'}
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {stats?.unreadFeedback ? (
-            <span style={{ background: '#EF4444', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 99 }}>
-              未読 {stats.unreadFeedback}件
+            <span style={{ background: '#EF4444', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 7px', borderRadius: 99 }}>
+              {isMobile ? stats.unreadFeedback : `未読 ${stats.unreadFeedback}件`}
             </span>
           ) : null}
-          <button onClick={load} style={{ padding: '6px 14px', borderRadius: 8, background: '#334155', color: '#94A3B8', fontSize: 12, border: 'none', cursor: 'pointer' }}>
-            更新
+          <button onClick={load}
+            style={{ padding: isMobile ? '6px 10px' : '6px 14px', borderRadius: 8, background: '#334155', color: '#94A3B8', fontSize: 12, border: 'none', cursor: 'pointer' }}>
+            {isMobile ? '↻' : '更新'}
           </button>
-          <Link href="/dashboard" style={{ padding: '6px 14px', borderRadius: 8, background: '#334155', color: '#94A3B8', fontSize: 12, textDecoration: 'none' }}>
-            ← サービスへ
+          <Link href="/dashboard"
+            style={{ padding: isMobile ? '6px 10px' : '6px 14px', borderRadius: 8, background: '#334155', color: '#94A3B8', fontSize: 12, textDecoration: 'none' }}>
+            {isMobile ? '⌂' : '← サービスへ'}
           </Link>
         </div>
       </div>
 
       {/* タブ */}
-      <div style={{ background: '#1E293B', borderBottom: '1px solid #334155', padding: '0 24px', display: 'flex', gap: 4, overflowX: 'auto' }}>
+      <div style={{
+        background: '#1E293B',
+        borderBottom: '1px solid #334155',
+        padding: '0 8px',
+        display: 'flex',
+        gap: 0,
+        overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch' as never,
+      }}>
         {([
-          ['kpi',      'KPI ダッシュボード'],
-          ['users',    '最近の登録者'],
-          ['feedback', `意見箱${stats?.unreadFeedback ? ` (${stats.unreadFeedback})` : ''}`],
-          ['support',  '👩 香里サポート'],
+          ['kpi',      isMobile ? 'KPI' : 'KPI ダッシュボード'],
+          ['users',    isMobile ? '登録者' : '最近の登録者'],
+          ['feedback', `${isMobile ? '意見箱' : '意見箱'}${stats?.unreadFeedback ? ` (${stats.unreadFeedback})` : ''}`],
+          ['support',  isMobile ? '👩 サポート' : '👩 香里サポート'],
         ] as const).map(([key, label]) => (
           <button key={key} onClick={() => setTab(key)}
             style={{
-              padding: '12px 16px', fontSize: 13, whiteSpace: 'nowrap',
-              fontWeight: tab === key ? 800 : 400, background: 'none', border: 'none', cursor: 'pointer',
+              padding: isMobile ? '11px 14px' : '12px 16px',
+              fontSize: isMobile ? 12 : 13,
+              whiteSpace: 'nowrap',
+              fontWeight: tab === key ? 800 : 400,
+              background: 'none', border: 'none', cursor: 'pointer',
               color: tab === key ? '#F26722' : '#64748B',
               borderBottom: tab === key ? '2px solid #F26722' : '2px solid transparent',
             }}>
@@ -385,60 +439,59 @@ export default function AdminPage() {
         ))}
       </div>
 
-      <div style={{ padding: '24px', maxWidth: 1200, margin: '0 auto' }}>
-        {loading && tab !== 'support' && <div style={{ color: '#64748B', textAlign: 'center', padding: 40 }}>読み込み中…</div>}
+      <div style={{ padding: pad, maxWidth: 1200, margin: '0 auto' }}>
+        {loading && tab !== 'support' && (
+          <div style={{ color: '#64748B', textAlign: 'center', padding: 40 }}>読み込み中…</div>
+        )}
 
         {/* ── KPIダッシュボード ── */}
         {!loading && stats && tab === 'kpi' && (
           <>
-            <div style={{ fontSize: 12, color: '#64748B', fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10 }}>ユーザー</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 24 }}>
+            <div style={{ fontSize: 11, color: '#64748B', fontWeight: 700, letterSpacing: '0.06em', marginBottom: 8 }}>ユーザー</div>
+            <div style={{ display: 'grid', gridTemplateColumns: gridCols, gap: 10, marginBottom: 20 }}>
               <KpiCard label="総ユーザー数" value={stats.users.total.toLocaleString('ja-JP')} sub="累計登録数" />
               <KpiCard label="今月の新規登録"
                 value={stats.users.newThisMonth}
-                sub={`先月 ${stats.users.newLastMonth}人 / MoM ${stats.users.momGrowthPct > 0 ? '+' : ''}${stats.users.momGrowthPct}%`}
+                sub={`先月 ${stats.users.newLastMonth}人`}
                 color={stats.users.momGrowthPct >= 0 ? '#10B981' : '#EF4444'}
               />
-              <KpiCard label="アクティブユーザー" value={stats.activeUsers30d} sub="過去30日以内に会話あり" />
-              <KpiCard label="有料ユーザー数" value={stats.subscriptions.totalPaying} sub={`全体の${Math.round(stats.subscriptions.totalPaying / Math.max(stats.users.total, 1) * 100)}%`} color="#F26722" />
+              <KpiCard label="アクティブユーザー" value={stats.activeUsers30d} sub="過去30日" />
+              <KpiCard label="有料ユーザー" value={stats.subscriptions.totalPaying} color="#F26722" />
             </div>
 
-            <div style={{ fontSize: 12, color: '#64748B', fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10 }}>収益</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 24 }}>
-              <KpiCard label="MRR（月次経常収益）" value={`¥${stats.subscriptions.mrr.toLocaleString('ja-JP')}`} sub="サブスク合計" color="#10B981" />
+            <div style={{ fontSize: 11, color: '#64748B', fontWeight: 700, letterSpacing: '0.06em', marginBottom: 8 }}>収益</div>
+            <div style={{ display: 'grid', gridTemplateColumns: gridCols, gap: 10, marginBottom: 20 }}>
+              <KpiCard label="MRR" value={`¥${stats.subscriptions.mrr.toLocaleString('ja-JP')}`} sub="月次経常収益" color="#10B981" />
               {(['solo', 'growth', 'scale'] as const).map(plan => (
-                <div key={plan} style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #EDD9C8', padding: '16px 20px' }}>
-                  <div style={{ fontSize: 11, color: '#A08068', fontWeight: 700, marginBottom: 6 }}>{PLAN_LABELS[plan]}</div>
-                  <div style={{ fontSize: 28, fontWeight: 900, color: PLAN_COLORS[plan], lineHeight: 1 }}>
-                    {stats.subscriptions.byPlan[plan] ?? 0}<span style={{ fontSize: 13, color: '#A08068', fontWeight: 400 }}>人</span>
+                <div key={plan} style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #EDD9C8', padding: '14px 16px' }}>
+                  <div style={{ fontSize: 11, color: '#A08068', fontWeight: 700, marginBottom: 4 }}>{PLAN_LABELS[plan]}</div>
+                  <div style={{ fontSize: 24, fontWeight: 900, color: PLAN_COLORS[plan], lineHeight: 1 }}>
+                    {stats.subscriptions.byPlan[plan] ?? 0}<span style={{ fontSize: 12, color: '#A08068', fontWeight: 400 }}>人</span>
                   </div>
-                  <div style={{ fontSize: 11, color: '#A08068', marginTop: 6 }}>
+                  <div style={{ fontSize: 10, color: '#A08068', marginTop: 4 }}>
                     ¥{((stats.subscriptions.byPlan[plan] ?? 0) * PLANS[plan].priceJpy).toLocaleString('ja-JP')}/月
                   </div>
                 </div>
               ))}
             </div>
 
-            <div style={{ fontSize: 12, color: '#64748B', fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10 }}>AI会話</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 24 }}>
-              <KpiCard label="累計セッション数" value={stats.sessions.total.toLocaleString('ja-JP')} />
-              <KpiCard label="今月のセッション数" value={stats.sessions.thisMonth.toLocaleString('ja-JP')} />
-              <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #EDD9C8', padding: '16px 20px' }}>
-                <div style={{ fontSize: 11, color: '#A08068', fontWeight: 700, marginBottom: 8 }}>過去30日のセッション推移</div>
+            <div style={{ fontSize: 11, color: '#64748B', fontWeight: 700, letterSpacing: '0.06em', marginBottom: 8 }}>AI会話</div>
+            <div style={{ display: 'grid', gridTemplateColumns: gridCols, gap: 10, marginBottom: 20 }}>
+              <KpiCard label="累計セッション" value={stats.sessions.total.toLocaleString('ja-JP')} />
+              <KpiCard label="今月のセッション" value={stats.sessions.thisMonth.toLocaleString('ja-JP')} />
+              <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #EDD9C8', padding: '14px 16px' }}>
+                <div style={{ fontSize: 11, color: '#A08068', fontWeight: 700, marginBottom: 6 }}>過去30日の推移</div>
                 <Sparkline data={stats.sessions.dailyLast30} />
               </div>
               <KpiCard label="アクティブ名刺" value={stats.cards} sub={`ペルソナ ${stats.personas}個`} />
             </div>
 
-            <div style={{ fontSize: 12, color: '#64748B', fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10 }}>トークン</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 24 }}>
-              <KpiCard label="累計消費トークン" value={formatTokens(stats.tokens.totalConsumed)} sub={`≈ ${tokensToConversations(stats.tokens.totalConsumed)}会話`} />
-              <KpiCard label="累計購入トークン" value={formatTokens(stats.tokens.totalPurchased)} sub="チャージ合計" color="#F26722" />
-              <KpiCard label="全ユーザー残高合計"
-                value={formatTokens(stats.tokens.totalSubBalance + stats.tokens.totalPaidBalance)}
-                sub={`サブスク ${formatTokens(stats.tokens.totalSubBalance)} + 購入済 ${formatTokens(stats.tokens.totalPaidBalance)}`}
-              />
-              <KpiCard label="未読フィードバック" value={stats.unreadFeedback} sub={stats.unreadFeedback > 0 ? '要確認' : '全件確認済み'} alert={stats.unreadFeedback > 0} />
+            <div style={{ fontSize: 11, color: '#64748B', fontWeight: 700, letterSpacing: '0.06em', marginBottom: 8 }}>トークン</div>
+            <div style={{ display: 'grid', gridTemplateColumns: gridCols, gap: 10, marginBottom: 20 }}>
+              <KpiCard label="累計消費" value={formatTokens(stats.tokens.totalConsumed)} sub={`≈ ${tokensToConversations(stats.tokens.totalConsumed)}会話`} />
+              <KpiCard label="累計購入" value={formatTokens(stats.tokens.totalPurchased)} color="#F26722" />
+              <KpiCard label="残高合計" value={formatTokens(stats.tokens.totalSubBalance + stats.tokens.totalPaidBalance)} />
+              <KpiCard label="未読FBK" value={stats.unreadFeedback} alert={stats.unreadFeedback > 0} />
             </div>
           </>
         )}
@@ -446,11 +499,17 @@ export default function AdminPage() {
         {/* ── 最近の登録者 ── */}
         {!loading && stats && tab === 'users' && (
           <div style={{ background: '#1E293B', borderRadius: 16, overflow: 'hidden' }}>
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid #334155', fontSize: 14, fontWeight: 700, color: '#F1F5F9' }}>
+            <div style={{ padding: '14px 16px', borderBottom: '1px solid #334155', fontSize: 13, fontWeight: 700, color: '#F1F5F9' }}>
               最近の登録者（直近10名）
             </div>
             {stats.recentSignups.map((u, i) => (
-              <div key={u.id} style={{ display: 'flex', alignItems: 'center', padding: '12px 20px', borderBottom: '1px solid #1E293B', background: i % 2 === 0 ? '#1E293B' : '#263147', gap: 16 }}>
+              <div key={u.id} style={{
+                display: 'flex', alignItems: 'center',
+                padding: isMobile ? '10px 14px' : '12px 20px',
+                borderBottom: '1px solid #1E293B',
+                background: i % 2 === 0 ? '#1E293B' : '#263147',
+                gap: 12,
+              }}>
                 <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#334155', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#94A3B8', flexShrink: 0 }}>
                   {(u.full_name ?? u.email)[0].toUpperCase()}
                 </div>
@@ -468,7 +527,7 @@ export default function AdminPage() {
 
         {/* ── 意見箱 ── */}
         {!loading && tab === 'feedback' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {feedback.length === 0 && (
               <div style={{ color: '#64748B', textAlign: 'center', padding: 40 }}>フィードバックはまだありません</div>
             )}
@@ -476,23 +535,25 @@ export default function AdminPage() {
               <div key={f.id} style={{
                 background: f.is_read ? '#1E293B' : '#1E3A5F',
                 border: `1.5px solid ${f.is_read ? '#334155' : '#3B82F6'}`,
-                borderRadius: 16, padding: '16px 20px',
+                borderRadius: 14, padding: '14px 16px',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, background: '#334155', color: '#94A3B8', padding: '2px 10px', borderRadius: 99 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, background: '#334155', color: '#94A3B8', padding: '2px 8px', borderRadius: 99 }}>
                     {CAT_LABELS[f.category] ?? f.category}
                   </span>
                   {!f.is_read && (
-                    <span style={{ fontSize: 11, background: '#3B82F6', color: '#fff', fontWeight: 800, padding: '2px 8px', borderRadius: 99 }}>NEW</span>
+                    <span style={{ fontSize: 11, background: '#3B82F6', color: '#fff', fontWeight: 800, padding: '2px 7px', borderRadius: 99 }}>NEW</span>
                   )}
                   <span style={{ fontSize: 11, color: '#64748B', marginLeft: 'auto' }}>
-                    {f.profiles?.full_name ?? ''} &lt;{f.profiles?.email}&gt;
-                  </span>
-                  <span style={{ fontSize: 11, color: '#64748B' }}>
                     {new Date(f.created_at).toLocaleDateString('ja-JP')}
                   </span>
                 </div>
-                <div style={{ fontSize: 14, color: '#E2E8F0', lineHeight: 1.7, marginBottom: 12, whiteSpace: 'pre-wrap' }}>{f.body}</div>
+                {!isMobile && (
+                  <div style={{ fontSize: 11, color: '#475569', marginBottom: 6 }}>
+                    {f.profiles?.full_name ?? ''} &lt;{f.profiles?.email}&gt;
+                  </div>
+                )}
+                <div style={{ fontSize: 13, color: '#E2E8F0', lineHeight: 1.7, marginBottom: 10, whiteSpace: 'pre-wrap' }}>{f.body}</div>
                 {!f.is_read && (
                   <button onClick={() => markRead(f.id)}
                     style={{ padding: '6px 14px', borderRadius: 8, background: '#334155', color: '#94A3B8', fontSize: 12, border: 'none', cursor: 'pointer' }}>
