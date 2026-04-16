@@ -18,7 +18,7 @@ export default function TokushoPage() {
       </p>
 
       <S>販売業者情報</S>
-      <Row label="販売事業者名" value="スマイルテックエージェント" />
+      <Row label="販売事業者名" value="AI名刺（運営：スマイルテックエージェント）" />
       <Row label="運営統括責任者" value="後藤鋼" />
       <Row label="所在地" value="兵庫県加古川市平岡町新在家716-8 ハイタウンD-412" />
       <Row label="電話番号"
