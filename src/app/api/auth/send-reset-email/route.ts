@@ -34,12 +34,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true })
     }
 
-    const token_hash = linkData?.properties?.hashed_token
-    if (!token_hash) {
-      console.error('[send-reset-email] no hashed_token in response:', JSON.stringify(linkData))
+    // action_link を使用（supabase.co のverifyエンドポイント経由で認証後 redirectTo へ）
+    const actionLink = linkData?.properties?.action_link
+    const hashedToken = linkData?.properties?.hashed_token
+
+    console.log('[send-reset-email] action_link:', actionLink?.slice(0, 60))
+    console.log('[send-reset-email] hashed_token:', hashedToken?.slice(0, 20))
+
+    if (!hashedToken && !actionLink) {
+      console.error('[send-reset-email] no token in response')
       return NextResponse.json({ error: 'Failed to generate token' }, { status: 500 })
     }
-    const confirmUrl = `${SITE_URL}/auth/confirm?token_hash=${token_hash}&type=recovery`
+
+    // hashed_token があれば自ドメインのconfirmページへ、なければaction_linkを直接使用
+    const confirmUrl = hashedToken
+      ? `${SITE_URL}/auth/confirm?token_hash=${hashedToken}&type=recovery`
+      : actionLink!
 
     // Resend で直接送信
     const html = `<!DOCTYPE html>
