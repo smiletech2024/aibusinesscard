@@ -28,6 +28,8 @@ type SupportSession = {
   session_key: string
   created_at: string
   updated_at: string
+  escalated: boolean
+  escalated_at?: string
   messages: SupportMsg[]
 }
 
@@ -121,6 +123,7 @@ function SupportBotPanel() {
 
   const shortKey = (key: string) => key.slice(0, 8) + '…'
   const lastMsg  = (s: SupportSession) => s.messages[s.messages.length - 1]
+  const escalatedCount = sessions.filter(s => s.escalated).length
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: selected ? '320px 1fr' : '1fr', gap: 12, minHeight: 500 }}>
@@ -128,7 +131,14 @@ function SupportBotPanel() {
       <div style={{ background: '#1E293B', borderRadius: 16, overflow: 'hidden' }}>
         <div style={{ padding: '14px 16px', borderBottom: '1px solid #334155', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: '#F1F5F9' }}>チャット履歴</div>
-          <div style={{ fontSize: 11, color: '#64748B' }}>{sessions.length}件</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ fontSize: 11, color: '#64748B' }}>{sessions.length}件</div>
+            {escalatedCount > 0 && (
+              <span style={{ fontSize: 10, fontWeight: 800, background: '#EF4444', color: '#fff', padding: '2px 8px', borderRadius: 99 }}>
+                🆘 {escalatedCount}件対応待ち
+              </span>
+            )}
+          </div>
         </div>
         {loading && <div style={{ padding: 20, color: '#64748B', fontSize: 12 }}>読み込み中…</div>}
         {!loading && sessions.length === 0 && (
@@ -152,10 +162,17 @@ function SupportBotPanel() {
                   transition: 'background 0.15s',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', fontFamily: 'monospace' }}>
-                    {shortKey(s.session_key)}
-                  </span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', fontFamily: 'monospace' }}>
+                      {shortKey(s.session_key)}
+                    </span>
+                    {s.escalated && (
+                      <span style={{ fontSize: 10, fontWeight: 800, background: '#EF4444', color: '#fff', padding: '1px 6px', borderRadius: 99 }}>
+                        🆘 対応待ち
+                      </span>
+                    )}
+                  </div>
                   <span style={{ fontSize: 10, color: '#475569' }}>
                     {new Date(s.updated_at).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                   </span>

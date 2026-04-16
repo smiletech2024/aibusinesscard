@@ -29,6 +29,8 @@ function KaoriChat() {
   const [input, setInput]         = useState('')
   const [loading, setLoading]     = useState(false)
   const [sessionKey]              = useState(() => getSessionKey())
+  const [escalated, setEscalated] = useState(false)
+  const [escalating, setEscalating] = useState(false)
   const lastPollTimeRef           = useRef<string>(new Date().toISOString())
   const bottomRef                 = useRef<HTMLDivElement>(null)
   const pollTimerRef              = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -120,6 +122,30 @@ function KaoriChat() {
       ])
     } finally {
       setLoading(false)
+    }
+  }
+
+  const escalate = async () => {
+    if (escalating || escalated) return
+    setEscalating(true)
+    try {
+      await fetch('/api/support-chat/escalate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionKey }),
+      })
+      setEscalated(true)
+      setMessages(prev => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: '✅ 運営スタッフへサポートリクエストを送りました！\n\n担当者がこのチャットに参加します。そのままお待ちください。引き続き香里にご質問いただくことも可能です😊',
+        },
+      ])
+    } catch {
+      // ignore
+    } finally {
+      setEscalating(false)
     }
   }
 
@@ -293,6 +319,33 @@ function KaoriChat() {
             ? <span style={{ display: 'inline-block', width: 16, height: 16, border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
             : '➤'}
         </button>
+        {!escalated && (
+          <button
+            onClick={escalate}
+            disabled={escalating}
+            title="人間のサポートに繋ぐ"
+            style={{
+              background: escalating ? '#EDD9C8' : '#FFF0E8',
+              color: escalating ? '#A08068' : '#F26722',
+              border: '1.5px solid #F26722',
+              borderRadius: 12,
+              width: 42, height: 42,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: escalating ? 'not-allowed' : 'pointer',
+              fontSize: 18, flexShrink: 0,
+              transition: 'background 0.2s',
+            }}
+          >
+            🙋
+          </button>
+        )}
+        {escalated && (
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: 42, height: 42, borderRadius: 12,
+            background: '#D1FAE5', fontSize: 18, flexShrink: 0,
+          }}>✅</div>
+        )}
       </div>
 
       <style>{`
@@ -306,48 +359,15 @@ function KaoriChat() {
   )
 }
 
-// ── サポートリンクカード ────────────────────────────────────────
-const Card = ({ icon, title, desc, href, linkText }: {
-  icon: string; title: string; desc: string; href: string; linkText: string
-}) => (
-  <a href={href}
-    target={href.startsWith('mailto') ? '_blank' : undefined}
-    rel="noopener noreferrer"
-    style={{ display: 'block', background: '#fff', border: '1px solid #EDD9C8', borderRadius: 16, padding: '18px', textDecoration: 'none' }}>
-    <div style={{ fontSize: 26, marginBottom: 8 }}>{icon}</div>
-    <div style={{ fontSize: 14, fontWeight: 800, color: '#1C0F05', marginBottom: 4 }}>{title}</div>
-    <div style={{ fontSize: 12.5, color: '#A08068', lineHeight: 1.7, marginBottom: 10 }}>{desc}</div>
-    <div style={{ fontSize: 12.5, fontWeight: 700, color: '#F26722' }}>{linkText} →</div>
-  </a>
-)
-
 // ── ページ ─────────────────────────────────────────────────────
 export default function SupportPage() {
   return (
     <LegalLayout title="サポート">
       <p style={{ fontSize: 13.5, color: '#4A2C1A', lineHeight: 1.8, marginBottom: 24 }}>
-        ご質問はAIサポートスタッフの<strong>香里</strong>が24時間即答します。解決しない場合はメールにてご連絡ください。
+        ご質問はAIサポートスタッフの<strong>香里</strong>が24時間即答します。<br />
+        <span style={{ fontSize: 12, color: '#A08068' }}>解決しない場合はチャット内の 🙋 ボタンで運営スタッフに繋げます。</span>
       </p>
-
-      {/* 香里チャット */}
       <KaoriChat />
-
-      {/* その他のサポートリンク */}
-      <h2 style={{ fontSize: 14, fontWeight: 800, color: '#1C0F05', margin: '0 0 12px' }}>その他</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12, marginBottom: 32 }}>
-        <Card icon="💳" title="お支払い・請求"
-          desc="領収書・支払い方法の変更はStripeポータルから。"
-          href="/pricing" linkText="プランページへ" />
-        <Card icon="🔄" title="解約・プラン変更"
-          desc="月額プランの解約・変更はいつでも可能です。"
-          href="/pricing" linkText="プランページへ" />
-        <Card icon="🪙" title="トークン残高"
-          desc="トークンの確認・追加購入はこちらから。"
-          href="/credits" linkText="トークン補充ページへ" />
-        <Card icon="📧" title="メールサポート（人間対応）"
-          desc="香里で解決しない場合は担当スタッフが対応します。平日10:00〜18:00。"
-          href="mailto:admin@aimeishi.biz" linkText="admin@aimeishi.biz" />
-      </div>
     </LegalLayout>
   )
 }

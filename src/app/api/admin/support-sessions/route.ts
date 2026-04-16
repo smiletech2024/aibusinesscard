@@ -29,7 +29,8 @@ export async function GET() {
   // 最新50セッション
   const { data: sessions } = await admin
     .from('support_sessions')
-    .select('session_key, created_at, updated_at')
+    .select('session_key, created_at, updated_at, escalated, escalated_at')
+    .order('escalated', { ascending: false })
     .order('updated_at', { ascending: false })
     .limit(50)
 
