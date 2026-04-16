@@ -133,12 +133,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
     }
 
-    const { token_hash, email_action_type, site_url } = email_data
+    const { token_hash, email_action_type } = email_data
     const type = email_action_type as string
 
-    // 確認URL（/auth/confirm ページへ）
-    const base       = site_url || SITE_URL
-    const confirmUrl = `${base}/auth/confirm?token_hash=${token_hash}&type=${type}`
+    // 確認URL（/auth/confirm ページへ）常に自ドメインを使用
+    const confirmUrl = `${SITE_URL}/auth/confirm?token_hash=${token_hash}&type=${type}`
 
     const { subject, html } = buildEmail(type, confirmUrl)
 
