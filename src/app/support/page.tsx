@@ -41,6 +41,30 @@ function KaoriChat() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  // ブラウザ通知の許可を取得
+  useEffect(() => {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+  }, [])
+
+  // 通知音を鳴らす
+  const playNotification = useCallback(() => {
+    try {
+      const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.frequency.setValueAtTime(880, ctx.currentTime)
+      osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1)
+      gain.gain.setValueAtTime(0.3, ctx.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4)
+      osc.start(ctx.currentTime)
+      osc.stop(ctx.currentTime + 0.4)
+    } catch { /* ignore */ }
+  }, [])
+
   // 運営割り込みポーリング（3秒ごと）
   const pollOperator = useCallback(async () => {
     if (!sessionKey) return
@@ -53,6 +77,15 @@ function KaoriChat() {
       setOperatorActive(active ?? false)
       if (newMsgs?.length) {
         lastPollTimeRef.current = newMsgs[newMsgs.length - 1].created_at
+        // 通知音を鳴らす
+        playNotification()
+        // ブラウザ通知（許可されていれば）
+        if (Notification.permission === 'granted') {
+          new Notification('💼 運営スタッフからメッセージが届きました', {
+            body: newMsgs[newMsgs.length - 1].content,
+            icon: '/favicon.ico',
+          })
+        }
         setMessages(prev => [
           ...prev,
           ...newMsgs.map((m: { id: string; content: string }) => ({
@@ -63,7 +96,7 @@ function KaoriChat() {
         ])
       }
     } catch { /* ignore */ }
-  }, [sessionKey])
+  }, [sessionKey, playNotification])
 
   useEffect(() => {
     pollTimerRef.current = setInterval(pollOperator, 3000)
@@ -213,10 +246,13 @@ function KaoriChat() {
         {operatorActive && (
           <div style={{
             background: 'linear-gradient(135deg,#1E40AF,#3B82F6)',
-            borderRadius: 10, padding: '8px 12px', margin: '0 0 8px',
-            fontSize: 12, color: '#fff', fontWeight: 700, textAlign: 'center',
+            borderRadius: 10, padding: '10px 14px', margin: '0 0 4px',
+            fontSize: 13, color: '#fff', fontWeight: 700, textAlign: 'center',
+            boxShadow: '0 2px 12px rgba(59,130,246,0.4)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
           }}>
-            💼 運営スタッフが対応中です
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4ADE80', display: 'inline-block', animation: 'pulse 1.5s infinite' }} />
+            💼 運営スタッフが対応中です — 少々お待ちください
           </div>
         )}
         {messages.map((msg, i) => {
@@ -364,6 +400,14 @@ function KaoriChat() {
         @keyframes dotBlink {
           0%,80%,100% { opacity: 0.15; transform: scale(0.8); }
           40% { opacity: 1; transform: scale(1.1); }
+        }
+        @keyframes pulse {
+          0%,100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.4); }
+        }
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateY(-8px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </div>
