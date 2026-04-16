@@ -95,17 +95,31 @@ export default function LoginPage() {
           return
         }
 
-        // 成功 → セッションをセット
+        // 成功 → セッションをセットして完全リロード
         await supabase.auth.setSession({
           access_token:  data.access_token,
           refresh_token: data.refresh_token,
         })
         setAttempts(0)
-        router.push('/dashboard')
-        router.refresh()
+        window.location.href = '/dashboard'
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'エラーが発生しました')
+      const msg = err instanceof Error ? err.message : ''
+      if (msg.includes('rate limit') || msg.includes('429')) {
+        setError('登録回数の上限に達しました。しばらく時間をおいてから再度お試しください。')
+      } else if (msg.includes('already registered') || msg.includes('already been registered')) {
+        setError('このメールアドレスはすでに登録されています。ログインしてください。')
+      } else if (msg.includes('invalid email')) {
+        setError('メールアドレスの形式が正しくありません。')
+      } else if (msg.includes('Password should')) {
+        setError('パスワードは6文字以上で入力してください。')
+      } else if (msg.includes('Invalid login credentials')) {
+        setError('メールアドレスまたはパスワードが違います。')
+      } else if (msg.includes('Email not confirmed')) {
+        setError('メールアドレスが未確認です。届いた確認メールのボタンを押してください。')
+      } else {
+        setError(msg || 'エラーが発生しました。再度お試しください。')
+      }
     } finally {
       setLoading(false)
     }
