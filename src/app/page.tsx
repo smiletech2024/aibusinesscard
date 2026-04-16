@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Logo } from '@/components/Logo'
+import SiteFooter from '@/components/SiteFooter'
 
 export default function HomePage() {
   return (
@@ -107,12 +108,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="text-center py-6">
-        <p className="text-xs" style={{ color: '#6B4030' }}>
-          © 2026 AI名刺
-        </p>
-      </div>
+      <SiteFooter />
     </main>
   )
 }

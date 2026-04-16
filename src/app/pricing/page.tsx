@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { PLANS, PLAN_COLORS, TOKEN_RATE_TABLE, type PlanId } from '@/lib/plans'
 import { formatTokens, tokensToConversations } from '@/lib/credits'
+import SiteFooter from '@/components/SiteFooter'
 import Link from 'next/link'
 
 type PlanInfo = {
@@ -383,6 +384,7 @@ function PricingContent() {
           </ul>
         </div>
       </div>
+      <SiteFooter />
     </div>
   )
 }

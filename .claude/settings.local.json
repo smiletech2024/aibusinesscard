@@ -30,7 +30,12 @@
       "WebSearch",
       "Bash(gh deployment:*)",
       "Bash(python3 -)",
-      "Bash(node -e \"const s = require\\('stripe'\\); console.log\\(Object.keys\\(s.Stripe?.LATEST_API_VERSION ? {'v': s.Stripe.LATEST_API_VERSION} : {}\\)\\)\")"
+      "Bash(node -e \"const s = require\\('stripe'\\); console.log\\(Object.keys\\(s.Stripe?.LATEST_API_VERSION ? {'v': s.Stripe.LATEST_API_VERSION} : {}\\)\\)\")",
+      "Bash(supabase --version)",
+      "Bash(npm list:*)",
+      "Bash(npx supabase:*)",
+      "Bash(npx next:*)",
+      "Bash(node -e ':*)"
     ]
   }
 }

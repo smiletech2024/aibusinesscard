@@ -11,6 +11,7 @@ import QRCode from 'qrcode'
 import { Logo } from '@/components/Logo'
 import { formatTokens, tokensToConversations } from '@/lib/credits'
 import { PLANS, PLAN_COLORS, type PlanId } from '@/lib/plans'
+import SiteFooter from '@/components/SiteFooter'
 
 const statusConfig: Record<string, { label: string; bg: string; color: string; step: number }> = {
   ai_chat:    { label: 'AIと会話中',    bg: 'rgba(242,103,34,0.1)',  color: '#F5A47A', step: 2 },
@@ -892,6 +893,7 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+      <SiteFooter />
     </div>
   )
 }
