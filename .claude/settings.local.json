@@ -35,7 +35,8 @@
       "Bash(npm list:*)",
       "Bash(npx supabase:*)",
       "Bash(npx next:*)",
-      "Bash(node -e ':*)"
+      "Bash(node -e ':*)",
+      "Bash(ls /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/api/card/[cardId]/)"
     ]
   }
 }
