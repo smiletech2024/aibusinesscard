@@ -136,6 +136,8 @@ export async function POST(req: NextRequest) {
     const { token_hash, email_action_type } = email_data
     const type = email_action_type as string
 
+    console.log(`[send-email hook] type=${type} to=${user.email} token_hash=${token_hash?.slice(0,8)}...`)
+
     // 確認URL（/auth/confirm ページへ）常に自ドメインを使用
     const confirmUrl = `${SITE_URL}/auth/confirm?token_hash=${token_hash}&type=${type}`
 

@@ -16,11 +16,20 @@ export default function ResetPasswordPage() {
     setError('')
     try {
       const supabase = createClient()
-      const { error } = await supabase.auth.resetPasswordForEmail(email)
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/confirm`,
+      })
       if (error) throw error
       setSent(true)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'エラーが発生しました')
+      const msg = err instanceof Error ? err.message : ''
+      if (msg.includes('rate limit') || msg.includes('429')) {
+        setError('送信回数の上限に達しました。しばらく時間をおいてから再度お試しください。')
+      } else if (msg.includes('User not found') || msg.includes('unable to find')) {
+        setError('このメールアドレスは登録されていません。')
+      } else {
+        setError(msg || 'エラーが発生しました。再度お試しください。')
+      }
     } finally {
       setLoading(false)
     }
