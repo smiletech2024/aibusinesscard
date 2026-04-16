@@ -381,19 +381,19 @@ export default function DashboardPage() {
         className="sticky top-0 z-20 border-b"
         style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)', borderColor: '#EDD9C8' }}
       >
-        <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between">
-          <Logo size={28} variant="dark" />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-2">
+          <Logo size={26} variant="dark" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
             {/* プランバッジ */}
             <Link
               href="/pricing"
               style={{
-                display: 'inline-flex', alignItems: 'center',
-                padding: '4px 10px', borderRadius: 99,
+                display: 'inline-flex', alignItems: 'center', whiteSpace: 'nowrap',
+                padding: '3px 9px', borderRadius: 99,
                 background: PLAN_COLORS[currentPlan].bg,
                 border: `1.5px solid ${PLAN_COLORS[currentPlan].border}`,
                 textDecoration: 'none', fontSize: 11, fontWeight: 800,
-                color: PLAN_COLORS[currentPlan].text, letterSpacing: '0.04em',
+                color: PLAN_COLORS[currentPlan].text, flexShrink: 0,
               }}
             >
               {PLANS[currentPlan].name}
@@ -403,8 +403,8 @@ export default function DashboardPage() {
             <Link
               href="/credits"
               style={{
-                display: 'inline-flex', alignItems: 'center', gap: 4,
-                padding: '4px 10px', borderRadius: 99,
+                display: 'inline-flex', alignItems: 'center', gap: 3,
+                padding: '3px 9px', borderRadius: 99, whiteSpace: 'nowrap', flexShrink: 0,
                 background: creditBalance !== null && creditBalance <= 0
                   ? 'rgba(239,68,68,0.1)'
                   : creditBalance !== null && creditBalance < 30_000
@@ -419,6 +419,7 @@ export default function DashboardPage() {
                 textDecoration: 'none',
               }}
             >
+              <span style={{ fontSize: 10 }}>💬</span>
               <span style={{
                 fontSize: 11, fontWeight: 700,
                 color: creditBalance !== null && creditBalance <= 0 ? '#EF4444'
@@ -428,17 +429,27 @@ export default function DashboardPage() {
                 {creditBalance === null
                   ? '…'
                   : creditBalance <= 0
-                  ? 'AI会話0回'
-                  : `AI会話${tokensToConversations(creditBalance)}`}
+                  ? '0回'
+                  : tokensToConversations(creditBalance)}
               </span>
             </Link>
 
+            {/* ログアウト（アイコンのみ） */}
             <button
               onClick={handleLogout}
-              className="text-xs font-medium px-3 py-1.5 rounded-full transition hover:bg-red-50"
-              style={{ color: '#A08068' }}
+              title="ログアウト"
+              style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                width: 30, height: 30, borderRadius: '50%', border: 'none',
+                background: 'transparent', cursor: 'pointer', color: '#A08068', fontSize: 16,
+                flexShrink: 0,
+              }}
             >
-              ログアウト
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
             </button>
           </div>
         </div>
