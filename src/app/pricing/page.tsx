@@ -24,9 +24,10 @@ function PricingContent() {
   const searchParams = useSearchParams()
   const supabase     = createClient()
 
-  const [planInfo, setPlanInfo]     = useState<PlanInfo | null>(null)
-  const [loading, setLoading]       = useState(true)
-  const [processing, setProcessing] = useState<string | null>(null)
+  const [planInfo, setPlanInfo]         = useState<PlanInfo | null>(null)
+  const [loading, setLoading]           = useState(true)
+  const [processing, setProcessing]     = useState<string | null>(null)
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
 
   const successPlan = searchParams.get('success') === '1' ? searchParams.get('plan') : null
   const cancelled   = searchParams.get('cancel')  === '1'
@@ -98,35 +99,88 @@ function PricingContent() {
 
         {/* 現在のプランステータス */}
         {!loading && planInfo && (
-          <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #EDD9C8', padding: '16px 20px', marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-            <div>
-              <div style={{ fontSize: 11, color: '#A08068', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>現在のプラン</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 18, fontWeight: 800, color: PLAN_COLORS[currentPlan].text }}>{PLANS[currentPlan].name}</span>
-                {planInfo.cancelAtPeriodEnd && planInfo.currentPeriodEnd && (
-                  <span style={{ fontSize: 11, background: '#FEF2F2', color: '#EF4444', padding: '2px 8px', borderRadius: 99, fontWeight: 700 }}>
-                    {new Date(planInfo.currentPeriodEnd).toLocaleDateString('ja-JP')}で終了
-                  </span>
+          <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #EDD9C8', padding: '16px 20px', marginTop: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+              <div>
+                <div style={{ fontSize: 11, color: '#A08068', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>現在のプラン</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 18, fontWeight: 800, color: PLAN_COLORS[currentPlan].text }}>{PLANS[currentPlan].name}</span>
+                  {planInfo.cancelAtPeriodEnd && planInfo.currentPeriodEnd && (
+                    <span style={{ fontSize: 11, background: '#FEF2F2', color: '#EF4444', padding: '2px 8px', borderRadius: 99, fontWeight: 700 }}>
+                      {new Date(planInfo.currentPeriodEnd).toLocaleDateString('ja-JP')}に終了予定
+                    </span>
+                  )}
+                </div>
+                {currentPlan === 'free' && (
+                  <div style={{ marginTop: 6, fontSize: 12, color: '#A08068' }}>
+                    今月のAI対話: <strong style={{ color: planInfo.monthlySessionCount >= 5 ? '#EF4444' : '#1C0F05' }}>{planInfo.monthlySessionCount}/5件</strong>
+                    {planInfo.monthlySessionCount >= 5 && <span style={{ color: '#EF4444', marginLeft: 6 }}>上限に達しています</span>}
+                  </div>
                 )}
               </div>
-              {currentPlan === 'free' && (
-                <div style={{ marginTop: 6, fontSize: 12, color: '#A08068' }}>
-                  今月のAI対話: <strong style={{ color: planInfo.monthlySessionCount >= 5 ? '#EF4444' : '#1C0F05' }}>{planInfo.monthlySessionCount}/5件</strong>
-                  {planInfo.monthlySessionCount >= 5 && <span style={{ color: '#EF4444', marginLeft: 6 }}>上限に達しています</span>}
-                </div>
-              )}
+              <div style={{ display: 'flex', gap: 8 }}>
+                {currentPlan !== 'free' && (
+                  <button onClick={handlePortal} disabled={!!processing}
+                    style={{ padding: '8px 16px', borderRadius: 99, fontSize: 13, fontWeight: 600, background: '#FAF5F0', color: '#F26722', border: '1.5px solid #F26722', cursor: 'pointer', opacity: processing ? 0.6 : 1 }}>
+                    {processing === 'portal' ? '…' : '支払い履歴'}
+                  </button>
+                )}
+                <Link href="/credits" style={{ padding: '8px 16px', borderRadius: 99, fontSize: 13, fontWeight: 600, background: 'rgba(242,103,34,0.08)', color: '#F26722', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
+                  トークン補充
+                </Link>
+              </div>
             </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {currentPlan !== 'free' && (
+
+            {/* 解約セクション（有料プランのみ） */}
+            {currentPlan !== 'free' && !planInfo.cancelAtPeriodEnd && (
+              <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #F5E8DC' }}>
+                {!showCancelConfirm ? (
+                  <button
+                    onClick={() => setShowCancelConfirm(true)}
+                    style={{ fontSize: 12, color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+                  >
+                    月額プランを解約する
+                  </button>
+                ) : (
+                  <div style={{ background: '#FEF2F2', borderRadius: 12, padding: '14px 16px', border: '1px solid #FECACA' }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#DC2626', marginBottom: 6 }}>⚠️ 解約の確認</div>
+                    <div style={{ fontSize: 12, color: '#4A2C1A', lineHeight: 1.7, marginBottom: 12 }}>
+                      解約すると、<strong>今の契約期間が終わるまでは引き続き使えます。</strong><br />
+                      {planInfo.currentPeriodEnd
+                        ? `次回請求日（${new Date(planInfo.currentPeriodEnd).toLocaleDateString('ja-JP')}）以降は自動更新されません。`
+                        : '次回請求日以降は自動更新されません。'}<br />
+                      解約後はフリープランに戻ります。
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button
+                        onClick={() => { setShowCancelConfirm(false); handlePortal(); }}
+                        disabled={!!processing}
+                        style={{ padding: '8px 18px', borderRadius: 99, fontSize: 13, fontWeight: 700, background: '#DC2626', color: '#fff', border: 'none', cursor: 'pointer', opacity: processing ? 0.6 : 1 }}
+                      >
+                        {processing === 'portal' ? '移動中…' : '解約手続きへ進む'}
+                      </button>
+                      <button
+                        onClick={() => setShowCancelConfirm(false)}
+                        style={{ padding: '8px 18px', borderRadius: 99, fontSize: 13, fontWeight: 600, background: '#F5E8DC', color: '#4A2C1A', border: 'none', cursor: 'pointer' }}
+                      >
+                        キャンセル
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 解約済みの場合のメッセージ */}
+            {currentPlan !== 'free' && planInfo.cancelAtPeriodEnd && planInfo.currentPeriodEnd && (
+              <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #F5E8DC', fontSize: 12, color: '#6B7280' }}>
+                解約済みです。{new Date(planInfo.currentPeriodEnd).toLocaleDateString('ja-JP')}まで利用できます。
                 <button onClick={handlePortal} disabled={!!processing}
-                  style={{ padding: '8px 16px', borderRadius: 99, fontSize: 13, fontWeight: 600, background: '#FAF5F0', color: '#F26722', border: '1.5px solid #F26722', cursor: 'pointer', opacity: processing ? 0.6 : 1 }}>
-                  {processing === 'portal' ? '…' : '請求管理'}
+                  style={{ marginLeft: 8, fontSize: 12, color: '#F26722', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>
+                  再開する
                 </button>
-              )}
-              <Link href="/credits" style={{ padding: '8px 16px', borderRadius: 99, fontSize: 13, fontWeight: 600, background: 'rgba(242,103,34,0.08)', color: '#F26722', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
-                トークン補充
-              </Link>
-            </div>
+              </div>
+            )}
           </div>
         )}
 
