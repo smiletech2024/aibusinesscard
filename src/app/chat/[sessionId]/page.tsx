@@ -246,10 +246,21 @@ export default function ChatPage() {
               {ownerName}の分身AI
             </h1>
             <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#34D399' }} />
-              <p className="text-xs truncate" style={{ color: '#6B4030' }}>
-                {ownerCard?.title || '本人監修のAI'}{ownerCard?.company ? ` · ${ownerCard.company}` : ''}
-              </p>
+              {session?.status === 'owner_chat' ? (
+                <>
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 animate-pulse" style={{ background: '#60A5FA' }} />
+                  <p className="text-xs truncate" style={{ color: '#60A5FA', fontWeight: 600 }}>
+                    {ownerName}本人からの返信を待っています
+                  </p>
+                </>
+              ) : (
+                <>
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#34D399' }} />
+                  <p className="text-xs truncate" style={{ color: '#6B4030' }}>
+                    {ownerCard?.title || '本人監修のAI'}{ownerCard?.company ? ` · ${ownerCard.company}` : ''}
+                  </p>
+                </>
+              )}
             </div>
           </div>
           {turnCount >= 5 && !autoHandingOff && (

@@ -239,12 +239,13 @@ export default function SummaryPage() {
         <div className="space-y-3 pt-2">
           <button
             onClick={async () => {
-              // セッションステータスを owner_chat に更新（通知トリガー）
+              // セッションステータスを owner_chat に更新（オーナーへの通知トリガー）
               await supabase
                 .from('customer_sessions')
                 .update({ status: 'owner_chat', updated_at: new Date().toISOString() })
                 .eq('id', sessionId)
-              router.push(`/owner/chat/${sessionId}`)
+              // お客様はチャットページへ（オーナーからのメッセージを3秒ポーリングで受信）
+              router.push(`/chat/${sessionId}`)
             }}
             className="w-full py-4 text-base font-bold text-white rounded-2xl transition hover:opacity-90"
             style={{
