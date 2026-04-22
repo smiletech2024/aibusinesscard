@@ -1126,7 +1126,7 @@ function PulseBack({ card, fontFamily, tc }: { card: BusinessCard; fontFamily?: 
 }
 
 /* ══════════════════════════════════════════
-   FREE — 自由配置レイアウト（全テーマ共通）
+   FREE — 自由配置レイアウト（テーマ装飾完全再現）
 ══════════════════════════════════════════ */
 function FreeFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 18, tc, printEls, design }: {
   card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number; tc: TC; printEls: PrintEls; design: Design
@@ -1136,22 +1136,45 @@ function FreeFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 18, t
   const qrSize = Math.max(50, qr_block.w - 18)
   return (
     <div className="print-card" style={{ width: W, height: H, background: frontBg, position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
-      {/* テーマ別デコレーション */}
-      {isDark && (
-        <>
-          <div style={{ position: 'absolute', top: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: `radial-gradient(circle, ${accent}22 0%, transparent 70%)`, pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', bottom: -60, right: -60, width: 220, height: 220, borderRadius: '50%', background: `radial-gradient(circle, ${accent}18 0%, transparent 70%)`, pointerEvents: 'none' }} />
-          {[...Array(10)].map((_, i) => (
-            <div key={i} style={{ position: 'absolute', left: 0, right: 0, top: i * 34 + 4, height: 1, background: 'rgba(255,255,255,0.015)', pointerEvents: 'none' }} />
-          ))}
-        </>
+
+      {/* ── テーマ別装飾 ── */}
+      {design === 'executive' && <>
+        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 8, background: 'linear-gradient(180deg,#C4511A,#F26722)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: -40, right: -40, width: 120, height: 120, borderRadius: '50%', background: '#FFF0E8', opacity: 0.7, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: -20, right: -20, width: 70, height: 70, borderRadius: '50%', background: '#FDD5B5', opacity: 0.4, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: 0, left: 8, right: 0, height: 3, background: 'linear-gradient(90deg,#F26722,#F59340,transparent)', pointerEvents: 'none' }} />
+      </>}
+      {design === 'midnight' && <>
+        <div style={{ position: 'absolute', top: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle,rgba(242,103,34,0.18) 0%,transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: -60, right: -60, width: 220, height: 220, borderRadius: '50%', background: 'radial-gradient(circle,rgba(242,103,34,0.12) 0%,transparent 70%)', pointerEvents: 'none' }} />
+        {[...Array(12)].map((_,i) => <div key={i} style={{ position:'absolute', left:0, right:0, top:i*28+4, height:1, background:'rgba(255,255,255,0.015)', pointerEvents:'none' }} />)}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,transparent,#FDD5B5 30%,#F59340 70%,transparent)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,transparent,#FDD5B5 30%,#F59340 70%,transparent)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', right: 140, top: '50%', transform: 'translateY(-50%)', fontSize: 120, fontWeight: 900, color: 'rgba(242,103,34,0.06)', lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>{card.full_name[0]}</div>
+      </>}
+      {(design === 'vivid' || design === 'ocean' || design === 'forest' || design === 'crimson') && <>
+        <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, borderRadius: '50%', background: `radial-gradient(circle,rgba(255,255,255,0.08) 0%,transparent 70%)`, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: -40, left: -40, width: 160, height: 160, borderRadius: '50%', background: `radial-gradient(circle,rgba(255,255,255,0.05) 0%,transparent 70%)`, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent)`, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)`, pointerEvents: 'none' }} />
+      </>}
+      {design === 'gold' && <>
+        <div style={{ position: 'absolute', top: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle,rgba(212,175,55,0.15) 0%,transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: -60, right: -60, width: 220, height: 220, borderRadius: '50%', background: 'radial-gradient(circle,rgba(212,175,55,0.10) 0%,transparent 70%)', pointerEvents: 'none' }} />
+        {[...Array(12)].map((_,i) => <div key={i} style={{ position:'absolute', left:0, right:0, top:i*28+4, height:1, background:'rgba(255,255,255,0.015)', pointerEvents:'none' }} />)}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,transparent,#D4AF37 30%,#F5E6A3 70%,transparent)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,transparent,#D4AF37 30%,#F5E6A3 70%,transparent)', pointerEvents: 'none' }} />
+      </>}
+      {design === 'pink' && <>
+        <div style={{ position: 'absolute', top: -40, right: -40, width: 120, height: 120, borderRadius: '50%', background: '#FECDD3', opacity: 0.5, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: -20, right: -20, width: 70, height: 70, borderRadius: '50%', background: '#FCA5A5', opacity: 0.3, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#EC4899,transparent)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#EC4899,transparent)', pointerEvents: 'none' }} />
+      </>}
+      {/* executive以外の左アクセントバー */}
+      {design !== 'executive' && (
+        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 5, background: `linear-gradient(180deg,${accent},${accent}66)`, pointerEvents: 'none' }} />
       )}
-      {/* 左アクセントバー */}
-      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, background: `linear-gradient(180deg, ${accent}, ${accent}88)`, pointerEvents: 'none' }} />
-      {/* アクセントライン（上） */}
-      <div style={{ position: 'absolute', top: 0, left: 6, right: 0, height: 2, background: `linear-gradient(90deg, ${accent}, transparent)`, pointerEvents: 'none' }} />
-      {/* アクセントライン（下） */}
-      <div style={{ position: 'absolute', bottom: 0, left: 6, right: 0, height: 2, background: `linear-gradient(90deg, ${accent}, transparent)`, pointerEvents: 'none' }} />
 
       {/* ロゴ */}
       {logoUrl && (
@@ -1951,11 +1974,8 @@ export default function PrintCardPage() {
             </div>
           ) : undefined}
         >
-          {/* captureRef内: 編集モード=FreeFront（カスタム配置ダウンロード）、プレビュー=元のデザイン */}
-          {editMode
-            ? <FreeFront card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} logoUrl={logoUrl || undefined} logoX={logoX} logoY={logoY} tc={tc} printEls={printEls} design={design} />
-            : <FrontComponent card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} logoUrl={logoUrl || undefined} logoX={logoX} logoY={logoY} />
-          }
+          {/* captureRef: 常にFreeFront（編集・プレビュー・ダウンロード全て一致） */}
+          <FreeFront card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} logoUrl={logoUrl || undefined} logoX={logoX} logoY={logoY} tc={tc} printEls={printEls} design={design} />
         </CardPreview>
 
         {/* 裏面 */}
