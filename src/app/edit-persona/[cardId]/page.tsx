@@ -222,8 +222,22 @@ export default function EditPersonaPage() {
             onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.boxShadow = '0 0 0 3px rgba(242,103,34,0.1)' }}
             onBlur={e => { e.target.style.borderColor = 'rgba(242,103,34,0.2)'; e.target.style.boxShadow = 'none' }}
           />
-          {rawVoice.length > 0 && (
-            <p className="text-xs mt-2" style={{ color: '#A08068' }}>{rawVoice.length}文字 · 多いほど精度が上がります</p>
+          <div className="mt-2 flex items-center justify-between">
+            {rawVoice.length > 0 ? (
+              <div className="flex items-center gap-2">
+                <div className="text-xs font-bold" style={{ color: rawVoice.length >= 300 ? '#059669' : rawVoice.length >= 100 ? '#F59E0B' : '#EF4444' }}>
+                  {rawVoice.length >= 300 ? '✓ 精度：高' : rawVoice.length >= 100 ? '△ 精度：中（もう少し書くと上がります）' : '✗ 精度：低（100文字以上を目安に）'}
+                </div>
+                <span className="text-xs" style={{ color: '#A08068' }}>{rawVoice.length}文字</span>
+              </div>
+            ) : (
+              <p className="text-xs" style={{ color: '#A08068' }}>100文字以上書くと効果が出ます（300文字以上で最高精度）</p>
+            )}
+          </div>
+          {rawVoice.length > 0 && rawVoice.length < 100 && (
+            <div className="mt-2 p-3 rounded-xl text-xs" style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)', color: '#B91C1C' }}>
+              💡 ヒント：SNSの投稿、お客様へのメール、自己紹介文など、すでに書いたものをそのまま貼り付けるだけでOKです
+            </div>
           )}
         </div>
 

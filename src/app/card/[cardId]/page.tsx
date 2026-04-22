@@ -630,6 +630,24 @@ export default function CardPage() {
                   本人の分身AIに相談する
                 </button>
 
+                {/* カスタムCTAボタン（成約への直接導線） */}
+                {card.cta_url && card.cta_label && (
+                  <a
+                    href={card.cta_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-4 text-base font-bold rounded-2xl flex items-center justify-center gap-2"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(242,103,34,0.15), rgba(242,103,34,0.25))',
+                      border: '1.5px solid rgba(242,103,34,0.5)',
+                      color: '#F5843A', textDecoration: 'none',
+                      touchAction: 'manipulation', display: 'flex',
+                    } as React.CSSProperties}
+                  >
+                    🎯 {card.cta_label}
+                  </a>
+                )}
+
                 {/* サブCTA：アポイント */}
                 <button
                   onClick={() => setShowAppt(true)}

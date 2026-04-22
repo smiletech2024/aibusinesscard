@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/client'
 interface CardData {
   full_name: string; title: string; company: string
   short_intro: string; email: string; phone: string; website: string
+  cta_label: string; cta_url: string
 }
 
 const cardFields = [
@@ -28,6 +29,7 @@ export default function EditCardPage() {
 
   const [cardData, setCardData] = useState<CardData>({
     full_name: '', title: '', company: '', short_intro: '', email: '', phone: '', website: '',
+    cta_label: '', cta_url: '',
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -55,6 +57,8 @@ export default function EditCardPage() {
         email:       card.email       ?? '',
         phone:       card.phone       ?? '',
         website:     card.website     ?? '',
+        cta_label:   (card as { cta_label?: string }).cta_label ?? '',
+        cta_url:     (card as { cta_url?: string }).cta_url     ?? '',
       })
       setLoading(false)
     }
@@ -69,7 +73,11 @@ export default function EditCardPage() {
       const res = await fetch(`/api/card/${cardId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(cardData),
+        body: JSON.stringify({
+          ...cardData,
+          cta_label: cardData.cta_label || null,
+          cta_url:   cardData.cta_url   || null,
+        }),
       })
       if (res.ok) {
         router.push('/dashboard')
@@ -169,6 +177,48 @@ export default function EditCardPage() {
               )}
             </div>
           ))}
+
+          {/* CTA（成約ボタン） */}
+          <div style={{ marginTop: 8, padding: '16px', background: 'rgba(242,103,34,0.05)', border: '1.5px solid rgba(242,103,34,0.2)', borderRadius: 14 }}>
+            <p className="text-sm font-black mb-0.5" style={{ color: '#1C0F05' }}>
+              🎯 成約ボタン <span className="text-xs font-normal" style={{ color: '#A08068' }}>（任意）</span>
+            </p>
+            <p className="text-xs mb-4" style={{ color: '#A08068' }}>お客様のカードページに「予約する」「注文する」などのボタンを表示できます</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div>
+                <label className="block text-xs font-semibold mb-1" style={{ color: '#4A2C1A' }}>ボタンのラベル</label>
+                <input
+                  type="text"
+                  value={cardData.cta_label}
+                  onChange={e => setCardData(p => ({ ...p, cta_label: e.target.value }))}
+                  placeholder="例：今すぐ予約する / 注文ページへ"
+                  style={{
+                    width: '100%', padding: '11px 14px', fontSize: 14,
+                    border: '1.5px solid #DEC4AD', borderRadius: 10,
+                    background: '#FAF5F0', color: '#1C0F05', outline: 'none', boxSizing: 'border-box',
+                  }}
+                  onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.boxShadow = '0 0 0 3px rgba(242,103,34,0.12)' }}
+                  onBlur={e => { e.target.style.borderColor = '#DEC4AD'; e.target.style.boxShadow = 'none' }}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1" style={{ color: '#4A2C1A' }}>遷移先URL</label>
+                <input
+                  type="url"
+                  value={cardData.cta_url}
+                  onChange={e => setCardData(p => ({ ...p, cta_url: e.target.value }))}
+                  placeholder="https://your-booking-site.com"
+                  style={{
+                    width: '100%', padding: '11px 14px', fontSize: 14,
+                    border: '1.5px solid #DEC4AD', borderRadius: 10,
+                    background: '#FAF5F0', color: '#1C0F05', outline: 'none', boxSizing: 'border-box',
+                  }}
+                  onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.boxShadow = '0 0 0 3px rgba(242,103,34,0.12)' }}
+                  onBlur={e => { e.target.style.borderColor = '#DEC4AD'; e.target.style.boxShadow = 'none' }}
+                />
+              </div>
+            </div>
+          </div>
 
           {error && (
             <p className="text-sm text-center" style={{ color: '#EF4444' }}>{error}</p>

@@ -62,6 +62,13 @@ export default function DashboardPage() {
   const [quickInput, setQuickInput]           = useState<Record<string, string>>({})
   const [quickSubmitting, setQuickSubmitting] = useState<Record<string, boolean>>({})
 
+  type Analytics = {
+    hot: number; warm: number; cold: number
+    topInterests: { label: string; count: number }[]
+    totalSessions: number; summarizedSessions: number
+  }
+  const [analytics, setAnalytics] = useState<Analytics | null>(null)
+
   type Appointment = {
     id: string; card_id: string; card_name: string
     customer_name: string; customer_email: string | null; customer_phone: string | null
@@ -71,6 +78,12 @@ export default function DashboardPage() {
   }
 
   useEffect(() => { checkAuth() }, [])
+  useEffect(() => {
+    fetch('/api/analytics')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setAnalytics(d) })
+      .catch(() => {})
+  }, [])
   useEffect(() => {
     fetch('/api/appointments')
       .then(r => r.ok ? r.json() : null)
@@ -640,6 +653,83 @@ export default function DashboardPage() {
                 <div className="text-xs" style={{ color }}>{unit}</div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* ── 顧客関心の可視化（アナリティクス） ── */}
+        {analytics && analytics.summarizedSessions > 0 && (
+          <div
+            className="rounded-2xl p-5"
+            style={{ background: 'white', border: '1px solid #EDD9C8', boxShadow: '0 1px 3px rgba(242,103,34,0.06)' }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="section-label mb-0.5">分析レポート</p>
+                <h2 className="text-base font-black" style={{ color: '#1C0F05' }}>顧客インサイト</h2>
+              </div>
+              <span className="text-xs" style={{ color: '#A08068' }}>直近90日 · {analytics.summarizedSessions}件の会話</span>
+            </div>
+
+            {/* 熱量分布 */}
+            <div className="mb-4">
+              <p className="text-xs font-bold mb-2" style={{ color: '#A08068' }}>商談温度の分布</p>
+              {(() => {
+                const total = analytics.hot + analytics.warm + analytics.cold || 1
+                return (
+                  <div>
+                    <div className="flex rounded-xl overflow-hidden h-6 mb-2">
+                      {analytics.hot > 0 && (
+                        <div style={{ width: `${(analytics.hot / total) * 100}%`, background: 'linear-gradient(90deg, #EF4444, #F97316)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span style={{ fontSize: 10, color: 'white', fontWeight: 700 }}>{Math.round((analytics.hot / total) * 100)}%</span>
+                        </div>
+                      )}
+                      {analytics.warm > 0 && (
+                        <div style={{ width: `${(analytics.warm / total) * 100}%`, background: 'linear-gradient(90deg, #F59E0B, #FBBF24)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span style={{ fontSize: 10, color: 'white', fontWeight: 700 }}>{Math.round((analytics.warm / total) * 100)}%</span>
+                        </div>
+                      )}
+                      {analytics.cold > 0 && (
+                        <div style={{ width: `${(analytics.cold / total) * 100}%`, background: 'linear-gradient(90deg, #6B7280, #9CA3AF)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span style={{ fontSize: 10, color: 'white', fontWeight: 700 }}>{Math.round((analytics.cold / total) * 100)}%</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-4">
+                      {[
+                        { emoji: '🔥', label: '熱い', count: analytics.hot, color: '#EF4444' },
+                        { emoji: '🌡', label: 'ぬるい', count: analytics.warm, color: '#F59E0B' },
+                        { emoji: '❄️', label: '冷たい', count: analytics.cold, color: '#6B7280' },
+                      ].map(({ emoji, label, count, color }) => count > 0 && (
+                        <div key={label} className="flex items-center gap-1.5">
+                          <span style={{ fontSize: 12 }}>{emoji}</span>
+                          <span className="text-xs font-bold" style={{ color }}>{count}件</span>
+                          <span className="text-xs" style={{ color: '#A08068' }}>{label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()}
+            </div>
+
+            {/* 興味キーワード */}
+            {analytics.topInterests.length > 0 && (
+              <div>
+                <p className="text-xs font-bold mb-2" style={{ color: '#A08068' }}>お客様が最も関心を持ったトピック</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {analytics.topInterests.map(({ label, count }, i) => (
+                    <div key={label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+                      style={{
+                        background: i === 0 ? 'rgba(242,103,34,0.12)' : 'rgba(0,0,0,0.04)',
+                        border: i === 0 ? '1px solid rgba(242,103,34,0.3)' : '1px solid rgba(0,0,0,0.08)',
+                      }}>
+                      <span className="text-xs font-bold" style={{ color: i === 0 ? '#F26722' : '#4A2C1A' }}>{label}</span>
+                      <span className="text-xs rounded-full px-1.5 font-bold" style={{ background: i === 0 ? '#F26722' : '#A08068', color: 'white', fontSize: 10 }}>{count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

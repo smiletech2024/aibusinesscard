@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
 
     const { data: card } = await supabase
       .from('business_cards')
-      .select('full_name, title')
+      .select('full_name, title, cta_label, cta_url')
       .eq('persona_id', personaId)
       .single()
 
@@ -63,7 +63,14 @@ export async function POST(req: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(10)
 
-    const systemPrompt = getAvatarSystemPrompt(persona, ownerName, ownerTitle, quickUpdates ?? [])
+    const systemPrompt = getAvatarSystemPrompt(
+      persona,
+      ownerName,
+      ownerTitle,
+      quickUpdates ?? [],
+      (card as { cta_label?: string | null } | null)?.cta_label,
+      (card as { cta_url?: string | null } | null)?.cta_url,
+    )
 
     // ユーザーメッセージを保存
     if (sessionId && userMessage) {

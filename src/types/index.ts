@@ -48,6 +48,8 @@ export interface BusinessCard {
   phone: string | null
   website: string | null
   qr_url: string | null
+  cta_label: string | null
+  cta_url: string | null
   is_active: boolean
   created_at: string
   updated_at: string

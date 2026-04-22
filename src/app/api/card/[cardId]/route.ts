@@ -29,7 +29,7 @@ export async function PATCH(
     }
 
     const body = await req.json()
-    const { full_name, title, company, short_intro, email, phone, website, style_config } = body
+    const { full_name, title, company, short_intro, email, phone, website, style_config, cta_label, cta_url } = body
 
     const payload: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
@@ -45,6 +45,10 @@ export async function PATCH(
       payload.phone       = phone       || null
       payload.website     = website     || null
     }
+
+    // CTAフィールド
+    if (cta_label !== undefined) payload.cta_label = cta_label || null
+    if (cta_url   !== undefined) payload.cta_url   = cta_url   || null
 
     // style_config は image_url に JSON 文字列として保存
     if (style_config !== undefined) {

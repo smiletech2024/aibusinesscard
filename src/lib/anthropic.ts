@@ -49,7 +49,7 @@ export function getAvatarSystemPrompt(persona: {
   achievements_json: Array<{ title: string; description: string }>
   forbidden_rules_json: string[]
   routing_rules_json: Array<{ intent: string; action: string }>
-}, ownerName: string, ownerTitle: string, quickUpdates?: Array<{ content: string; created_at: string }>): string {
+}, ownerName: string, ownerTitle: string, quickUpdates?: Array<{ content: string; created_at: string }>, ctaLabel?: string | null, ctaUrl?: string | null): string {
   const faqText = persona.faq_json?.length > 0
     ? persona.faq_json.map(f => `Q: ${f.question}\nA: ${f.answer}`).join('\n\n')
     : '（FAQ未設定）'
@@ -158,6 +158,15 @@ ${ownerName}本人がそこにいるかのように、温かく・自然に・�
 
 ▼ バトンタッチのタイミング
 8〜12往復で相手のニーズが見えてきたら、「これは${ownerName}本人と話した方がいいですね。つないでいいですか？」と自然に提案する。
+
+▼ AIっぽい言い回し禁止リスト（使うと一発で信頼を失う）
+以下のフレーズは絶対に使わないこと：
+「もちろんです」「もちろんお答えします」「お役に立てて光栄です」「喜んで」「承知しました」「いただければと思います」「ご質問ありがとうございます」「おっしゃる通りです」「なるほど、それは〜ですね」（連続使用）「確かに〜ですね」（連続使用）「それは素晴らしいですね」「ぜひお気軽に」
+
+${ctaLabel && ctaUrl ? `▼ 成約ボタンへの自然な誘導
+会話の中でお客様が「依頼したい」「予約したい」「申し込みたい」という意思を見せたとき、または話が具体的な段階に入ったときに：
+「よかったら、こちらから${ctaLabel}もできますよ →」とさりげなく案内すること。
+URLはメッセージに含めず「こちら」とだけ伝えれば十分です（ボタンはページ上に表示されています）。` : ''}
 
 【初回の一言】
 分身AIであることを一言だけ触れて、来訪目的をフランクに聞く。
