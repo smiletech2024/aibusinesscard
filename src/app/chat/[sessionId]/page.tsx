@@ -35,39 +35,39 @@ export default function ChatPage() {
     loadSession()
   }, [sessionId])
 
-  // 本人メッセージのポーリング（3秒ごと・ブラウザ側Supabaseクライアントで直接取得）
+  // 本人メッセージのポーリング（3秒ごと・APIルート経由でサービスロール取得）
   const knownOwnerMsgIds = useRef<Set<string>>(new Set())
   useEffect(() => {
     if (viewOnly) return
 
     const fetchOwnerChats = async (notify: boolean) => {
-      const { data: chats } = await supabase
-        .from('human_chats')
-        .select('*')
-        .eq('session_id', sessionId)
-        .eq('sender_role', 'owner')
-        .order('created_at', { ascending: true })
-      if (!chats) return
-      const newOnes = chats.filter((c: { id: string; content: string }) => !knownOwnerMsgIds.current.has(c.id))
-      if (newOnes.length === 0) return
-      newOnes.forEach((c: { id: string }) => knownOwnerMsgIds.current.add(c.id))
-      setMessages(prev => [
-        ...prev,
-        ...newOnes.map((c: { content: string }) => ({ role: 'owner' as const, content: c.content })),
-      ])
-      if (notify) {
-        setOwnerMessageAlert(true)
-        try {
-          const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
-          const osc = ctx.createOscillator(); const gain = ctx.createGain()
-          osc.connect(gain); gain.connect(ctx.destination)
-          osc.frequency.setValueAtTime(660, ctx.currentTime)
-          osc.frequency.setValueAtTime(880, ctx.currentTime + 0.12)
-          gain.gain.setValueAtTime(0.3, ctx.currentTime)
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5)
-          osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.5)
-        } catch { /* ignore */ }
-      }
+      try {
+        const res = await fetch(`/api/human-chat?sessionId=${sessionId}`)
+        if (!res.ok) return
+        const { chats } = await res.json()
+        if (!Array.isArray(chats)) return
+        const ownerChats = chats.filter((c: { sender_role: string }) => c.sender_role === 'owner')
+        const newOnes = ownerChats.filter((c: { id: string }) => !knownOwnerMsgIds.current.has(c.id))
+        if (newOnes.length === 0) return
+        newOnes.forEach((c: { id: string }) => knownOwnerMsgIds.current.add(c.id))
+        setMessages(prev => [
+          ...prev,
+          ...newOnes.map((c: { content: string }) => ({ role: 'owner' as const, content: c.content })),
+        ])
+        if (notify) {
+          setOwnerMessageAlert(true)
+          try {
+            const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+            const osc = ctx.createOscillator(); const gain = ctx.createGain()
+            osc.connect(gain); gain.connect(ctx.destination)
+            osc.frequency.setValueAtTime(660, ctx.currentTime)
+            osc.frequency.setValueAtTime(880, ctx.currentTime + 0.12)
+            gain.gain.setValueAtTime(0.3, ctx.currentTime)
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5)
+            osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.5)
+          } catch { /* ignore */ }
+        }
+      } catch { /* ignore */ }
     }
 
     // 初回：既存メッセージを表示するが通知しない

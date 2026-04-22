@@ -141,6 +141,10 @@ export default function OwnerChatPage() {
       // 相手へプッシュ通知
       const targetRole = senderRole === 'owner' ? 'customer' : 'owner'
       const senderName = senderRole === 'owner' ? ownerName : customerName
+      // お客様宛は /chat/、本人宛は /owner/chat/ に誘導
+      const notifyUrl = targetRole === 'customer'
+        ? `${window.location.origin}/chat/${sessionId}`
+        : `${window.location.origin}/owner/chat/${sessionId}`
       fetch('/api/push/send', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -148,7 +152,7 @@ export default function OwnerChatPage() {
           targetRole,
           title: `💬 ${senderName}からメッセージ`,
           body: content.length > 60 ? content.slice(0, 60) + '…' : content,
-          url: `${window.location.origin}/owner/chat/${sessionId}`,
+          url: notifyUrl,
         }),
       })
     } finally { setLoading(false) }

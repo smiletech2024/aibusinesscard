@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdmin } from '@supabase/supabase-js'
+
+function getAdmin() {
+  return createAdmin(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,7 +43,6 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient()
     const { searchParams } = new URL(req.url)
     const sessionId = searchParams.get('sessionId')
 
@@ -43,13 +50,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'sessionId required' }, { status: 400 })
     }
 
-    const { data: chats, error } = await supabase
+    // サービスロールでRLSを完全にバイパス（未ログインのお客様でも取得可能）
+    const admin = getAdmin()
+    const { data: chats, error } = await admin
       .from('human_chats')
       .select('*')
       .eq('session_id', sessionId)
       .order('created_at', { ascending: true })
 
     if (error) {
+      console.error('[human-chat GET]', error)
       return NextResponse.json({ error: 'Failed to fetch chats' }, { status: 500 })
     }
 
