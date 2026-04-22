@@ -1096,7 +1096,7 @@ function PulseBack({ card, fontFamily, tc }: { card: BusinessCard; fontFamily?: 
         {/* キャッチコピー */}
         <p style={{ fontSize: 8, color: accent, fontWeight: 800, letterSpacing: '0.2em', margin: '0 0 12px', textTransform: 'uppercase' as const }}>分身AI搭載名刺</p>
         <h3 style={{ fontSize: 19, fontWeight: 900, color: '#FFFFFF', margin: '0 0 8px', lineHeight: 1.3, letterSpacing: '-0.01em' }}>
-          名刺をスキャンすると<br />私のAIと話せます
+          名刺をスキャンすると<br />私の分身AIと話せます
         </h3>
         {card.short_intro && (
           <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.4)', margin: '0 0 18px', lineHeight: 1.65, maxWidth: 300 }}>{card.short_intro}</p>
