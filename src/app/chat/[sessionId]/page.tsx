@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import { CustomerSession, AiConversation } from '@/types'
 import { subscribePush } from '@/lib/push'
 
-interface Message { role: 'user' | 'assistant'; content: string; saved?: boolean }
+interface Message { role: 'user' | 'assistant' | 'owner'; content: string; saved?: boolean }
 
 export default function ChatPage() {
   const params = useParams()
@@ -26,6 +26,7 @@ export default function ChatPage() {
   const [pushEnabled, setPushEnabled] = useState(false)
   const [pushAsked, setPushAsked] = useState(false)
   const [showBranding, setShowBranding] = useState(false)
+  const [ownerMessageAlert, setOwnerMessageAlert] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
@@ -33,6 +34,40 @@ export default function ChatPage() {
     if (viewOnly) { router.replace(`/owner/chat/${sessionId}`); return }
     loadSession()
   }, [sessionId])
+
+  // 本人メッセージのリアルタイム受信
+  useEffect(() => {
+    if (viewOnly) return
+    const channel = supabase
+      .channel(`owner_msgs_${sessionId}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'human_chats', filter: `session_id=eq.${sessionId}` },
+        payload => {
+          const chat = payload.new as { sender_role: string; content: string; id: string }
+          if (chat.sender_role !== 'owner') return
+          setMessages(prev => {
+            if (prev.some(m => m.role === 'owner' && m.content === chat.content)) return prev
+            return [...prev, { role: 'owner', content: chat.content }]
+          })
+          setOwnerMessageAlert(true)
+          // 通知音
+          try {
+            const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+            const osc = ctx.createOscillator(); const gain = ctx.createGain()
+            osc.connect(gain); gain.connect(ctx.destination)
+            osc.frequency.setValueAtTime(660, ctx.currentTime)
+            osc.frequency.setValueAtTime(880, ctx.currentTime + 0.12)
+            gain.gain.setValueAtTime(0.3, ctx.currentTime)
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5)
+            osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.5)
+          } catch { /* ignore */ }
+        }
+      )
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [sessionId, viewOnly])
+
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
   const loadSession = async () => {
@@ -186,6 +221,28 @@ export default function ChatPage() {
         </div>
       </div>
 
+      {/* 本人からメッセージ届いたバナー */}
+      {ownerMessageAlert && (
+        <div
+          style={{
+            background: 'linear-gradient(135deg,#1E40AF,#2563EB)',
+            padding: '10px 16px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4ADE80', display: 'inline-block', flexShrink: 0 }} />
+            <p style={{ color: '#fff', fontSize: 13, fontWeight: 700, margin: 0 }}>
+              {ownerName}本人からメッセージが届きました👇
+            </p>
+          </div>
+          <button
+            onClick={() => setOwnerMessageAlert(false)}
+            style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', fontSize: 18, flexShrink: 0 }}
+          >×</button>
+        </div>
+      )}
+
       {/* メッセージ */}
       <div className="flex-1 overflow-y-auto px-4 pt-5 pb-4 space-y-4 max-w-2xl mx-auto w-full">
 
@@ -249,30 +306,58 @@ export default function ChatPage() {
             </div>
           </div>
         )}
-        {messages.map((msg, i) => (
-          <div key={i} className={`flex gap-2.5 fade-up ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {msg.role === 'assistant' && (
-              <div
-                className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-black text-white shadow-sm"
-                style={{ background: 'linear-gradient(135deg, #E05A18, #F5843A)' }}
-              >
-                AI
-              </div>
-            )}
-            <div
-              className={`max-w-xs sm:max-w-md ${msg.role === 'user' ? 'bubble-user-dark' : 'bubble-ai-dark'}`}
-              style={{ whiteSpace: 'pre-wrap' }}
-            >
-              {msg.content || (
-                <span className="flex items-center gap-1.5 py-0.5">
-                  <span className="dot-pulse" style={{ background: '#A08068' }} />
-                  <span className="dot-pulse" style={{ background: '#A08068' }} />
-                  <span className="dot-pulse" style={{ background: '#A08068' }} />
-                </span>
+        {messages.map((msg, i) => {
+          const isUser     = msg.role === 'user'
+          const isOwner    = msg.role === 'owner'
+          const isAssist   = msg.role === 'assistant'
+          return (
+            <div key={i} className={`flex gap-2.5 fade-up ${isUser ? 'justify-end' : 'justify-start'}`}>
+              {/* アバター */}
+              {isAssist && (
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-black text-white shadow-sm"
+                  style={{ background: 'linear-gradient(135deg, #E05A18, #F5843A)' }}>AI</div>
               )}
+              {isOwner && (
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-black text-white shadow-sm"
+                  style={{ background: 'linear-gradient(135deg, #1E40AF, #3B82F6)' }}
+                >{ownerName[0]}</div>
+              )}
+
+              <div className="flex flex-col gap-1 max-w-xs sm:max-w-md">
+                {/* 送信者ラベル */}
+                {isOwner && (
+                  <p className="text-xs font-bold" style={{ color: '#60A5FA' }}>
+                    👤 {ownerName}本人
+                  </p>
+                )}
+                <div
+                  style={{
+                    whiteSpace: 'pre-wrap',
+                    padding: '10px 14px',
+                    borderRadius: isUser ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+                    fontSize: 14, lineHeight: 1.75,
+                    background: isUser
+                      ? 'linear-gradient(135deg,#F26722,#F59340)'
+                      : isOwner
+                        ? 'linear-gradient(135deg,#1E40AF,#3B82F6)'
+                        : '#1C0F05',
+                    color: (isUser || isOwner) ? '#fff' : '#FFF0E8',
+                    border: (!isUser && !isOwner) ? '1px solid rgba(242,103,34,0.12)' : 'none',
+                    boxShadow: isOwner ? '0 4px 16px rgba(37,99,235,0.3)' : isUser ? '0 4px 16px rgba(242,103,34,0.2)' : 'none',
+                  }}
+                >
+                  {msg.content || (
+                    <span className="flex items-center gap-1.5 py-0.5">
+                      <span className="dot-pulse" style={{ background: '#A08068' }} />
+                      <span className="dot-pulse" style={{ background: '#A08068' }} />
+                      <span className="dot-pulse" style={{ background: '#A08068' }} />
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
         <div ref={messagesEndRef} />
       </div>
 
