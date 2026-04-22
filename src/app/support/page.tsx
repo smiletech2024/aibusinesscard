@@ -34,7 +34,6 @@ function KaoriChat() {
   const [operatorActive, setOperatorActive] = useState(false)
   const [showIntro, setShowIntro]         = useState(true)
   const [customerName, setCustomerName]   = useState('')
-  const [meetingCtx, setMeetingCtx]       = useState('')
   const lastPollTimeRef           = useRef<string>(new Date().toISOString())
   const bottomRef                 = useRef<HTMLDivElement>(null)
   const pollTimerRef              = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -189,7 +188,7 @@ function KaoriChat() {
 
   const startChat = async () => {
     // セッションにコンテキストを保存
-    if (sessionKey && (customerName.trim() || meetingCtx.trim())) {
+    if (sessionKey && customerName.trim()) {
       try {
         await fetch('/api/support-chat/context', {
           method: 'POST',
@@ -197,7 +196,6 @@ function KaoriChat() {
           body: JSON.stringify({
             sessionKey,
             customerName: customerName.trim(),
-            meetingContext: meetingCtx.trim(),
           }),
         })
       } catch { /* ignore */ }
@@ -277,46 +275,6 @@ function KaoriChat() {
               placeholder="例：田中 太郎"
               style={{
                 width: '100%', padding: '10px 14px', fontSize: 14,
-                border: '1.5px solid #EDD9C8', borderRadius: 10,
-                background: '#fff', color: '#1C0F05', outline: 'none',
-                boxSizing: 'border-box',
-              }}
-            />
-          </div>
-
-          {/* 接点 */}
-          <div style={{ marginBottom: 20 }}>
-            <label style={{ fontSize: 12, fontWeight: 700, color: '#4A2C1A', display: 'block', marginBottom: 8 }}>
-              どちらでお会いしましたか？
-            </label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
-              {['展示会・イベント', '紹介', 'SNS・Web', '直接お渡し', 'その他'].map(option => (
-                <button
-                  key={option}
-                  onClick={() => setMeetingCtx(meetingCtx === option ? '' : option)}
-                  style={{
-                    padding: '7px 14px',
-                    borderRadius: 99,
-                    border: `1.5px solid ${meetingCtx === option ? '#F26722' : '#EDD9C8'}`,
-                    background: meetingCtx === option ? '#FFF0E8' : '#fff',
-                    color: meetingCtx === option ? '#F26722' : '#A08068',
-                    fontSize: 12,
-                    fontWeight: meetingCtx === option ? 700 : 400,
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-            <input
-              type="text"
-              value={['展示会・イベント', '紹介', 'SNS・Web', '直接お渡し', 'その他'].includes(meetingCtx) ? '' : meetingCtx}
-              onChange={e => setMeetingCtx(e.target.value)}
-              placeholder="または自由に入力…"
-              style={{
-                width: '100%', padding: '9px 14px', fontSize: 13,
                 border: '1.5px solid #EDD9C8', borderRadius: 10,
                 background: '#fff', color: '#1C0F05', outline: 'none',
                 boxSizing: 'border-box',
