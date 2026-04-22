@@ -150,10 +150,10 @@ function FrontBrandMark({ theme }: { theme: 'light' | 'dark' }) {
 function BackFeatureList({ accent, textColor = 'rgba(255,255,255,0.85)' }: { accent: string; textColor?: string }) {
   const items = ['お問い合わせ対応', 'アポイント取得', '分身AIと会話']
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 20px', justifyContent: 'center', margin: '0 0 10px' }}>
+    <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '6px 16px', justifyContent: 'center', alignItems: 'center', width: '100%', margin: '0 0 10px' }}>
       {items.map((item, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 18, color: textColor, lineHeight: 1.2 }}>
-          <span style={{ color: accent, fontWeight: 900, lineHeight: 1 }}>✓</span>
+        <div key={i} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 5, fontSize: 18, color: textColor, lineHeight: 1.2, whiteSpace: 'nowrap' }}>
+          <span style={{ color: accent, fontWeight: 900, lineHeight: 1, flexShrink: 0 }}>✓</span>
           <span>{item}</span>
         </div>
       ))}
@@ -161,18 +161,6 @@ function BackFeatureList({ accent, textColor = 'rgba(255,255,255,0.85)' }: { acc
   )
 }
 
-/* ─── ブランドロゴ（裏面用・やや大きめ） ─── */
-function BackBrandLogo() {
-  return (
-    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-      <LogoIcon size={20} />
-      <div>
-        <div style={{ fontSize: 18, fontWeight: 900, color: 'white', letterSpacing: '-0.01em', lineHeight: 1 }}>AI名刺</div>
-        <div style={{ fontSize: 18, color: 'rgba(255,255,255,0.45)', fontWeight: 600, letterSpacing: '0.08em', marginTop: 1 }}>次世代名刺</div>
-      </div>
-    </div>
-  )
-}
 
 /* ══════════════════════════════════════════
    EXECUTIVE — 白 × インディゴ
