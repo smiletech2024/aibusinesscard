@@ -1180,20 +1180,22 @@ function FreeFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 18, t
       </div>
 
       {/* 連絡先ブロック */}
-      <div style={{ position: 'absolute', left: contacts.x, top: contacts.y, width: contacts.w, height: contacts.h, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 7 }}>
+      <div style={{ position: 'absolute', left: contacts.x, top: contacts.y, width: contacts.w, display: 'flex', flexDirection: 'column', gap: 7 }}>
         {card.email && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: textContact, fontSize: 18 }}>
-            <span style={{ color: accent }}><IconMail /></span>{card.email}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: textContact, fontSize: 18, minWidth: 0 }}>
+            <span style={{ color: accent, flexShrink: 0 }}><IconMail /></span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{card.email}</span>
           </div>
         )}
         {card.phone && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: textContact, fontSize: 18 }}>
-            <span style={{ color: accent }}><IconPhone /></span>{card.phone}
+            <span style={{ color: accent, flexShrink: 0 }}><IconPhone /></span>{card.phone}
           </div>
         )}
         {card.website && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: textContact, fontSize: 18 }}>
-            <span style={{ color: accent }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: textContact, fontSize: 18, minWidth: 0 }}>
+            <span style={{ color: accent, flexShrink: 0 }}><IconGlobe /></span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{card.website.replace(/https?:\/\//, '')}</span>
           </div>
         )}
       </div>
@@ -1709,13 +1711,13 @@ export default function PrintCardPage() {
           </div>
 
           {/* 編集 / プレビュー 切替バー */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {/* トグル（コンパクト・折り返しなし） */}
-            <div style={{ display: 'flex', background: '#F0E8E0', borderRadius: 8, padding: 2, gap: 2, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
+            {/* トグル — 両ボタン固定幅でスマホでも折り返しなし */}
+            <div style={{ display: 'inline-flex', background: '#F0E8E0', borderRadius: 8, padding: 2, gap: 2, flexShrink: 0 }}>
               <button
                 onClick={() => setEditMode(true)}
                 style={{
-                  padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700,
+                  width: 64, padding: '6px 0', borderRadius: 6, fontSize: 11, fontWeight: 700,
                   border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
                   background: editMode ? '#1C0F05' : 'transparent',
                   color: editMode ? 'white' : '#A08068',
@@ -1725,7 +1727,7 @@ export default function PrintCardPage() {
               <button
                 onClick={() => setEditMode(false)}
                 style={{
-                  padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700,
+                  width: 76, padding: '6px 0', borderRadius: 6, fontSize: 11, fontWeight: 700,
                   border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
                   background: !editMode ? '#F26722' : 'transparent',
                   color: !editMode ? 'white' : '#A08068',
@@ -1734,7 +1736,7 @@ export default function PrintCardPage() {
               >👁 仕上がり</button>
             </div>
             {/* サブテキスト */}
-            <span style={{ fontSize: 10, color: editMode ? '#C4511A' : '#A08068', fontWeight: 600, flex: 1, minWidth: 0 }}>
+            <span style={{ fontSize: 10, color: editMode ? '#C4511A' : '#A08068', fontWeight: 600, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {editMode ? '点線枠をドラッグ移動' : '印刷と同じ仕上がり'}
             </span>
             {/* リセット（編集時のみ） */}
@@ -1742,7 +1744,7 @@ export default function PrintCardPage() {
               <button
                 onClick={() => setPrintEls(DEFAULT_PRINT_ELS)}
                 style={{
-                  fontSize: 10, fontWeight: 700, padding: '4px 10px', borderRadius: 6,
+                  fontSize: 10, fontWeight: 700, padding: '4px 8px', borderRadius: 6,
                   background: 'white', color: '#C4511A', border: '1px solid #FDD5B5',
                   cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap',
                 }}
