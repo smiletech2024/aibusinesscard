@@ -65,21 +65,81 @@ function AppointmentForm({ cardId, ownerName, onClose }: {
   const labelStyle = { fontSize: 12, fontWeight: 700, color: '#A08068', display: 'block' as const, marginBottom: 6 }
 
   if (done) return (
-    <div style={{ textAlign: 'center', padding: '32px 20px' }}>
-      <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
-      <h3 style={{ color: '#FFF0E8', fontWeight: 800, fontSize: 18, marginBottom: 8 }}>
-        送信完了！
-      </h3>
-      <p style={{ color: '#A08068', fontSize: 13, lineHeight: 1.8, marginBottom: 24 }}>
-        {ownerName}にアポイントのご依頼をお送りしました。<br />
-        確認後、ご連絡先にご連絡いたします。
+    <div style={{ padding: '32px 20px' }}>
+      {/* アイコン＋タイトル */}
+      <div style={{ textAlign: 'center', marginBottom: 24 }}>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>📅</div>
+        <h3 style={{ color: '#FFF0E8', fontWeight: 800, fontSize: 18, margin: '0 0 6px' }}>
+          アポイントを受け付けました！
+        </h3>
+        <p style={{ color: '#A08068', fontSize: 13, margin: 0 }}>
+          {ownerName}に依頼を送りました
+        </p>
+      </div>
+
+      {/* 次のステップ説明 */}
+      <div style={{
+        background: 'rgba(242,103,34,0.08)',
+        border: '1px solid rgba(242,103,34,0.2)',
+        borderRadius: 14,
+        padding: '18px 16px',
+        marginBottom: 20,
+      }}>
+        <p style={{ color: '#F5843A', fontWeight: 800, fontSize: 13, margin: '0 0 14px' }}>
+          📋 次のステップ
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+            <span style={{
+              width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
+              background: 'rgba(242,103,34,0.2)', color: '#F5843A',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 12, fontWeight: 800,
+            }}>1</span>
+            <p style={{ color: '#FFF0E8', fontSize: 13, margin: 0, lineHeight: 1.7 }}>
+              <strong>{ownerName}</strong>が日程を確認します
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+            <span style={{
+              width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
+              background: 'rgba(242,103,34,0.2)', color: '#F5843A',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 12, fontWeight: 800,
+            }}>2</span>
+            <p style={{ color: '#FFF0E8', fontSize: 13, margin: 0, lineHeight: 1.7 }}>
+              ご入力いただいた
+              {email ? <><strong style={{ color: '#F5843A' }}> {email} </strong>（メール）</> : ''}
+              {phone ? <><strong style={{ color: '#F5843A' }}> {phone} </strong>（電話）</> : ''}
+              に連絡が届きます
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+            <span style={{
+              width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
+              background: 'rgba(242,103,34,0.2)', color: '#F5843A',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 12, fontWeight: 800,
+            }}>3</span>
+            <p style={{ color: '#FFF0E8', fontSize: 13, margin: 0, lineHeight: 1.7 }}>
+              日程が確定したらアポイント成立です！
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 注意書き */}
+      <p style={{ color: '#6B4030', fontSize: 11, textAlign: 'center', lineHeight: 1.7, marginBottom: 20 }}>
+        連絡が来ない場合は、迷惑メールフォルダをご確認いただくか、<br />
+        直接 {ownerName} にお問い合わせください。
       </p>
+
       <button
         onClick={onClose}
         style={{
-          padding: '12px 32px', borderRadius: 99, fontWeight: 700, fontSize: 14,
+          width: '100%', padding: '13px', borderRadius: 12, fontWeight: 700, fontSize: 14,
           background: 'linear-gradient(135deg,#F5843A,#F59340)', color: '#fff',
-          border: 'none', cursor: 'pointer',
+          border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(242,103,34,0.35)',
         }}
       >
         閉じる
