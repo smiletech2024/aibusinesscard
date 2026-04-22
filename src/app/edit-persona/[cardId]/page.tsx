@@ -338,8 +338,8 @@ export default function EditPersonaPage() {
         <div>
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>よくある質問（FAQ）</h2>
-              <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>お客様がよく聞く質問と回答を登録しておくと精度が上がります</p>
+              <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>お問い合わせ対応設定</h2>
+              <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>よくある質問と回答を登録しておくとAIが代わりに答えます</p>
             </div>
             <button
               onClick={addFaq}
