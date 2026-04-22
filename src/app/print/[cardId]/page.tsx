@@ -146,14 +146,14 @@ function FrontBrandMark({ theme }: { theme: 'light' | 'dark' }) {
   )
 }
 
-/* ─── 裏面 機能リスト ─── */
+/* ─── 裏面 機能リスト（横並びwrap） ─── */
 function BackFeatureList({ accent, textColor = 'rgba(255,255,255,0.85)' }: { accent: string; textColor?: string }) {
   const items = ['お問い合わせ対応', 'アポイント取得', '分身AIと会話']
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 5, margin: '0 0 12px', alignSelf: 'stretch', textAlign: 'left' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 20px', justifyContent: 'center', margin: '0 0 10px' }}>
       {items.map((item, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 18, color: textColor }}>
-          <span style={{ color: accent, fontWeight: 900, fontSize: 18, lineHeight: 1 }}>✓</span>
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 18, color: textColor, lineHeight: 1.2 }}>
+          <span style={{ color: accent, fontWeight: 900, lineHeight: 1 }}>✓</span>
           <span>{item}</span>
         </div>
       ))}
@@ -278,22 +278,17 @@ function ExecutiveBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: 
 
       {/* Content */}
       <div style={{ position: 'absolute', left: 40, top: 0, right: 40, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <p style={{ fontSize: 18, color: '#F5A47A', fontWeight: 700, letterSpacing: '0.15em', margin: '0 0 8px' }}>
+        <p style={{ fontSize: 18, color: '#F5A47A', fontWeight: 700, letterSpacing: '0.15em', margin: '0 0 8px', lineHeight: 1.2 }}>
           分身AI搭載名刺
         </p>
-        <h3 style={{ fontSize: 20, fontWeight: 900, color: 'white', margin: '0 0 10px', lineHeight: 1.2, letterSpacing: '-0.01em' }}>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: '0 0 10px', lineHeight: 1.3, letterSpacing: '-0.01em' }}>
           QRから分身AIに<br />いつでも相談を
         </h3>
         <BackFeatureList accent="#F26722" />
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(242,103,34,0.2)', borderRadius: 20, padding: '6px 14px', border: '1px solid rgba(242,103,34,0.3)', marginTop: 4 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(242,103,34,0.2)', borderRadius: 20, padding: '6px 14px', border: '1px solid rgba(242,103,34,0.3)' }}>
           <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80' }} />
-          <span style={{ fontSize: 18, color: '#A5B4FC', fontWeight: 700 }}>24時間 オンライン対応中</span>
+          <span style={{ fontSize: 18, color: '#A5B4FC', fontWeight: 700, lineHeight: 1.2 }}>24時間 オンライン対応中</span>
         </div>
-      </div>
-
-      {/* Brand logo */}
-      <div style={{ position: 'absolute', bottom: 14, right: 20 }}>
-        <BackBrandLogo />
       </div>
     </div>
   )
@@ -395,19 +390,17 @@ function MidnightBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: s
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(196,181,253,0.4), transparent)' }} />
 
       {/* Center content */}
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 40px', textAlign: 'center' }}>
-        {/* Logo icon */}
-        <div style={{ marginBottom: 14 }}>
-          <LogoIcon size={40} />
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px 36px', textAlign: 'center' }}>
+        <div style={{ marginBottom: 10 }}>
+          <LogoIcon size={32} />
         </div>
 
-        <p style={{ fontSize: 18, color: '#F5A47A', fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 6px' }}>分身AI搭載名刺</p>
-        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: '0 0 10px', lineHeight: 1.25, letterSpacing: '-0.01em' }}>
+        <p style={{ fontSize: 18, color: '#F5A47A', fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 8px', lineHeight: 1.2 }}>分身AI搭載名刺</p>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: '0 0 12px', lineHeight: 1.3, letterSpacing: '-0.01em' }}>
           QRをスキャンして<br />分身AIと話してください
         </h3>
         <BackFeatureList accent="#F5A47A" />
-        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #F5A47A, transparent)', margin: '8px 0' }} />
-        <BackBrandLogo />
+        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #F5A47A, transparent)', marginTop: 8 }} />
       </div>
     </div>
   )
@@ -507,17 +500,15 @@ function VividBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: stri
       <div style={{ position: 'absolute', left: -10, top: -10, width: 80, height: 80, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.08)' }} />
 
       {/* Content */}
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '28px 40px', textAlign: 'center' }}>
-        <div style={{ marginBottom: 16 }}>
-          <LogoIcon size={44} />
-        </div>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px 40px', textAlign: 'center' }}>
         <div style={{ marginBottom: 10 }}>
-          <BackBrandLogo />
+          <LogoIcon size={32} />
         </div>
-        <h3 style={{ fontSize: 20, fontWeight: 900, color: 'white', margin: '0 0 10px', lineHeight: 1.2, textShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
+        <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.8)', fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 8px', lineHeight: 1.2 }}>分身AI搭載名刺</p>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: '0 0 10px', lineHeight: 1.3, textShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
           このQRから<br />分身AIに相談できます
         </h3>
-        <BackFeatureList accent="#F59340" />
+        <BackFeatureList accent="#FFFFFF" />
       </div>
     </div>
   )
@@ -573,13 +564,12 @@ function OceanBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: stri
       <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 400, height: 300, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(13,212,200,0.12) 0%, transparent 70%)' }} />
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(126,242,232,0.4), transparent)' }} />
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(126,242,232,0.4), transparent)' }} />
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px 36px', textAlign: 'center' }}>
-        <div style={{ marginBottom: 8 }}><LogoIcon size={28} /></div>
-        <p style={{ fontSize: 18, color: '#7EF2E8', fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 6px' }}>分身AI搭載名刺</p>
-        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: '0 0 10px', lineHeight: 1.25 }}>QRをスキャンして<br />分身AIと話してください</h3>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px 36px', textAlign: 'center' }}>
+        <div style={{ marginBottom: 10 }}><LogoIcon size={32} /></div>
+        <p style={{ fontSize: 18, color: '#7EF2E8', fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 8px', lineHeight: 1.2 }}>分身AI搭載名刺</p>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: '0 0 12px', lineHeight: 1.3 }}>QRをスキャンして<br />分身AIと話してください</h3>
         <BackFeatureList accent="#7EF2E8" />
-        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #7EF2E8, transparent)', margin: '8px 0' }} />
-        <BackBrandLogo />
+        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #7EF2E8, transparent)' }} />
       </div>
     </div>
   )
@@ -637,13 +627,12 @@ function ForestBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: str
       <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 380, height: 280, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(52,211,153,0.1) 0%, transparent 70%)' }} />
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(110,231,183,0.4), transparent)' }} />
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(110,231,183,0.4), transparent)' }} />
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px 36px', textAlign: 'center' }}>
-        <div style={{ marginBottom: 8 }}><LogoIcon size={28} /></div>
-        <p style={{ fontSize: 18, color: '#6EE7B7', fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 6px' }}>分身AI搭載名刺</p>
-        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: '0 0 10px', lineHeight: 1.25 }}>QRをスキャンして<br />分身AIと話してください</h3>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px 36px', textAlign: 'center' }}>
+        <div style={{ marginBottom: 10 }}><LogoIcon size={32} /></div>
+        <p style={{ fontSize: 18, color: '#6EE7B7', fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 8px', lineHeight: 1.2 }}>分身AI搭載名刺</p>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: '0 0 12px', lineHeight: 1.3 }}>QRをスキャンして<br />分身AIと話してください</h3>
         <BackFeatureList accent="#6EE7B7" />
-        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #6EE7B7, transparent)', margin: '8px 0' }} />
-        <BackBrandLogo />
+        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #6EE7B7, transparent)' }} />
       </div>
     </div>
   )
@@ -701,13 +690,12 @@ function CrimsonBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: st
       <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 380, height: 280, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(244,63,94,0.12) 0%, transparent 70%)' }} />
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(254,205,211,0.4), transparent)' }} />
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(254,205,211,0.4), transparent)' }} />
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px 36px', textAlign: 'center' }}>
-        <div style={{ marginBottom: 8 }}><LogoIcon size={28} /></div>
-        <p style={{ fontSize: 18, color: '#FECDD3', fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 6px' }}>分身AI搭載名刺</p>
-        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: '0 0 10px', lineHeight: 1.25 }}>QRをスキャンして<br />分身AIと話してください</h3>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px 36px', textAlign: 'center' }}>
+        <div style={{ marginBottom: 10 }}><LogoIcon size={32} /></div>
+        <p style={{ fontSize: 18, color: '#FECDD3', fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 8px', lineHeight: 1.2 }}>分身AI搭載名刺</p>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: '0 0 12px', lineHeight: 1.3 }}>QRをスキャンして<br />分身AIと話してください</h3>
         <BackFeatureList accent="#FECDD3" />
-        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #FECDD3, transparent)', margin: '8px 0' }} />
-        <BackBrandLogo />
+        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #FECDD3, transparent)' }} />
       </div>
     </div>
   )
@@ -774,19 +762,12 @@ function GoldBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: strin
       <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 360, height: 260, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(212,175,55,0.1) 0%, transparent 70%)' }} />
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, #B8960C, #F0D060, #D4AF37, transparent)' }} />
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, #B8960C, #F0D060, #D4AF37, transparent)' }} />
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px 36px', textAlign: 'center' }}>
-        <div style={{ marginBottom: 8 }}><LogoIcon size={28} /></div>
-        <p style={{ fontSize: 18, color: '#D4AF37', fontWeight: 700, letterSpacing: '0.22em', margin: '0 0 6px' }}>分身AI搭載名刺</p>
-        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#F5E6A3', margin: '0 0 10px', lineHeight: 1.25 }}>QRをスキャンして<br />分身AIと話してください</h3>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px 36px', textAlign: 'center' }}>
+        <div style={{ marginBottom: 10 }}><LogoIcon size={32} /></div>
+        <p style={{ fontSize: 18, color: '#D4AF37', fontWeight: 700, letterSpacing: '0.22em', margin: '0 0 8px', lineHeight: 1.2 }}>分身AI搭載名刺</p>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#F5E6A3', margin: '0 0 12px', lineHeight: 1.3 }}>QRをスキャンして<br />分身AIと話してください</h3>
         <BackFeatureList accent="#D4AF37" textColor="rgba(245,230,163,0.85)" />
-        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #D4AF37, transparent)', margin: '8px 0' }} />
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <LogoIcon size={20} />
-          <div>
-            <div style={{ fontSize: 18, fontWeight: 900, color: '#D4AF37', letterSpacing: '-0.01em', lineHeight: 1 }}>AI名刺</div>
-            <div style={{ fontSize: 18, color: 'rgba(212,175,55,0.5)', fontWeight: 600, letterSpacing: '0.08em', marginTop: 1 }}>次世代名刺</div>
-          </div>
-        </div>
+        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #D4AF37, transparent)', marginTop: 8 }} />
       </div>
     </div>
   )
@@ -845,13 +826,12 @@ function PinkBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: strin
       <div style={{ position: 'absolute', bottom: -30, left: -30, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(249,168,212,0.5), transparent)' }} />
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(249,168,212,0.5), transparent)' }} />
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px 36px', textAlign: 'center' }}>
-        <div style={{ marginBottom: 8 }}><LogoIcon size={28} /></div>
-        <p style={{ fontSize: 18, color: '#FBCFE8', fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 6px' }}>分身AI搭載名刺</p>
-        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: '0 0 10px', lineHeight: 1.25 }}>QRをスキャンして<br />分身AIと話してください</h3>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px 36px', textAlign: 'center' }}>
+        <div style={{ marginBottom: 10 }}><LogoIcon size={32} /></div>
+        <p style={{ fontSize: 18, color: '#FBCFE8', fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 8px', lineHeight: 1.2 }}>分身AI搭載名刺</p>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: '0 0 12px', lineHeight: 1.3 }}>QRをスキャンして<br />分身AIと話してください</h3>
         <BackFeatureList accent="#F9A8D4" />
-        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #F9A8D4, transparent)', margin: '8px 0' }} />
-        <BackBrandLogo />
+        <div style={{ height: 1, width: 60, background: 'linear-gradient(90deg, transparent, #F9A8D4, transparent)' }} />
       </div>
     </div>
   )
@@ -1082,20 +1062,20 @@ function PulseBack({ card, fontFamily, tc }: { card: BusinessCard; fontFamily?: 
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${accent}80, ${accent}, ${accent}80, transparent)` }} />
 
       {/* 本文 */}
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px 44px', textAlign: 'center' }}>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px 44px', textAlign: 'center' }}>
         {/* ブランドロゴ */}
-        <div style={{ marginBottom: 8, filter: `drop-shadow(0 0 12px ${accent}80)` }}>
-          <LogoIcon size={30} />
+        <div style={{ marginBottom: 10, filter: `drop-shadow(0 0 12px ${accent}80)` }}>
+          <LogoIcon size={32} />
         </div>
         {/* キャッチコピー */}
-        <p style={{ fontSize: 18, color: accent, fontWeight: 800, letterSpacing: '0.2em', margin: '0 0 6px', textTransform: 'uppercase' as const }}>分身AI搭載名刺</p>
-        <h3 style={{ fontSize: 19, fontWeight: 900, color: '#FFFFFF', margin: '0 0 8px', lineHeight: 1.3, letterSpacing: '-0.01em' }}>
+        <p style={{ fontSize: 18, color: accent, fontWeight: 800, letterSpacing: '0.2em', margin: '0 0 8px', lineHeight: 1.2, textTransform: 'uppercase' as const }}>分身AI搭載名刺</p>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#FFFFFF', margin: '0 0 10px', lineHeight: 1.3, letterSpacing: '-0.01em' }}>
           名刺をスキャンすると<br />私の分身AIと話せます
         </h3>
         {/* 機能リスト */}
         <BackFeatureList accent={accent} />
         {/* EKG ライン */}
-        <div style={{ width: '100%', maxWidth: 320, marginBottom: 8 }}>
+        <div style={{ width: '100%', maxWidth: 320, marginBottom: 6 }}>
           <svg width="100%" height="16" viewBox="0 0 320 16" fill="none" preserveAspectRatio="none">
             <path d="M 0 8 L 100 8 L 106 8 L 112 4 L 118 12 L 124 1 L 130 15 L 136 8 L 142 8 L 320 8" stroke={accent} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"/>
             <path d="M 0 8 L 100 8 L 106 8 L 112 4 L 118 12 L 124 1 L 130 15 L 136 8 L 142 8 L 320 8" stroke={accent} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" opacity="0.1"/>
@@ -1109,16 +1089,7 @@ function PulseBack({ card, fontFamily, tc }: { card: BusinessCard; fontFamily?: 
         </div>
       </div>
 
-      {/* ブランドロゴ */}
-      <div style={{ position: 'absolute', bottom: 14, right: 20 }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <LogoIcon size={16} />
-          <div>
-            <div style={{ fontSize: 18, fontWeight: 900, color: accent, letterSpacing: '-0.01em', lineHeight: 1 }}>AI名刺</div>
-            <div style={{ fontSize: 18, color: 'rgba(255,255,255,0.3)', fontWeight: 600, letterSpacing: '0.08em', marginTop: 1 }}>次世代名刺</div>
-          </div>
-        </div>
-      </div>
+
     </div>
   )
 }
