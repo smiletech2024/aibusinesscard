@@ -139,7 +139,10 @@ export default function ChatPage() {
       const res = await fetch('/api/ai-chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
+          // role:'owner'はDeepSeek APIが受け付けないため除外
+          messages: newMessages
+            .filter(m => m.role === 'user' || m.role === 'assistant')
+            .map(m => ({ role: m.role, content: m.content })),
           sessionId, personaId: session.persona_id,
           userMessage,
         }),
