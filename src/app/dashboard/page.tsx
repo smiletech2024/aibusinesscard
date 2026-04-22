@@ -1154,23 +1154,20 @@ export default function DashboardPage() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                      <div className="flex items-center gap-2 mb-0.5">
                         <p className="font-semibold text-sm truncate" style={{ color: '#1C0F05' }}>{name}</p>
                         <span
                           className="badge text-xs flex-shrink-0"
-                          style={{ background: st.bg, color: st.color, padding: '3px 10px', borderRadius: 9999, fontSize: '0.7rem', fontWeight: 700 }}
+                          style={{ background: st.bg, color: st.color, padding: '3px 10px', borderRadius: 9999, fontSize: '0.7rem', fontWeight: 700, whiteSpace: 'nowrap' }}
                         >
                           {st.label}
                         </span>
-                        {needsAttention && (
-                          <span style={{
-                            fontSize: 11, fontWeight: 700, color: '#D4691E',
-                            background: '#EDE9FE', borderRadius: 6, padding: '2px 6px',
-                          }}>
-                            あなたを待っています
-                          </span>
-                        )}
                       </div>
+                      {needsAttention && (
+                        <p style={{ fontSize: 11, fontWeight: 700, color: '#D4691E', marginBottom: 2 }}>
+                          ● あなたを待っています
+                        </p>
+                      )}
                       <p className="text-xs" style={{ color: '#A08068' }}>
                         {new Date(session.updated_at).toLocaleDateString('ja-JP', {
                           month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
