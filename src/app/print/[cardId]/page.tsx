@@ -1593,14 +1593,21 @@ export default function PrintCardPage() {
     ? (p: { card: BusinessCard; fontFamily?: string }) => <PulseBack {...p} tc={tc} />
     : standardBackMap[design]
 
-  // レイアウト × カラー でフロントコンポーネントを決定
+  // レイアウト × カラー でフロントコンポーネントを決定（元のデザイン — PDF/PNG出力にも使用）
   const standardMap: Record<Design, React.ComponentType<{ card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }>> = {
     executive: ExecutiveFront, midnight: MidnightFront, vivid: VividFront,
     ocean: OceanFront, forest: ForestFront, crimson: CrimsonFront, gold: GoldFront, pink: PinkFront,
   }
-  /* 表面は常に FreeFront（ドラッグ編集対応）でレンダリング */
-  const FrontComponent = (p: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) =>
-    <FreeFront {...p} tc={tc} printEls={printEls} design={design} />
+  const FrontComponent = layout === 'standard'
+    ? standardMap[design]
+    : layout === 'centered'
+      ? (p: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) =>
+          <CenteredFront {...p} tc={tc} />
+      : layout === 'split'
+        ? (p: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) =>
+            <SplitFront {...p} tc={tc} />
+        : (p: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) =>
+            <PulseFront {...p} tc={tc} />
 
   const currentFontFamily = fontMeta[font].family
 
@@ -1918,100 +1925,37 @@ export default function PrintCardPage() {
           btnLabel="表面を保存"
           captureRef={frontRef}
           overlay={editMode ? (scale) => (
+            /* 編集モード: ドラッグハンドル */
             <>
-              {/* ロゴドラッグハンドル */}
+              {/* ロゴハンドル */}
               {logoUrl && (
-                <div
-                  onPointerDown={(e) => handleLogoDragStart(e, scale)}
-                  style={{
-                    position: 'absolute',
-                    left: logoX - 3,
-                    top: logoY - 3,
-                    width: 96,
-                    height: 34,
-                    cursor: 'move',
-                    border: '2px dashed rgba(242,103,34,0.7)',
-                    borderRadius: 6,
-                    boxSizing: 'border-box',
-                    zIndex: 20,
-                    touchAction: 'none',
-                    userSelect: 'none',
-                  }}
-                  title="ドラッグしてロゴを移動"
-                >
-                  <div style={{
-                    position: 'absolute', top: -10, right: -10,
-                    width: 18, height: 18, borderRadius: '50%',
-                    background: '#F26722', color: 'white',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 10, boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-                    pointerEvents: 'none',
-                  }}>✥</div>
+                <div onPointerDown={(e) => handleLogoDragStart(e, scale)} style={{ position: 'absolute', left: logoX - 3, top: logoY - 3, width: 96, height: 34, cursor: 'move', border: '2px dashed rgba(242,103,34,0.7)', borderRadius: 6, boxSizing: 'border-box', zIndex: 20, touchAction: 'none', userSelect: 'none' }} title="ロゴを移動">
+                  <div style={{ position: 'absolute', top: -10, right: -10, width: 18, height: 18, borderRadius: '50%', background: '#F26722', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, boxShadow: '0 2px 6px rgba(0,0,0,0.2)', pointerEvents: 'none' }}>✥</div>
                 </div>
               )}
-              {/* 要素ドラッグハンドル（常時表示） */}
+              {/* 要素ハンドル */}
               {(Object.entries(printEls) as [PrintElId, PrintEl][]).map(([id, el]) => (
-                <div
-                  key={id}
-                  onPointerDown={(e) => handlePrintElDragStart(e, scale, id)}
-                  style={{
-                    position: 'absolute',
-                    left: el.x - 2,
-                    top: el.y - 2,
-                    width: el.w + 4,
-                    height: el.h + 4,
-                    cursor: 'move',
-                    border: '2px dashed rgba(242,103,34,0.65)',
-                    borderRadius: 5,
-                    boxSizing: 'border-box',
-                    zIndex: 19,
-                    touchAction: 'none',
-                    userSelect: 'none',
-                  }}
-                  title={`${EL_LABELS[id]}をドラッグして移動`}
-                >
-                  {/* 要素ラベル */}
-                  <div style={{
-                    position: 'absolute', top: -16, left: 0,
-                    fontSize: 9, fontWeight: 700, color: 'white',
-                    background: '#F26722',
-                    padding: '2px 6px', borderRadius: 4,
-                    whiteSpace: 'nowrap', pointerEvents: 'none',
-                  }}>{EL_LABELS[id]}</div>
-                  {/* 移動アイコン */}
-                  <div style={{
-                    position: 'absolute', top: -10, right: -10,
-                    width: 18, height: 18, borderRadius: '50%',
-                    background: '#1C0F05', color: 'white',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 10, boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
-                    pointerEvents: 'none',
-                  }}>✥</div>
-                  {/* リサイズハンドル（右下） */}
-                  <div
-                    onPointerDown={(e) => { e.stopPropagation(); handlePrintElResizeStart(e, scale, id) }}
-                    style={{
-                      position: 'absolute', bottom: -7, right: -7,
-                      width: 14, height: 14,
-                      background: '#F26722',
-                      borderRadius: 3,
-                      cursor: 'se-resize',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      zIndex: 21,
-                      touchAction: 'none',
-                    }}
-                    title="ドラッグしてサイズ変更"
-                  >
-                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                      <path d="M2 6L6 2M4.5 6L6 4.5" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                    </svg>
+                <div key={id} onPointerDown={(e) => handlePrintElDragStart(e, scale, id)} style={{ position: 'absolute', left: el.x - 2, top: el.y - 2, width: el.w + 4, height: el.h + 4, cursor: 'move', border: '2px dashed rgba(242,103,34,0.65)', borderRadius: 5, boxSizing: 'border-box', zIndex: 19, touchAction: 'none', userSelect: 'none' }} title={`${EL_LABELS[id]}を移動`}>
+                  <div style={{ position: 'absolute', top: -16, left: 0, fontSize: 9, fontWeight: 700, color: 'white', background: '#F26722', padding: '2px 6px', borderRadius: 4, whiteSpace: 'nowrap', pointerEvents: 'none' }}>{EL_LABELS[id]}</div>
+                  <div style={{ position: 'absolute', top: -10, right: -10, width: 18, height: 18, borderRadius: '50%', background: '#1C0F05', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, boxShadow: '0 2px 6px rgba(0,0,0,0.25)', pointerEvents: 'none' }}>✥</div>
+                  <div onPointerDown={(e) => { e.stopPropagation(); handlePrintElResizeStart(e, scale, id) }} style={{ position: 'absolute', bottom: -7, right: -7, width: 14, height: 14, background: '#F26722', borderRadius: 3, cursor: 'se-resize', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 21, touchAction: 'none' }} title="リサイズ">
+                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M2 6L6 2M4.5 6L6 4.5" stroke="white" strokeWidth="1.5" strokeLinecap="round"/></svg>
                   </div>
                 </div>
               ))}
             </>
+          ) : logoUrl ? (scale) => (
+            /* プレビューモード: ロゴハンドルのみ */
+            <div onPointerDown={(e) => handleLogoDragStart(e, scale)} style={{ position: 'absolute', left: logoX - 3, top: logoY - 3, width: 96, height: 34, cursor: 'move', border: '2px dashed rgba(242,103,34,0.7)', borderRadius: 6, boxSizing: 'border-box', zIndex: 20, touchAction: 'none', userSelect: 'none' }} title="ロゴを移動">
+              <div style={{ position: 'absolute', top: -10, right: -10, width: 18, height: 18, borderRadius: '50%', background: '#F26722', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, pointerEvents: 'none' }}>✥</div>
+            </div>
           ) : undefined}
         >
-          <FrontComponent card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} logoUrl={logoUrl || undefined} logoX={logoX} logoY={logoY} />
+          {/* captureRef内: 編集モード=FreeFront（カスタム配置ダウンロード）、プレビュー=元のデザイン */}
+          {editMode
+            ? <FreeFront card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} logoUrl={logoUrl || undefined} logoX={logoX} logoY={logoY} tc={tc} printEls={printEls} design={design} />
+            : <FrontComponent card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} logoUrl={logoUrl || undefined} logoX={logoX} logoY={logoY} />
+          }
         </CardPreview>
 
         {/* 裏面 */}
