@@ -53,10 +53,24 @@ export default function DashboardPage() {
   const [currentPlan, setCurrentPlan]             = useState<PlanId>('free')
   const [monthlySessionCount, setMonthlySessionCount] = useState(0)
   const [maxSessions, setMaxSessions]             = useState(-1)
+  const [appointments, setAppointments]           = useState<Appointment[]>([])
   const personaIdsRef = useRef<string[]>([])
   const supabase = createClient()
 
+  type Appointment = {
+    id: string; card_id: string; card_name: string
+    customer_name: string; customer_email: string | null; customer_phone: string | null
+    preferred_date: string | null; preferred_time: string | null; message: string | null
+    status: string; created_at: string
+  }
+
   useEffect(() => { checkAuth() }, [])
+  useEffect(() => {
+    fetch('/api/appointments')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.appointments) setAppointments(d.appointments) })
+      .catch(() => {})
+  }, [])
   useEffect(() => {
     fetch('/api/plan')
       .then(r => r.ok ? r.json() : null)
@@ -166,6 +180,15 @@ export default function DashboardPage() {
     }
     setDeletingSessionId(null)
     setDeleteSessionConfirm(null)
+  }
+
+  const handleApptStatus = async (id: string, status: string) => {
+    const res = await fetch('/api/appointments', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status }),
+    })
+    if (res.ok) setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a))
   }
 
   const handleLogout = async () => {
@@ -767,6 +790,96 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── アポイント一覧 ── */}
+        {appointments.length > 0 && (
+          <div>
+            <div className="mb-5">
+              <p className="section-label mb-1">顧客管理</p>
+              <h2 className="text-lg font-black" style={{ color: '#1C0F05' }}>📅 アポイント依頼</h2>
+            </div>
+            <div className="space-y-3">
+              {appointments.map(appt => {
+                const isPending   = appt.status === 'pending'
+                const isConfirmed = appt.status === 'confirmed'
+                const statusLabel = isPending ? '未確認' : isConfirmed ? '確認済み' : 'キャンセル'
+                const statusColor = isPending ? '#F59340' : isConfirmed ? '#34D399' : '#9CA3AF'
+                const statusBg    = isPending ? 'rgba(245,163,64,0.1)' : isConfirmed ? 'rgba(52,211,153,0.1)' : 'rgba(156,163,175,0.1)'
+                return (
+                  <div key={appt.id}
+                    className="rounded-2xl p-4"
+                    style={{
+                      background: 'white', border: '1px solid #EDD9C8',
+                      borderLeft: isPending ? '3px solid #F59340' : '1px solid #EDD9C8',
+                    }}
+                  >
+                    {/* ヘッダー行 */}
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex items-center gap-3">
+                        <Avatar name={appt.customer_name} size={40} gradient />
+                        <div>
+                          <p className="font-bold text-sm" style={{ color: '#1C0F05' }}>{appt.customer_name}</p>
+                          <p className="text-xs" style={{ color: '#A08068' }}>
+                            {new Date(appt.created_at).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                            {appt.card_name ? ` · ${appt.card_name}の名刺から` : ''}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0"
+                        style={{ background: statusBg, color: statusColor }}
+                      >{statusLabel}</span>
+                    </div>
+
+                    {/* 詳細 */}
+                    <div className="space-y-1.5 mb-3 text-sm" style={{ color: '#4A2C1A' }}>
+                      {appt.preferred_date && (
+                        <div className="flex items-center gap-2">
+                          <span style={{ color: '#A08068', fontSize: 12, width: 72, flexShrink: 0 }}>希望日時</span>
+                          <span className="font-semibold">{appt.preferred_date}{appt.preferred_time ? ` ${appt.preferred_time}` : ''}</span>
+                        </div>
+                      )}
+                      {appt.customer_email && (
+                        <div className="flex items-center gap-2">
+                          <span style={{ color: '#A08068', fontSize: 12, width: 72, flexShrink: 0 }}>メール</span>
+                          <a href={`mailto:${appt.customer_email}`} style={{ color: '#F26722', fontSize: 13 }}>{appt.customer_email}</a>
+                        </div>
+                      )}
+                      {appt.customer_phone && (
+                        <div className="flex items-center gap-2">
+                          <span style={{ color: '#A08068', fontSize: 12, width: 72, flexShrink: 0 }}>電話</span>
+                          <a href={`tel:${appt.customer_phone}`} style={{ color: '#F26722', fontSize: 13 }}>{appt.customer_phone}</a>
+                        </div>
+                      )}
+                      {appt.message && (
+                        <div className="flex gap-2">
+                          <span style={{ color: '#A08068', fontSize: 12, width: 72, flexShrink: 0 }}>用件</span>
+                          <span style={{ fontSize: 13, lineHeight: 1.6, color: '#4A2C1A' }}>{appt.message}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* アクションボタン */}
+                    {isPending && (
+                      <div className="flex gap-2">
+                        <button onClick={() => handleApptStatus(appt.id, 'confirmed')}
+                          className="flex-1 text-xs font-bold py-2 rounded-xl"
+                          style={{ background: 'rgba(52,211,153,0.12)', color: '#059669', border: '1px solid rgba(52,211,153,0.3)', cursor: 'pointer' }}
+                        >✓ 確認済みにする</button>
+                        <button onClick={() => handleApptStatus(appt.id, 'cancelled')}
+                          className="text-xs px-4 py-2 rounded-xl"
+                          style={{ background: 'transparent', color: '#9CA3AF', border: '1px solid #EDD9C8', cursor: 'pointer' }}
+                        >キャンセル</button>
+                      </div>
+                    )}
+                    {isConfirmed && (
+                      <p className="text-xs text-center" style={{ color: '#34D399' }}>✓ 確認済み — 連絡してアポイントを確定しましょう</p>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </div>
         )}
