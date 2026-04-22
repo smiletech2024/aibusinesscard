@@ -9,6 +9,7 @@ import { BusinessCard } from '@/types'
 
 type CardPageData = BusinessCard & {
   profiles?: { full_name: string | null; avatar_url: string | null }
+  personas?: { faq_json: { question: string; answer: string }[] } | null
 }
 
 const SESSION_KEY = (cardId: string) => `aimeishi_session_${cardId}`
@@ -313,6 +314,7 @@ export default function CardPage() {
   const [showAppt, setShowAppt] = useState(false)
   const [existingSession, setExistingSession] = useState<{ id: string; status: string } | null>(null)
   const [proceeding, setProceeding] = useState(false)
+  const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(null)
   const supabase = createClient()
 
   useEffect(() => { loadCard() }, [cardId])
@@ -320,7 +322,7 @@ export default function CardPage() {
   const loadCard = async () => {
     const { data } = await supabase
       .from('business_cards')
-      .select('*, profiles:user_id(full_name, avatar_url)')
+      .select('*, profiles:user_id(full_name, avatar_url), personas:persona_id(faq_json)')
       .eq('id', cardId).single()
     if (data && !data.is_active) {
       setCardDeleted(true)
@@ -550,6 +552,58 @@ export default function CardPage() {
             )}
           </div>
         </div>
+
+        {/* ── よくある質問 ── */}
+        {(() => {
+          const faqs = card.personas?.faq_json?.filter(f => f.question?.trim()) ?? []
+          if (faqs.length === 0) return null
+          return (
+            <div className="rounded-3xl overflow-hidden"
+              style={{ background: '#0F0E20', border: '1px solid rgba(242,103,34,0.15)' }}
+            >
+              <div className="px-5 pt-5 pb-3 flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(242,103,34,0.15)' }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F5843A" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                </div>
+                <h2 className="font-bold text-sm" style={{ color: '#FFF0E8' }}>よくある質問</h2>
+              </div>
+              <div className="pb-3">
+                {faqs.map((faq, idx) => (
+                  <div key={idx}
+                    style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
+                  >
+                    <button
+                      onClick={() => setOpenFaqIdx(openFaqIdx === idx ? null : idx)}
+                      className="w-full text-left px-5 py-3.5 flex items-center justify-between gap-3"
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+                    >
+                      <span className="text-sm font-semibold leading-snug" style={{ color: '#FFF0E8' }}>
+                        Q. {faq.question}
+                      </span>
+                      <svg
+                        width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="#F5843A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                        style={{ flexShrink: 0, transform: openFaqIdx === idx ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
+                      >
+                        <polyline points="6 9 12 15 18 9"/>
+                      </svg>
+                    </button>
+                    {openFaqIdx === idx && (
+                      <div className="px-5 pb-4">
+                        <p className="text-sm leading-relaxed" style={{ color: '#A08068' }}>
+                          A. {faq.answer}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        })()}
 
         {/* ── アポイントフォーム（展開時） ── */}
         {showAppt && (
