@@ -757,22 +757,18 @@ export default function DashboardPage() {
                   AIが受けた質問に<strong style={{ color: '#1C0F05' }}>本人の正解を登録</strong>すると、次から同じ質問にあなたらしく答えられます。<br />
                   お客様との会話履歴を見ながら「惜しい回答」を本人の言葉に直しましょう。
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  {cards.map(card => (
-                    <Link
-                      key={card.id}
-                      href={`/edit-persona/${card.id}`}
-                      className="text-xs font-bold px-4 py-2 rounded-xl transition"
-                      style={{
-                        background: 'linear-gradient(135deg, #F26722, #F59340)',
-                        color: 'white',
-                        boxShadow: '0 2px 8px rgba(242,103,34,0.3)',
-                      }}
-                    >
-                      {card.full_name}のAIを育てる →
-                    </Link>
-                  ))}
-                </div>
+                <a
+                  href="#sessions"
+                  className="inline-block text-xs font-bold px-4 py-2 rounded-xl transition"
+                  style={{
+                    background: 'linear-gradient(135deg, #F26722, #F59340)',
+                    color: 'white',
+                    boxShadow: '0 2px 8px rgba(242,103,34,0.3)',
+                    textDecoration: 'none',
+                  }}
+                >
+                  会話履歴を確認する →
+                </a>
               </div>
             </div>
             <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(242,103,34,0.15)' }}>
@@ -893,7 +889,7 @@ export default function DashboardPage() {
 
         {/* セッション一覧 */}
         {sessions.length > 0 && (
-          <div>
+          <div id="sessions">
             <div className="mb-5">
               <p className="section-label mb-1">顧客管理</p>
               <h2 className="text-lg font-black" style={{ color: '#1C0F05' }}>AIが受けた相談</h2>
