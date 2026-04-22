@@ -23,6 +23,7 @@ export default function ChatPage() {
   const [summarizing, setSummarizing] = useState(false)
   const [turnCount, setTurnCount] = useState(0)
   const [showSummaryPrompt, setShowSummaryPrompt] = useState(false)
+  const [autoHandingOff, setAutoHandingOff]       = useState(false)
   const [pushEnabled, setPushEnabled] = useState(false)
   const [pushAsked, setPushAsked] = useState(false)
   const [showBranding, setShowBranding] = useState(false)
@@ -121,9 +122,14 @@ export default function ChatPage() {
         const { done, value } = await reader.read()
         if (done) break
         aiText += decoder.decode(value)
-        setMessages([{ role: 'assistant', content: aiText }])
+        // [[HANDOFF]]トークンは表示しない
+        setMessages([{ role: 'assistant', content: aiText.replace(HANDOFF_TOKEN, '').trimEnd() }])
       }
-    } finally { setLoading(false) }
+      setLoading(false)
+      await checkAndAutoHandoff(aiText)
+    } catch {
+      setLoading(false)
+    }
   }
 
   const sendMessage = async () => {
@@ -155,17 +161,29 @@ export default function ChatPage() {
         const { done, value } = await reader.read()
         if (done) break
         aiText += decoder.decode(value)
+        // [[HANDOFF]]トークンはストリーミング中も表示しない
         setMessages(prev => {
-          const arr = [...prev]; arr[arr.length - 1] = { role: 'assistant', content: aiText }; return arr
+          const arr = [...prev]
+          arr[arr.length - 1] = { role: 'assistant', content: aiText.replace(HANDOFF_TOKEN, '').trimEnd() }
+          return arr
         })
       }
-      if (newTurnCount >= 8) setShowSummaryPrompt(true)
       // 3往復目で通知許可を提案
       if (newTurnCount === 3 && !pushAsked) setPushAsked(true)
-    } finally { setLoading(false) }
+      setLoading(false)
+      // 自動引き継ぎ判定（手動バナーより優先）
+      const didHandoff = await checkAndAutoHandoff(aiText)
+      if (!didHandoff && newTurnCount >= 8) setShowSummaryPrompt(true)
+    } catch {
+      setLoading(false)
+    }
   }
 
-  const createSummary = async () => {
+  const HANDOFF_TOKEN = '[[HANDOFF]]'
+
+  const createSummary = async (auto = false) => {
+    if (summarizing) return
+    if (auto) setAutoHandingOff(true)
     setSummarizing(true)
     try {
       const res = await fetch('/api/summarize', {
@@ -174,7 +192,26 @@ export default function ChatPage() {
       })
       const data = await res.json()
       if (data.summary) router.push(`/summary/${sessionId}`)
-    } finally { setSummarizing(false) }
+    } finally {
+      setSummarizing(false)
+      setAutoHandingOff(false)
+    }
+  }
+
+  // AIの応答に [[HANDOFF]] が含まれているか検出し自動引き継ぎ
+  const checkAndAutoHandoff = async (aiText: string) => {
+    if (!aiText.includes(HANDOFF_TOKEN)) return false
+    // トークンを表示から取り除いて更新
+    const cleaned = aiText.replace(HANDOFF_TOKEN, '').trimEnd()
+    setMessages(prev => {
+      const arr = [...prev]
+      arr[arr.length - 1] = { role: 'assistant', content: cleaned }
+      return arr
+    })
+    // 少し待ってから自動引き継ぎ（メッセージを読んでもらう時間）
+    await new Promise(r => setTimeout(r, 1800))
+    await createSummary(true)
+    return true
   }
 
   const ownerName    = session?.business_cards?.full_name || '担当者'
@@ -215,9 +252,9 @@ export default function ChatPage() {
               </p>
             </div>
           </div>
-          {turnCount >= 5 && (
+          {turnCount >= 5 && !autoHandingOff && (
             <button
-              onClick={createSummary}
+              onClick={() => createSummary(false)}
               disabled={summarizing}
               className="text-xs font-bold px-3 py-1.5 rounded-full flex-shrink-0"
               style={{
@@ -412,8 +449,35 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* サマリー提案バナー */}
-      {showSummaryPrompt && !summarizing && (
+      {/* 自動引き継ぎ中オーバーレイ */}
+      {autoHandingOff && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 50,
+          background: 'rgba(7,6,15,0.85)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20,
+        }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: 20,
+            background: 'linear-gradient(135deg, #E05A18, #F5843A)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 28, boxShadow: '0 0 40px rgba(242,103,34,0.5)',
+          }}>👤</div>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ color: '#FFF0E8', fontWeight: 800, fontSize: 17, marginBottom: 6 }}>
+              {ownerName}本人に繋いでいます
+            </p>
+            <p style={{ color: '#A08068', fontSize: 13 }}>会話の内容をまとめています…</p>
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {[0, 1, 2].map(i => (
+              <div key={i} className="dot-pulse" style={{ background: '#F5843A', width: 8, height: 8, borderRadius: '50%', animationDelay: `${i * 0.2}s` }} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* サマリー提案バナー（自動引き継ぎしなかった場合の手動フォールバック） */}
+      {showSummaryPrompt && !summarizing && !autoHandingOff && (
         <div
           className="px-4 py-4"
           style={{
@@ -429,7 +493,7 @@ export default function ChatPage() {
               </p>
             </div>
             <button
-              onClick={createSummary}
+              onClick={() => createSummary(false)}
               className="text-xs font-bold px-4 py-2.5 rounded-xl flex-shrink-0 text-white"
               style={{
                 background: 'linear-gradient(135deg, #F5843A, #F59340)',
