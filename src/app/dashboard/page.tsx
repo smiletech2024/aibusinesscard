@@ -881,7 +881,11 @@ export default function DashboardPage() {
                           className="translate-y-1/2 rounded-2xl overflow-hidden shadow-md"
                           style={{ border: '3px solid white' }}
                         >
-                          <Avatar name={card.full_name} size={56} gradient />
+                          {avatarUrl ? (
+                            <img src={avatarUrl} alt={card.full_name} style={{ width: 56, height: 56, objectFit: 'cover', display: 'block' }} />
+                          ) : (
+                            <Avatar name={card.full_name} size={56} gradient />
+                          )}
                         </div>
                       </div>
                     </div>
@@ -890,6 +894,25 @@ export default function DashboardPage() {
                       <h3 className="font-black text-base" style={{ color: '#1C0F05' }}>{card.full_name}</h3>
                       {card.title && <p className="text-sm font-medium mt-0.5" style={{ color: '#F26722' }}>{card.title}</p>}
                       {card.company && <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>{card.company}</p>}
+
+                      {/* 写真登録ボタン */}
+                      <button
+                        onClick={() => avatarInputRef.current?.click()}
+                        disabled={avatarUploading}
+                        style={{
+                          marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 6,
+                          padding: '6px 12px', borderRadius: 99, fontSize: 12, fontWeight: 700,
+                          background: avatarUrl ? 'rgba(242,103,34,0.08)' : 'rgba(242,103,34,0.12)',
+                          border: '1.5px solid rgba(242,103,34,0.3)',
+                          color: '#F26722', cursor: 'pointer',
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                          <circle cx="12" cy="13" r="4"/>
+                        </svg>
+                        {avatarUploading ? 'アップロード中...' : avatarUrl ? '写真を変更' : '写真を登録'}
+                      </button>
                     </div>
 
                     {/* クイックアップデート */}
