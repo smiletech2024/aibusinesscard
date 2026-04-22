@@ -17,7 +17,7 @@ function getAdmin() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { cardId, customerName, customerEmail, customerPhone, preferredDate, preferredTime, message } = body
+    const { cardId, customerName, customerEmail, customerPhone, preferredDate, preferredTime, contactableTime, message } = body
 
     console.log('[appointments POST] body:', { cardId, customerName, customerEmail, customerPhone })
 
@@ -48,9 +48,10 @@ export async function POST(req: NextRequest) {
         customer_name:  customerName,
         customer_email: customerEmail || null,
         customer_phone: customerPhone || null,
-        preferred_date: preferredDate || null,
-        preferred_time: preferredTime || null,
-        message:        message || null,
+        preferred_date:   preferredDate || null,
+        preferred_time:   preferredTime || null,
+        contactable_time: contactableTime || null,
+        message:          message || null,
         status:         'pending',
       })
       .select()
@@ -96,6 +97,7 @@ export async function POST(req: NextRequest) {
                 <td style="padding:10px 0;color:#A08068;font-weight:600;">希望日時</td>
                 <td style="padding:10px 0;color:#1C0F05;">${dateStr}</td>
               </tr>
+              ${contactableTime ? `<tr style="border-bottom:1px solid #F5E8DC;"><td style="padding:10px 0;color:#A08068;font-weight:600;">連絡可能時間</td><td style="padding:10px 0;color:#1C0F05;">${contactableTime}</td></tr>` : ''}
               ${message ? `<tr><td style="padding:10px 0;color:#A08068;font-weight:600;vertical-align:top;">ご用件</td><td style="padding:10px 0;color:#1C0F05;white-space:pre-wrap;">${message}</td></tr>` : ''}
             </table>
             <div style="margin-top:20px;text-align:center;">

@@ -22,14 +22,22 @@ function AppointmentForm({ cardId, ownerName, onClose }: {
   const [name, setName]             = useState('')
   const [email, setEmail]           = useState('')
   const [phone, setPhone]           = useState('')
-  const [date, setDate]             = useState('')
-  const [time, setTime]             = useState('')
-  const [message, setMessage]       = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [done, setDone]             = useState(false)
-  const [error, setError]           = useState('')
+  const [date, setDate]                   = useState('')
+  const [time, setTime]                   = useState('')
+  const [contactableTime, setContactableTime] = useState<string[]>([])
+  const [message, setMessage]             = useState('')
+  const [submitting, setSubmitting]       = useState(false)
+  const [done, setDone]                   = useState(false)
+  const [error, setError]                 = useState('')
 
   const timeSlots = ['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00']
+  const contactableSlots = [
+    '平日 午前中', '平日 昼頃', '平日 夕方以降',
+    '土日 午前中', '土日 午後', 'いつでもOK',
+  ]
+
+  const toggleContactable = (slot: string) =>
+    setContactableTime(prev => prev.includes(slot) ? prev.filter(s => s !== slot) : [...prev, slot])
 
   const submit = async () => {
     if (!name.trim()) { setError('お名前を入力してください'); return }
@@ -41,12 +49,13 @@ function AppointmentForm({ cardId, ownerName, onClose }: {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           cardId,
-          customerName:  name.trim(),
-          customerEmail: email.trim() || null,
-          customerPhone: phone.trim() || null,
-          preferredDate: date || null,
-          preferredTime: time || null,
-          message:       message.trim() || null,
+          customerName:    name.trim(),
+          customerEmail:   email.trim() || null,
+          customerPhone:   phone.trim() || null,
+          preferredDate:   date || null,
+          preferredTime:   time || null,
+          contactableTime: contactableTime.length ? contactableTime.join('・') : null,
+          message:         message.trim() || null,
         }),
       })
       if (res.ok) { setDone(true) }
@@ -226,6 +235,33 @@ function AppointmentForm({ cardId, ownerName, onClose }: {
                 }}
               >{t}</button>
             ))}
+          </div>
+        </div>
+
+        {/* 連絡可能な時間帯 */}
+        <div>
+          <label style={labelStyle}>
+            📞 連絡可能な時間帯（任意・複数選択OK）
+          </label>
+          <p style={{ fontSize: 11, color: '#6B4030', margin: '0 0 8px' }}>
+            {ownerName}がご連絡しやすい時間を教えてください
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {contactableSlots.map(slot => {
+              const selected = contactableTime.includes(slot)
+              return (
+                <button
+                  key={slot} onClick={() => toggleContactable(slot)}
+                  style={{
+                    padding: '8px 14px', borderRadius: 99, fontSize: 12, fontWeight: 600,
+                    border: `1.5px solid ${selected ? '#F26722' : 'rgba(242,103,34,0.2)'}`,
+                    background: selected ? 'rgba(242,103,34,0.15)' : 'transparent',
+                    color: selected ? '#F5843A' : '#A08068',
+                    cursor: 'pointer', transition: 'all 0.15s',
+                  }}
+                >{slot}</button>
+              )
+            })}
           </div>
         </div>
 

@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS appointments (
   customer_phone    text,
   preferred_date    date,
   preferred_time    text,           -- '10:00', '14:00' など
+  contactable_time  text,           -- '平日 午前中・土日 午後' など
   message           text,
   status            text NOT NULL DEFAULT 'pending',  -- pending / confirmed / cancelled
   owner_note        text,           -- 本人メモ

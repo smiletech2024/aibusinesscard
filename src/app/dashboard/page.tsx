@@ -60,7 +60,8 @@ export default function DashboardPage() {
   type Appointment = {
     id: string; card_id: string; card_name: string
     customer_name: string; customer_email: string | null; customer_phone: string | null
-    preferred_date: string | null; preferred_time: string | null; message: string | null
+    preferred_date: string | null; preferred_time: string | null
+    contactable_time: string | null; message: string | null
     status: string; created_at: string
   }
 
@@ -851,6 +852,12 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-2">
                           <span style={{ color: '#A08068', fontSize: 12, width: 72, flexShrink: 0 }}>電話</span>
                           <a href={`tel:${appt.customer_phone}`} style={{ color: '#F26722', fontSize: 13 }}>{appt.customer_phone}</a>
+                        </div>
+                      )}
+                      {appt.contactable_time && (
+                        <div className="flex items-center gap-2">
+                          <span style={{ color: '#A08068', fontSize: 12, width: 72, flexShrink: 0 }}>連絡可能</span>
+                          <span style={{ fontSize: 13, color: '#34D399', fontWeight: 600 }}>📞 {appt.contactable_time}</span>
                         </div>
                       )}
                       {appt.message && (
