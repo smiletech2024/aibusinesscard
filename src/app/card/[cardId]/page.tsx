@@ -472,35 +472,49 @@ export default function CardPage() {
         {!showAppt && (
           <>
             {existingSession ? (
-              <div className="rounded-2xl p-5"
-                style={{ background: '#0F0E20', border: '1px solid rgba(242,103,34,0.2)' }}
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, #E05A18, #F5843A)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm" style={{ color: '#FFF0E8' }}>会話の続きがあります</p>
-                    <p className="text-xs" style={{ color: '#6B4030' }}>
-                      {existingSession.status === 'summarized' || existingSession.status === 'owner_chat'
-                        ? 'AIとの対話が完了 · 本人への引き継ぎ準備ができています'
-                        : 'AIとの対話が途中で終わっています'}
-                    </p>
-                  </div>
-                </div>
-                <button onClick={continueSession}
-                  className="w-full py-3 mb-2 font-bold text-white rounded-2xl"
-                  style={{ background: 'linear-gradient(135deg, #F5843A, #F59340)', boxShadow: '0 4px 20px rgba(242,103,34,0.4)', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}
+              <div className="space-y-3">
+                <div className="rounded-2xl p-5"
+                  style={{ background: '#0F0E20', border: '1px solid rgba(242,103,34,0.2)' }}
                 >
-                  {existingSession.status === 'summarized' || existingSession.status === 'owner_chat'
-                    ? '本人に直接話しかける →' : '続きから話す →'}
+                  <div className="flex items-center gap-3 mb-4">
+                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, #E05A18, #F5843A)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm" style={{ color: '#FFF0E8' }}>会話の続きがあります</p>
+                      <p className="text-xs" style={{ color: '#6B4030' }}>
+                        {existingSession.status === 'summarized' || existingSession.status === 'owner_chat'
+                          ? 'AIとの対話が完了 · 本人への引き継ぎ準備ができています'
+                          : 'AIとの対話が途中で終わっています'}
+                      </p>
+                    </div>
+                  </div>
+                  <button onClick={continueSession}
+                    className="w-full py-3 mb-2 font-bold text-white rounded-2xl"
+                    style={{ background: 'linear-gradient(135deg, #F5843A, #F59340)', boxShadow: '0 4px 20px rgba(242,103,34,0.4)', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}
+                  >
+                    {existingSession.status === 'summarized' || existingSession.status === 'owner_chat'
+                      ? '本人に直接話しかける →' : '続きから話す →'}
+                  </button>
+                  <button onClick={resetSession}
+                    className="w-full text-center text-xs py-2"
+                    style={{ color: '#6B4030', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                  >最初から相談する</button>
+                </div>
+                {/* アポイントボタンは常に表示 */}
+                <button
+                  onClick={() => setShowAppt(true)}
+                  className="w-full py-4 text-base font-bold rounded-2xl flex items-center justify-center gap-2"
+                  style={{
+                    background: 'transparent',
+                    border: '1.5px solid rgba(242,103,34,0.4)',
+                    color: '#F5843A', cursor: 'pointer',
+                  } as React.CSSProperties}
+                >
+                  📅 アポイントを取る
                 </button>
-                <button onClick={resetSession}
-                  className="w-full text-center text-xs py-2"
-                  style={{ color: '#6B4030', background: 'transparent', border: 'none', cursor: 'pointer' }}
-                >最初から相談する</button>
               </div>
             ) : !showNameInput ? (
               <div className="space-y-3">
