@@ -65,6 +65,36 @@ const EL_LABELS: Record<PrintElId, string> = {
   qr_block:   'QRコード',
 }
 
+/* ─── 裏面ドラッグ編集 ─── */
+type BackElId = 'back_label' | 'back_headline' | 'back_features' | 'back_badge'
+type BackEl   = { x: number; y: number; w: number; h: number }
+type BackEls  = Record<BackElId, BackEl>
+
+const DEFAULT_BACK_ELS: BackEls = {
+  back_label:    { x: 40, y: 88,  w: 380, h: 28 },
+  back_headline: { x: 40, y: 124, w: 380, h: 64 },
+  back_features: { x: 40, y: 200, w: 380, h: 74 },
+  back_badge:    { x: 40, y: 282, w: 270, h: 36 },
+}
+
+const BACK_EL_LABELS: Record<BackElId, string> = {
+  back_label:    'ラベル',
+  back_headline: '見出し',
+  back_features: '機能リスト',
+  back_badge:    'バッジ',
+}
+
+const BACK_BG: Record<Design, string> = {
+  executive: '#1C0F05',
+  midnight:  'linear-gradient(135deg,#0D0C2A,#150E3A)',
+  vivid:     'linear-gradient(135deg,#8B3010,#C4511A)',
+  ocean:     'linear-gradient(135deg,#062033,#0B4F7A)',
+  forest:    'linear-gradient(135deg,#051510,#0F3D2E)',
+  crimson:   'linear-gradient(135deg,#1A0008,#7A0B2A)',
+  gold:      '#0A0A0A',
+  pink:      'linear-gradient(135deg,#4A0020,#9D174D)',
+}
+
 /* テーマカラー設定 — レイアウト共通コンポーネントに渡す */
 type TC = {
   frontBg: string       // 表面の背景
@@ -1241,6 +1271,58 @@ function FreeFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 18, t
 }
 
 /* ══════════════════════════════════════════
+   FREE BACK — 自由配置・裏面
+══════════════════════════════════════════ */
+function FreeBack({ fontFamily, tc, backEls, design }: {
+  fontFamily?: string; tc: TC; backEls: BackEls; design: Design
+}) {
+  const { accent } = tc
+  const bg = BACK_BG[design]
+  const { back_label, back_headline, back_features, back_badge } = backEls
+  return (
+    <div className="print-card" style={{ width: W, height: H, background: bg, position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
+      {/* 装飾 */}
+      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, background: `linear-gradient(180deg,${accent},${accent}88)`, pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', right: -60, top: -60, width: 200, height: 200, borderRadius: '50%', border: `1px solid ${accent}33`, pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', right: -30, top: -30, width: 120, height: 120, borderRadius: '50%', border: `1px solid ${accent}22`, pointerEvents: 'none' }} />
+      {[...Array(8)].map((_,i) => <div key={i} style={{ position:'absolute', left:i*70, top:0, bottom:0, width:1, background:'rgba(255,255,255,0.03)', pointerEvents:'none' }} />)}
+      {[...Array(5)].map((_,i) => <div key={i} style={{ position:'absolute', top:i*70, left:0, right:0, height:1, background:'rgba(255,255,255,0.03)', pointerEvents:'none' }} />)}
+
+      {/* ラベル */}
+      <div style={{ position: 'absolute', left: back_label.x, top: back_label.y, width: back_label.w }}>
+        <p style={{ fontSize: 18, color: accent, fontWeight: 700, letterSpacing: '0.15em', margin: 0, lineHeight: 1.2 }}>分身AI搭載名刺</p>
+      </div>
+
+      {/* 見出し */}
+      <div style={{ position: 'absolute', left: back_headline.x, top: back_headline.y, width: back_headline.w, height: back_headline.h, overflow: 'hidden' }}>
+        <h3 style={{ fontSize: 22, fontWeight: 900, color: 'white', margin: 0, lineHeight: 1.3, letterSpacing: '-0.01em' }}>
+          QRから分身AIに<br />いつでも相談を
+        </h3>
+      </div>
+
+      {/* 機能リスト */}
+      <div style={{ position: 'absolute', left: back_features.x, top: back_features.y, width: back_features.w }}>
+        <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '6px 16px' }}>
+          {['お問い合わせ対応', 'アポイント取得', '分身AIと会話'].map((item, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 18, color: 'rgba(255,255,255,0.85)', whiteSpace: 'nowrap' }}>
+              <span style={{ color: accent, fontWeight: 900 }}>✓</span>{item}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* バッジ */}
+      <div style={{ position: 'absolute', left: back_badge.x, top: back_badge.y }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: `${accent}20`, borderRadius: 20, padding: '6px 14px', border: `1px solid ${accent}33` }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80', flexShrink: 0 }} />
+          <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.8)', fontWeight: 700 }}>24時間 オンライン対応中</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════
    カードプレビュー（レスポンシブ対応）
 ══════════════════════════════════════════ */
 function CardPreview({
@@ -1325,6 +1407,8 @@ export default function PrintCardPage() {
   const [logoX, setLogoX] = useState(32)
   const [logoY, setLogoY] = useState(16)
   const [printEls, setPrintEls] = useState<PrintEls>(DEFAULT_PRINT_ELS)
+  const [backEls, setBackEls]   = useState<BackEls>(DEFAULT_BACK_ELS)
+  const [backEditMode, setBackEditMode] = useState(false)
   const [logoUploading, setLogoUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [editMode, setEditMode] = useState(false)  // true=編集モード, false=プレビュー
@@ -1449,9 +1533,9 @@ export default function PrintCardPage() {
           if (cfg.printEls) {
             setPrintEls({ ...DEFAULT_PRINT_ELS, ...cfg.printEls })
           } else if (cfg.layout && cfg.layout in LAYOUT_PRESETS) {
-            // 旧保存データ（printEls未保存）→ プリセット位置を使用
             setPrintEls(LAYOUT_PRESETS[cfg.layout])
           }
+          if (cfg.backEls) setBackEls({ ...DEFAULT_BACK_ELS, ...cfg.backEls })
         } catch {
           // image_url が JSON でない場合は無視（旧データ互換）
         }
@@ -1545,6 +1629,48 @@ export default function PrintCardPage() {
     ;(e.target as HTMLElement).addEventListener('pointerup', handleUp as EventListener)
   }, [printEls])
 
+  // 裏面要素ドラッグ
+  const handleBackElDragStart = useCallback((e: React.PointerEvent, scale: number, id: BackElId) => {
+    e.preventDefault(); e.stopPropagation()
+    const sx = e.clientX, sy = e.clientY
+    const start = { ...backEls[id] }
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+    const onMove = (ev: PointerEvent) => {
+      setBackEls(prev => ({ ...prev, [id]: { ...prev[id],
+        x: Math.round(Math.max(0, Math.min(W - prev[id].w, start.x + (ev.clientX - sx) / scale))),
+        y: Math.round(Math.max(0, Math.min(H - prev[id].h, start.y + (ev.clientY - sy) / scale))),
+      }}))
+    }
+    const onUp = (ev: PointerEvent) => {
+      ;(e.target as HTMLElement).releasePointerCapture(ev.pointerId)
+      ;(e.target as HTMLElement).removeEventListener('pointermove', onMove as EventListener)
+      ;(e.target as HTMLElement).removeEventListener('pointerup',   onUp   as EventListener)
+    }
+    ;(e.target as HTMLElement).addEventListener('pointermove', onMove as EventListener)
+    ;(e.target as HTMLElement).addEventListener('pointerup',   onUp   as EventListener)
+  }, [backEls])
+
+  // 裏面要素リサイズ
+  const handleBackElResizeStart = useCallback((e: React.PointerEvent, scale: number, id: BackElId) => {
+    e.preventDefault(); e.stopPropagation()
+    const sx = e.clientX, sy = e.clientY
+    const start = { ...backEls[id] }
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+    const onMove = (ev: PointerEvent) => {
+      setBackEls(prev => ({ ...prev, [id]: { ...prev[id],
+        w: Math.round(Math.max(60, Math.min(W - prev[id].x, start.w + (ev.clientX - sx) / scale))),
+        h: Math.round(Math.max(20, Math.min(H - prev[id].y, start.h + (ev.clientY - sy) / scale))),
+      }}))
+    }
+    const onUp = (ev: PointerEvent) => {
+      ;(e.target as HTMLElement).releasePointerCapture(ev.pointerId)
+      ;(e.target as HTMLElement).removeEventListener('pointermove', onMove as EventListener)
+      ;(e.target as HTMLElement).removeEventListener('pointerup',   onUp   as EventListener)
+    }
+    ;(e.target as HTMLElement).addEventListener('pointermove', onMove as EventListener)
+    ;(e.target as HTMLElement).addEventListener('pointerup',   onUp   as EventListener)
+  }, [backEls])
+
   // ロゴをcanvasでリサイズしてbase64に変換
   const handleLogoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -1580,7 +1706,7 @@ export default function PrintCardPage() {
       const res = await fetch(`/api/card/${cardId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ style_config: { theme: design, font, layout, logoUrl: logoUrl || null, logoX, logoY, printEls } }),
+        body: JSON.stringify({ style_config: { theme: design, font, layout, logoUrl: logoUrl || null, logoX, logoY, printEls, backEls } }),
       })
       if (res.ok) {
         setSavedBanner(true)
@@ -1976,6 +2102,45 @@ export default function PrintCardPage() {
           <FrontComponent card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} logoUrl={logoUrl || undefined} logoX={logoX} logoY={logoY} />
         </CardPreview>
 
+        {/* 裏面 編集 / プレビュー 切替バー — 自由配置選択時のみ */}
+        {layout === 'free' && <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
+          <div style={{ display: 'inline-flex', background: '#F0E8E0', borderRadius: 8, padding: 2, gap: 2, flexShrink: 0 }}>
+            <button
+              onClick={() => setBackEditMode(true)}
+              style={{
+                width: 64, padding: '6px 0', borderRadius: 6, fontSize: 11, fontWeight: 700,
+                border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
+                background: backEditMode ? '#1C0F05' : 'transparent',
+                color: backEditMode ? 'white' : '#A08068',
+                transition: 'all 0.15s',
+              }}
+            >✏️ 編集</button>
+            <button
+              onClick={() => setBackEditMode(false)}
+              style={{
+                width: 76, padding: '6px 0', borderRadius: 6, fontSize: 11, fontWeight: 700,
+                border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
+                background: !backEditMode ? '#F26722' : 'transparent',
+                color: !backEditMode ? 'white' : '#A08068',
+                transition: 'all 0.15s',
+              }}
+            >👁 仕上がり</button>
+          </div>
+          <span style={{ fontSize: 10, color: backEditMode ? '#C4511A' : '#A08068', fontWeight: 600, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {backEditMode ? '裏面の点線枠をドラッグ移動' : '印刷と同じ仕上がり'}
+          </span>
+          {backEditMode && (
+            <button
+              onClick={() => setBackEls(DEFAULT_BACK_ELS)}
+              style={{
+                padding: '5px 10px', borderRadius: 6, fontSize: 10, fontWeight: 700,
+                border: '1.5px solid #EDD9C8', background: 'white', color: '#A08068',
+                cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+              }}
+            >リセット</button>
+          )}
+        </div>}
+
         {/* 裏面 */}
         <CardPreview
           label="裏面"
@@ -1983,8 +2148,24 @@ export default function PrintCardPage() {
           disabled={dlState !== 'idle'}
           btnLabel="裏面を保存"
           captureRef={backRef}
+          overlay={(layout === 'free' && backEditMode) ? (scale) => (
+            <>
+              {(Object.entries(backEls) as [BackElId, BackEl][]).map(([id, el]) => (
+                <div key={id} onPointerDown={(e) => handleBackElDragStart(e, scale, id)} style={{ position: 'absolute', left: el.x - 2, top: el.y - 2, width: el.w + 4, height: el.h + 4, cursor: 'move', border: '2px dashed rgba(242,103,34,0.65)', borderRadius: 5, boxSizing: 'border-box', zIndex: 19, touchAction: 'none', userSelect: 'none' }}>
+                  <div style={{ position: 'absolute', top: -16, left: 0, fontSize: 9, fontWeight: 700, color: 'white', background: '#F26722', padding: '2px 6px', borderRadius: 4, whiteSpace: 'nowrap', pointerEvents: 'none' }}>{BACK_EL_LABELS[id]}</div>
+                  <div style={{ position: 'absolute', top: -10, right: -10, width: 18, height: 18, borderRadius: '50%', background: '#1C0F05', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, pointerEvents: 'none' }}>✥</div>
+                  <div onPointerDown={(e) => { e.stopPropagation(); handleBackElResizeStart(e, scale, id) }} style={{ position: 'absolute', bottom: -7, right: -7, width: 14, height: 14, background: '#F26722', borderRadius: 3, cursor: 'se-resize', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 21, touchAction: 'none' }}>
+                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M2 6L6 2M4.5 6L6 4.5" stroke="white" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                  </div>
+                </div>
+              ))}
+            </>
+          ) : undefined}
         >
-          <BackComponent card={card} fontFamily={currentFontFamily} />
+          {layout === 'free'
+            ? <FreeBack fontFamily={currentFontFamily} tc={tc} backEls={backEls} design={design} />
+            : <BackComponent card={card} fontFamily={currentFontFamily} />
+          }
         </CardPreview>
 
         {/* ── QRコード素材ダウンロード ── */}
