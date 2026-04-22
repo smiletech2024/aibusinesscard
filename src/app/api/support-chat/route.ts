@@ -264,33 +264,37 @@ export async function POST(req: NextRequest) {
     })
 
     const encoder = new TextEncoder()
-    let fullResponse = ''
+    let rawResponse = ''
 
+    // ① ストリームを全文収集
+    for await (const chunk of stream) {
+      rawResponse += chunk.choices[0]?.delta?.content ?? ''
+    }
+
+    // ② 「ペルソナ」を強制置換（AIが指示を無視しても確実に除去）
+    const cleanedResponse = rawResponse
+      .replace(/ペルソナ編集/g, '「AIを強化」')
+      .replace(/ペルソナ設定/g, 'AI設定')
+      .replace(/ペルソナ/g, 'AI設定')
+
+    // ③ DB保存（置換済みテキストで保存）
+    if (sessionKey && cleanedResponse) {
+      await admin.from('support_messages').insert({
+        session_key: sessionKey,
+        role: 'assistant',
+        content: cleanedResponse,
+      })
+      await admin.from('support_sessions').upsert(
+        { session_key: sessionKey, updated_at: new Date().toISOString() },
+        { onConflict: 'session_key' }
+      )
+    }
+
+    // ④ クライアントへ送信
     const readable = new ReadableStream({
-      async start(controller) {
-        try {
-          for await (const chunk of stream) {
-            const text = chunk.choices[0]?.delta?.content ?? ''
-            if (text) {
-              fullResponse += text
-              controller.enqueue(encoder.encode(text))
-            }
-          }
-          // AIの返答をDB保存
-          if (sessionKey && fullResponse) {
-            await admin.from('support_messages').insert({
-              session_key: sessionKey,
-              role: 'assistant',
-              content: fullResponse,
-            })
-            await admin.from('support_sessions').upsert(
-              { session_key: sessionKey, updated_at: new Date().toISOString() },
-              { onConflict: 'session_key' }
-            )
-          }
-        } finally {
-          controller.close()
-        }
+      start(controller) {
+        controller.enqueue(encoder.encode(cleanedResponse))
+        controller.close()
       },
     })
 
