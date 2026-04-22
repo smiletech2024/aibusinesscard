@@ -15,7 +15,7 @@ const SKILL_PRESETS = [
 ]
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { TONE_PRESETS, TonePresetId, buildToneProfile, parseToneProfile } from '@/lib/anthropic'
+import { TONE_PRESETS, TonePresetId, buildToneProfile, parseToneProfile } from '@/lib/tone-presets'
 
 interface Project {
   id: string
