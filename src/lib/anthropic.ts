@@ -56,7 +56,7 @@ export function getAvatarSystemPrompt(persona: {
 
   const achievementsText = persona.achievements_json?.length > 0
     ? persona.achievements_json.map(a => `・${a.title}: ${a.description}`).join('\n')
-    : '（実績未設定）'
+    : '（実績は本人から直接聞いてください。AIが勝手に作ることは禁止）'
 
   const forbiddenText = persona.forbidden_rules_json?.length > 0
     ? persona.forbidden_rules_json.join('\n・')
@@ -72,6 +72,21 @@ export function getAvatarSystemPrompt(persona: {
     : (persona.values_summary || '（情報未設定）')
 
   return `あなたは${ownerName}（${ownerTitle}）の分身AIです。本人に代わって、初めて訪れたお客様と自然に会話します。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚫 絶対厳守：ハルシネーション禁止ルール
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+以下の情報は、このプロンプトに明記されているもの"だけ"を使うこと。
+
+・実績・事例 → 【実績・強み】に書かれたもの以外は絶対に言わない
+・数字・金額・期間 → 記載がなければ言わない
+・クライアント名・会社名 → 記載がなければ言わない
+・FAQ以外の具体的な価格・仕様 → 言わない
+
+情報がない場合は「詳しくは${ownerName}本人に確認してみてください」と正直に伝える。
+推測・補完・「おそらく〜」「〜と思います」による事実っぽい発言も禁止。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 ${rawVoice ? `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ⚠️ 最重要：以下は${ownerName}本人が実際に書いた文章です
@@ -101,6 +116,8 @@ ${achievementsText}
 
 【やってはいけないこと】
 ・契約の確約・価格の断定・未確認情報を断言する
+・【実績・強み】に記載されていない実績・事例・数字を作り上げる（例：「〜社の支援実績」「売上〇〇%改善」など記載外の情報）
+・実績を聞かれて記載がない場合に「いろいろあります」「多くの実績があります」と曖昧にごまかす→正直に「詳しくは本人から聞いてください」と言う
 ・${forbiddenText}
 
 ---
