@@ -216,67 +216,57 @@ function KaoriChat() {
       boxShadow: '0 6px 32px rgba(242,103,34,0.12)',
       marginBottom: 32,
     }}>
-      {/* ヘッダー — 常に表示 */}
-      <div style={{
-        background: 'linear-gradient(135deg,#C4511A,#F26722)',
-        padding: '12px 16px',
-      }}>
-        {/* 1行目: アバター + 名前 + オンラインバッジ */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      {/* ヘッダー */}
+      <div style={{ background: 'linear-gradient(135deg,#C4511A,#F26722)', padding: '14px 16px 12px' }}>
+        {/* アバター + テキスト */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
           <div style={{
-            width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
+            width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
             background: 'rgba(255,255,255,0.25)',
             border: '2px solid rgba(255,255,255,0.6)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 20,
+            fontSize: 22,
           }}>👩</div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ color: '#fff', fontWeight: 900, fontSize: 15, lineHeight: 1.2 }}>香里（かおり）</div>
-            <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: 11, marginTop: 1 }}>AI名刺 サポートスタッフ</div>
-          </div>
-          <div style={{
-            background: 'rgba(255,255,255,0.2)',
-            color: '#fff', fontSize: 10, fontWeight: 700,
-            padding: '3px 9px', borderRadius: 99, flexShrink: 0,
-            display: 'flex', alignItems: 'center', gap: 4,
-          }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80', display: 'inline-block' }} />
-            24時間対応
+          <div>
+            <div style={{ color: '#fff', fontWeight: 900, fontSize: 16, whiteSpace: 'nowrap' }}>香里（かおり）</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3 }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80', display: 'inline-block', flexShrink: 0 }} />
+              <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 11, whiteSpace: 'nowrap' }}>AI名刺 サポートスタッフ・24時間対応</span>
+            </div>
           </div>
         </div>
-        {/* 2行目: 人に対応してもらうボタン */}
-        <div style={{ marginTop: 10 }}>
-          {!escalated ? (
-            <button
-              onClick={escalate}
-              disabled={escalating}
-              style={{
-                width: '100%',
-                background: 'rgba(255,255,255,0.18)',
-                color: '#fff',
-                border: '1.5px solid rgba(255,255,255,0.5)',
-                borderRadius: 10,
-                padding: '8px 0',
-                fontSize: 13, fontWeight: 700,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                cursor: escalating ? 'not-allowed' : 'pointer',
-                opacity: escalating ? 0.6 : 1,
-              }}
-            >
-              🙋 解決しない場合は人に対応してもらう
-            </button>
-          ) : (
-            <div style={{
-              width: '100%',
-              background: 'rgba(255,255,255,0.15)',
-              color: '#fff', borderRadius: 10, padding: '8px 0',
+        {/* 人に対応してもらうボタン（横幅いっぱい） */}
+        {!escalated ? (
+          <button
+            onClick={escalate}
+            disabled={escalating}
+            style={{
+              width: '100%', boxSizing: 'border-box',
+              background: 'rgba(255,255,255,0.18)',
+              color: '#fff',
+              border: '1.5px solid rgba(255,255,255,0.6)',
+              borderRadius: 10,
+              padding: '9px 0',
               fontSize: 13, fontWeight: 700,
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            }}>
-              ✅ 担当者に繋ぎました。このままお待ちください
-            </div>
-          )}
-        </div>
+              cursor: escalating ? 'not-allowed' : 'pointer',
+              opacity: escalating ? 0.6 : 1,
+            }}
+          >
+            🙋 AIで解決しない場合は人に対応してもらう
+          </button>
+        ) : (
+          <div style={{
+            width: '100%', boxSizing: 'border-box',
+            background: 'rgba(52,211,153,0.25)',
+            border: '1.5px solid rgba(52,211,153,0.5)',
+            color: '#fff', borderRadius: 10, padding: '9px 0',
+            fontSize: 13, fontWeight: 700,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+          }}>
+            ✅ 担当者に繋ぎました。このままお待ちください
+          </div>
+        )}
       </div>
 
       {/* イントロフォーム */}
