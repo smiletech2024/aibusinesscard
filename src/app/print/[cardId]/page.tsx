@@ -13,13 +13,33 @@ import jsPDF from 'jspdf'
 
 type Design = 'executive' | 'midnight' | 'vivid' | 'ocean' | 'forest' | 'crimson' | 'gold' | 'pink'
 type Font   = 'sans' | 'serif' | 'rounded' | 'mono' | 'display' | 'elegant' | 'yumin'
-type Layout = 'standard' | 'centered' | 'split' | 'pulse'
+type Layout = 'standard' | 'centered' | 'split' | 'pulse' | 'free'
 
 const layoutMeta: Record<Layout, { label: string; desc: string }> = {
   standard: { label: 'スタンダード', desc: '左揃え・定番' },
   centered: { label: 'センター',    desc: '中央揃え・洗練' },
   split:    { label: 'スプリット',  desc: 'パネル分割・モダン' },
   pulse:    { label: 'PULSE',       desc: 'AI前面・生きた名刺' },
+  free:     { label: '自由配置',    desc: '要素をドラッグ移動' },
+}
+
+/* ─── 自由配置レイアウト用 要素型 ─── */
+type PrintElId = 'company' | 'name_block' | 'contacts' | 'qr_block'
+type PrintEl   = { x: number; y: number; w: number; h: number }
+type PrintEls  = Record<PrintElId, PrintEl>
+
+const DEFAULT_PRINT_ELS: PrintEls = {
+  company:    { x: 32,  y: 52,  w: 260, h: 28  },
+  name_block: { x: 32,  y: 86,  w: 300, h: 76  },
+  contacts:   { x: 32,  y: 172, w: 290, h: 88  },
+  qr_block:   { x: 416, y: 50,  w: 122, h: 130 },
+}
+
+const EL_LABELS: Record<PrintElId, string> = {
+  company:    '会社名',
+  name_block: '氏名・肩書',
+  contacts:   '連絡先',
+  qr_block:   'QRコード',
 }
 
 /* テーマカラー設定 — レイアウト共通コンポーネントに渡す */
@@ -1083,6 +1103,84 @@ function PulseBack({ card, fontFamily, tc }: { card: BusinessCard; fontFamily?: 
 }
 
 /* ══════════════════════════════════════════
+   FREE — 自由配置レイアウト（全テーマ共通）
+══════════════════════════════════════════ */
+function FreeFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 18, tc, printEls }: {
+  card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number; tc: TC; printEls: PrintEls
+}) {
+  const { frontBg, textName, textCompany, textContact, accent, isDark, qrWrap } = tc
+  const { company, name_block, contacts, qr_block } = printEls
+  const qrSize = Math.max(50, qr_block.w - 18)
+  return (
+    <div className="print-card" style={{ width: W, height: H, background: frontBg, position: 'relative', overflow: 'hidden', fontFamily: fontFamily ?? "'Helvetica Neue', Arial, sans-serif" }}>
+      {/* アクセントライン（上） */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${accent}, transparent)` }} />
+      {/* アクセントライン（下） */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${accent}, transparent)` }} />
+
+      {/* ロゴ */}
+      {logoUrl && (
+        <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', filter: isDark ? 'brightness(0) invert(1)' : undefined, opacity: 0.85, pointerEvents: 'none' }} />
+      )}
+
+      {/* 会社名 */}
+      {card.company && (
+        <div style={{ position: 'absolute', left: company.x, top: company.y, width: company.w, height: company.h, overflow: 'hidden' }}>
+          <p style={{ fontSize: 18, color: textCompany, fontWeight: 700, letterSpacing: '0.15em', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {card.company}
+          </p>
+        </div>
+      )}
+
+      {/* 氏名・肩書ブロック */}
+      <div style={{ position: 'absolute', left: name_block.x, top: name_block.y, width: name_block.w, height: name_block.h, overflow: 'hidden' }}>
+        <h2 style={{ fontSize: 26, fontWeight: 900, color: textName, margin: '0 0 5px', lineHeight: 1.1, letterSpacing: '-0.02em' }}>
+          {card.full_name}
+        </h2>
+        {card.title && (
+          <p style={{ fontSize: 18, color: accent, fontWeight: 600, margin: 0 }}>
+            {card.title}
+          </p>
+        )}
+      </div>
+
+      {/* 連絡先ブロック */}
+      <div style={{ position: 'absolute', left: contacts.x, top: contacts.y, width: contacts.w, height: contacts.h, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 7 }}>
+        {card.email && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: textContact, fontSize: 18 }}>
+            <span style={{ color: accent }}><IconMail /></span>{card.email}
+          </div>
+        )}
+        {card.phone && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: textContact, fontSize: 18 }}>
+            <span style={{ color: accent }}><IconPhone /></span>{card.phone}
+          </div>
+        )}
+        {card.website && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: textContact, fontSize: 18 }}>
+            <span style={{ color: accent }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}
+          </div>
+        )}
+      </div>
+
+      {/* QRブロック */}
+      {qrUrl && (
+        <div style={{ position: 'absolute', left: qr_block.x, top: qr_block.y, width: qr_block.w, height: qr_block.h, overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 2, flexShrink: 0 }}>
+            <LogoIcon size={11} />
+            <span style={{ fontSize: 18, fontWeight: 800, color: accent, letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
+          </div>
+          <div style={{ ...qrWrap, flexShrink: 0 }}>
+            <QRCodeSVG url={qrUrl} size={qrSize} />
+          </div>
+          <p style={{ fontSize: 9, color: accent, margin: 0, fontWeight: 700, whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════
    カードプレビュー（レスポンシブ対応）
 ══════════════════════════════════════════ */
 function CardPreview({
@@ -1166,6 +1264,7 @@ export default function PrintCardPage() {
   const [logoUrl, setLogoUrl] = useState<string>('')
   const [logoX, setLogoX] = useState(32)
   const [logoY, setLogoY] = useState(16)
+  const [printEls, setPrintEls] = useState<PrintEls>(DEFAULT_PRINT_ELS)
   const [logoUploading, setLogoUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [savedBanner, setSavedBanner] = useState(false)
@@ -1286,6 +1385,7 @@ export default function PrintCardPage() {
           if (cfg.logoUrl) setLogoUrl(cfg.logoUrl)
           if (typeof cfg.logoX === 'number') setLogoX(cfg.logoX)
           if (typeof cfg.logoY === 'number') setLogoY(cfg.logoY)
+          if (cfg.printEls) setPrintEls({ ...DEFAULT_PRINT_ELS, ...cfg.printEls })
         } catch {
           // image_url が JSON でない場合は無視（旧データ互換）
         }
@@ -1318,6 +1418,66 @@ export default function PrintCardPage() {
     ;(e.target as HTMLElement).addEventListener('pointermove', handleMove as EventListener)
     ;(e.target as HTMLElement).addEventListener('pointerup', handleUp as EventListener)
   }, [logoX, logoY])
+
+  // 自由配置: 要素ドラッグ
+  const handlePrintElDragStart = useCallback((e: React.PointerEvent, scale: number, id: PrintElId) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const startClientX = e.clientX
+    const startClientY = e.clientY
+    const startEl = { ...printEls[id] }
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+
+    const handleMove = (ev: PointerEvent) => {
+      const dx = (ev.clientX - startClientX) / scale
+      const dy = (ev.clientY - startClientY) / scale
+      setPrintEls(prev => ({
+        ...prev,
+        [id]: {
+          ...prev[id],
+          x: Math.round(Math.max(0, Math.min(W - prev[id].w, startEl.x + dx))),
+          y: Math.round(Math.max(0, Math.min(H - prev[id].h, startEl.y + dy))),
+        },
+      }))
+    }
+    const handleUp = (ev: PointerEvent) => {
+      ;(e.target as HTMLElement).releasePointerCapture(ev.pointerId)
+      ;(e.target as HTMLElement).removeEventListener('pointermove', handleMove as EventListener)
+      ;(e.target as HTMLElement).removeEventListener('pointerup', handleUp as EventListener)
+    }
+    ;(e.target as HTMLElement).addEventListener('pointermove', handleMove as EventListener)
+    ;(e.target as HTMLElement).addEventListener('pointerup', handleUp as EventListener)
+  }, [printEls])
+
+  // 自由配置: 要素リサイズ
+  const handlePrintElResizeStart = useCallback((e: React.PointerEvent, scale: number, id: PrintElId) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const startClientX = e.clientX
+    const startClientY = e.clientY
+    const startEl = { ...printEls[id] }
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+
+    const handleMove = (ev: PointerEvent) => {
+      const dx = (ev.clientX - startClientX) / scale
+      const dy = (ev.clientY - startClientY) / scale
+      setPrintEls(prev => ({
+        ...prev,
+        [id]: {
+          ...prev[id],
+          w: Math.round(Math.max(60, Math.min(W - prev[id].x, startEl.w + dx))),
+          h: Math.round(Math.max(20, Math.min(H - prev[id].y, startEl.h + dy))),
+        },
+      }))
+    }
+    const handleUp = (ev: PointerEvent) => {
+      ;(e.target as HTMLElement).releasePointerCapture(ev.pointerId)
+      ;(e.target as HTMLElement).removeEventListener('pointermove', handleMove as EventListener)
+      ;(e.target as HTMLElement).removeEventListener('pointerup', handleUp as EventListener)
+    }
+    ;(e.target as HTMLElement).addEventListener('pointermove', handleMove as EventListener)
+    ;(e.target as HTMLElement).addEventListener('pointerup', handleUp as EventListener)
+  }, [printEls])
 
   // ロゴをcanvasでリサイズしてbase64に変換
   const handleLogoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1354,7 +1514,7 @@ export default function PrintCardPage() {
       const res = await fetch(`/api/card/${cardId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ style_config: { theme: design, font, layout, logoUrl: logoUrl || null, logoX, logoY } }),
+        body: JSON.stringify({ style_config: { theme: design, font, layout, logoUrl: logoUrl || null, logoX, logoY, printEls } }),
       })
       if (res.ok) {
         setSavedBanner(true)
@@ -1403,8 +1563,11 @@ export default function PrintCardPage() {
       : layout === 'split'
         ? (p: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) =>
             <SplitFront {...p} tc={tc} />
-        : (p: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) =>
-            <PulseFront {...p} tc={tc} />
+        : layout === 'free'
+          ? (p: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) =>
+              <FreeFront {...p} tc={tc} printEls={printEls} />
+          : (p: { card: BusinessCard; qrUrl: string; fontFamily?: string; logoUrl?: string; logoX?: number; logoY?: number }) =>
+              <PulseFront {...p} tc={tc} />
 
   const currentFontFamily = fontMeta[font].family
 
@@ -1530,6 +1693,17 @@ export default function PrintCardPage() {
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
                 }}>
                   {/* ミニプレビューアイコン */}
+                  {key === 'free' && (
+                    <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
+                      <rect x="1" y="1" width="20" height="12" rx="1.5" fill={layout === key ? 'rgba(255,255,255,0.15)' : '#F0E8E0'} stroke={layout === key ? 'rgba(255,255,255,0.3)' : '#DEC4AD'} strokeWidth="0.8"/>
+                      {/* draggable blocks */}
+                      <rect x="2" y="2" width="8" height="3" rx="0.6" fill={layout === key ? 'rgba(255,255,255,0.35)' : '#D4B894'} strokeDasharray="1 0.5" stroke={layout === key ? 'rgba(255,255,255,0.5)' : '#C4A882'} strokeWidth="0.5"/>
+                      <rect x="12" y="5" width="8" height="3" rx="0.6" fill={layout === key ? 'rgba(255,255,255,0.2)' : '#DEC4AD'} strokeDasharray="1 0.5" stroke={layout === key ? 'rgba(255,255,255,0.4)' : '#C4A882'} strokeWidth="0.5"/>
+                      <rect x="3" y="8" width="9" height="3" rx="0.6" fill={layout === key ? 'rgba(255,255,255,0.2)' : '#DEC4AD'} strokeDasharray="1 0.5" stroke={layout === key ? 'rgba(255,255,255,0.4)' : '#C4A882'} strokeWidth="0.5"/>
+                      {/* arrows indicating move */}
+                      <path d="M 6 4.5 L 7 3.5 M 6 4.5 L 7 5.5" stroke={layout === key ? '#F26722' : '#C4A882'} strokeWidth="0.8" strokeLinecap="round"/>
+                    </svg>
+                  )}
                   {key === 'standard' && (
                     <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
                       <rect x="1" y="1" width="13" height="12" rx="1.5" fill={layout === key ? 'rgba(255,255,255,0.15)' : '#F0E8E0'} stroke={layout === key ? 'rgba(255,255,255,0.3)' : '#DEC4AD'} strokeWidth="0.8"/>
@@ -1579,6 +1753,23 @@ export default function PrintCardPage() {
               ))}
             </div>
           </div>
+
+          {/* 自由配置モード — ヒントバー */}
+          {layout === 'free' && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: '#FFF7F0', border: '1px solid #FDD5B5', borderRadius: 8, padding: '6px 10px' }}>
+              <span style={{ fontSize: 10, color: '#C4511A', fontWeight: 700 }}>
+                ✥ 点線枠をドラッグして各要素を移動 · 右下の橙ハンドルでリサイズ
+              </span>
+              <button
+                onClick={() => setPrintEls(DEFAULT_PRINT_ELS)}
+                style={{
+                  fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 6,
+                  background: 'white', color: '#C4511A', border: '1px solid #FDD5B5',
+                  cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap',
+                }}
+              >リセット</button>
+            </div>
+          )}
 
           {/* 行4: フォント選択（7書体グリッド） + 保存ボタン */}
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
@@ -1668,36 +1859,98 @@ export default function PrintCardPage() {
           disabled={dlState !== 'idle'}
           btnLabel="表面を保存"
           captureRef={frontRef}
-          overlay={logoUrl ? (scale) => (
-            /* ドラッグハンドル — captureRef の外なのでPDFに含まれない */
-            <div
-              onPointerDown={(e) => handleLogoDragStart(e, scale)}
-              style={{
-                position: 'absolute',
-                left: logoX - 3,
-                top: logoY - 3,
-                width: 96,
-                height: 34,
-                cursor: 'move',
-                border: '2px dashed rgba(242,103,34,0.7)',
-                borderRadius: 6,
-                boxSizing: 'border-box',
-                zIndex: 20,
-                touchAction: 'none',
-                userSelect: 'none',
-              }}
-              title="ドラッグしてロゴを移動"
-            >
-              {/* 移動アイコン */}
-              <div style={{
-                position: 'absolute', top: -10, right: -10,
-                width: 18, height: 18, borderRadius: '50%',
-                background: '#F26722', color: 'white',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 10, boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-                pointerEvents: 'none',
-              }}>✥</div>
-            </div>
+          overlay={(logoUrl || layout === 'free') ? (scale) => (
+            <>
+              {/* ロゴドラッグハンドル */}
+              {logoUrl && (
+                <div
+                  onPointerDown={(e) => handleLogoDragStart(e, scale)}
+                  style={{
+                    position: 'absolute',
+                    left: logoX - 3,
+                    top: logoY - 3,
+                    width: 96,
+                    height: 34,
+                    cursor: 'move',
+                    border: '2px dashed rgba(242,103,34,0.7)',
+                    borderRadius: 6,
+                    boxSizing: 'border-box',
+                    zIndex: 20,
+                    touchAction: 'none',
+                    userSelect: 'none',
+                  }}
+                  title="ドラッグしてロゴを移動"
+                >
+                  <div style={{
+                    position: 'absolute', top: -10, right: -10,
+                    width: 18, height: 18, borderRadius: '50%',
+                    background: '#F26722', color: 'white',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 10, boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                    pointerEvents: 'none',
+                  }}>✥</div>
+                </div>
+              )}
+              {/* 自由配置要素ドラッグハンドル */}
+              {layout === 'free' && (Object.entries(printEls) as [PrintElId, PrintEl][]).map(([id, el]) => (
+                <div
+                  key={id}
+                  onPointerDown={(e) => handlePrintElDragStart(e, scale, id)}
+                  style={{
+                    position: 'absolute',
+                    left: el.x - 2,
+                    top: el.y - 2,
+                    width: el.w + 4,
+                    height: el.h + 4,
+                    cursor: 'move',
+                    border: '2px dashed rgba(242,103,34,0.65)',
+                    borderRadius: 5,
+                    boxSizing: 'border-box',
+                    zIndex: 19,
+                    touchAction: 'none',
+                    userSelect: 'none',
+                  }}
+                  title={`${EL_LABELS[id]}をドラッグして移動`}
+                >
+                  {/* 要素ラベル */}
+                  <div style={{
+                    position: 'absolute', top: -16, left: 0,
+                    fontSize: 9, fontWeight: 700, color: 'white',
+                    background: '#F26722',
+                    padding: '2px 6px', borderRadius: 4,
+                    whiteSpace: 'nowrap', pointerEvents: 'none',
+                  }}>{EL_LABELS[id]}</div>
+                  {/* 移動アイコン */}
+                  <div style={{
+                    position: 'absolute', top: -10, right: -10,
+                    width: 18, height: 18, borderRadius: '50%',
+                    background: '#1C0F05', color: 'white',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 10, boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+                    pointerEvents: 'none',
+                  }}>✥</div>
+                  {/* リサイズハンドル（右下） */}
+                  <div
+                    onPointerDown={(e) => { e.stopPropagation(); handlePrintElResizeStart(e, scale, id) }}
+                    style={{
+                      position: 'absolute', bottom: -7, right: -7,
+                      width: 14, height: 14,
+                      background: '#F26722',
+                      borderRadius: 3,
+                      cursor: 'se-resize',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      zIndex: 21,
+                      touchAction: 'none',
+                    }}
+                    title="ドラッグしてサイズ変更"
+                  >
+                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                      <path d="M2 6L6 2M4.5 6L6 4.5" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                  </div>
+                </div>
+              ))}
+            </>
           ) : undefined}
         >
           <FrontComponent card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} logoUrl={logoUrl || undefined} logoX={logoX} logoY={logoY} />
