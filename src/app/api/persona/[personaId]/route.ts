@@ -28,7 +28,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { skills, projects, rawVoice, faqs } = await req.json()
+    const { skills, projects, rawVoice, faqs, toneProfile } = await req.json()
 
     // values_summary の各セクションを構築（順序：ベース → スキル → 生の声）
     const stripped = (persona.values_summary || '')
@@ -59,6 +59,9 @@ export async function PATCH(
       values_summary: newValues,
       achievements_json: newAchievements,
       updated_at: new Date().toISOString(),
+    }
+    if (toneProfile !== undefined) {
+      updatePayload.tone_profile = toneProfile || null
     }
     if (Array.isArray(faqs)) {
       updatePayload.faq_json = faqs.map((f: { question: string; answer: string }) => ({

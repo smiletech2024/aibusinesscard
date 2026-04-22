@@ -15,6 +15,7 @@ const SKILL_PRESETS = [
 ]
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { TONE_PRESETS, TonePresetId, buildToneProfile, parseToneProfile } from '@/lib/anthropic'
 
 interface Project {
   id: string
@@ -42,6 +43,8 @@ export default function EditPersonaPage() {
 
   const [personaId, setPersonaId] = useState('')
   const [rawVoice, setRawVoice] = useState('')
+  const [tonePreset, setTonePreset] = useState<TonePresetId | 'custom'>('natural')
+  const [toneCustom, setToneCustom] = useState('')
   const [skills, setSkills] = useState<string[]>([])
   const [kwInput, setKwInput] = useState('')
   const [projects, setProjects] = useState<Project[]>([newProject()])
@@ -66,7 +69,13 @@ export default function EditPersonaPage() {
 
       setPersonaId(card.persona_id)
 
-      const persona = card.personas as { values_summary?: string; achievements_json?: Array<{ title: string; description: string }> }
+      const persona = card.personas as { values_summary?: string; tone_profile?: string; achievements_json?: Array<{ title: string; description: string }> }
+      // tone_profile の読み込み
+      if (persona?.tone_profile !== undefined) {
+        const { presetId, custom } = parseToneProfile(persona.tone_profile ?? null)
+        setTonePreset(presetId)
+        setToneCustom(custom)
+      }
       if (persona?.values_summary) {
         // スキル読み込み
         const skillMatch = persona.values_summary.match(/【スキルセット・専門領域】\n([\s\S]*?)(?:\n\n|$)/)
@@ -143,6 +152,7 @@ export default function EditPersonaPage() {
           projects: projects.filter(p => p.title.trim()),
           rawVoice,
           faqs: faqs.filter(f => f.question.trim()),
+          toneProfile: buildToneProfile(tonePreset, toneCustom),
         }),
       })
       if (res.ok) {
@@ -190,6 +200,94 @@ export default function EditPersonaPage() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+
+        {/* ── 口調・トーン設定 ── */}
+        <div className="card p-5">
+          <div className="flex items-center gap-2 mb-1">
+            <span style={{ fontSize: 20 }}>🎭</span>
+            <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>AIの口調・トーン</h2>
+          </div>
+          <p className="text-xs mb-4" style={{ color: '#A08068' }}>
+            お客様に対してどんな話し方をするか選んでください。業種・ブランドイメージに合わせてください
+          </p>
+
+          {/* プリセット選択 */}
+          <div className="grid grid-cols-2 gap-2 mb-3">
+            {TONE_PRESETS.map(preset => {
+              const selected = tonePreset === preset.id
+              return (
+                <button
+                  key={preset.id}
+                  onClick={() => setTonePreset(preset.id)}
+                  style={{
+                    padding: '12px 10px', borderRadius: 12, textAlign: 'left',
+                    border: selected ? '2px solid #F26722' : '1.5px solid #DEC4AD',
+                    background: selected ? 'rgba(242,103,34,0.06)' : 'white',
+                    cursor: 'pointer', transition: 'all 0.15s',
+                  }}
+                >
+                  <div style={{ fontSize: 20, marginBottom: 4 }}>{preset.emoji}</div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: selected ? '#C4511A' : '#1C0F05', marginBottom: 2 }}>
+                    {preset.label}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#A08068', lineHeight: 1.4 }}>{preset.desc}</div>
+                </button>
+              )
+            })}
+            {/* カスタム */}
+            <button
+              onClick={() => setTonePreset('custom')}
+              style={{
+                padding: '12px 10px', borderRadius: 12, textAlign: 'left',
+                border: tonePreset === 'custom' ? '2px solid #F26722' : '1.5px solid #DEC4AD',
+                background: tonePreset === 'custom' ? 'rgba(242,103,34,0.06)' : 'white',
+                cursor: 'pointer', transition: 'all 0.15s',
+              }}
+            >
+              <div style={{ fontSize: 20, marginBottom: 4 }}>✍️</div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: tonePreset === 'custom' ? '#C4511A' : '#1C0F05', marginBottom: 2 }}>
+                カスタム
+              </div>
+              <div style={{ fontSize: 11, color: '#A08068', lineHeight: 1.4 }}>自分で細かく指定</div>
+            </button>
+          </div>
+
+          {/* 選択中プリセットのプレビュー */}
+          {tonePreset !== 'custom' && (() => {
+            const p = TONE_PRESETS.find(p => p.id === tonePreset)
+            return p ? (
+              <div style={{ background: '#FAF5F0', border: '1px solid #EDD9C8', borderRadius: 10, padding: '10px 12px', marginBottom: 12 }}>
+                <p className="text-xs font-bold mb-1" style={{ color: '#A08068' }}>AIへの指示（プリセット内容）</p>
+                <p className="text-xs" style={{ color: '#4A2C1A', lineHeight: 1.6 }}>{p.value}</p>
+              </div>
+            ) : null
+          })()}
+
+          {/* 追加指示 or カスタム全文 */}
+          <div>
+            <label className="block text-xs font-semibold mb-1.5" style={{ color: '#4A2C1A' }}>
+              {tonePreset === 'custom' ? '口調の指示（自由記述）' : '追加の口調指示（任意）'}
+            </label>
+            <textarea
+              value={toneCustom}
+              onChange={e => setToneCustom(e.target.value)}
+              rows={tonePreset === 'custom' ? 4 : 2}
+              placeholder={
+                tonePreset === 'custom'
+                  ? '例：語尾は「〜ですよ」「〜ですね」を使う。関西弁で話す。文章は短く句点で区切る。'
+                  : '例：「〜でございます」をより多く使う。文末は必ず句点で終える。'
+              }
+              style={{
+                width: '100%', padding: '10px 12px', fontSize: 13, lineHeight: 1.7,
+                border: '1.5px solid #DEC4AD', borderRadius: 10,
+                background: '#FAF5F0', color: '#1C0F05', outline: 'none',
+                resize: 'vertical', boxSizing: 'border-box',
+              }}
+              onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.background = '#fff'; e.target.style.boxShadow = '0 0 0 3px rgba(242,103,34,0.1)' }}
+              onBlur={e => { e.target.style.borderColor = '#DEC4AD'; e.target.style.background = '#FAF5F0'; e.target.style.boxShadow = 'none' }}
+            />
+          </div>
+        </div>
 
         {/* 生の声 ← 最も重要なセクション */}
         <div className="rounded-2xl p-5"
