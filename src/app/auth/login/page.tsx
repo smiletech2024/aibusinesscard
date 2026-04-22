@@ -104,9 +104,13 @@ export default function LoginPage() {
         window.location.href = '/dashboard'
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : ''
-      if (msg.includes('rate limit') || msg.includes('429')) {
-        setError('登録回数の上限に達しました。しばらく時間をおいてから再度お試しください。')
+      const msg = (err instanceof Error ? err.message : String(err)).toLowerCase()
+      if (msg.includes('rate limit') || msg.includes('429') || msg.includes('over_email_send_rate_limit') || msg.includes('email rate limit')) {
+        if (isSignUp) {
+          setError('現在メール送信が混み合っています。1時間ほど時間をおいてから再度お試しいただくか、admin@aimeishi.biz までお問い合わせください。')
+        } else {
+          setError('しばらく時間をおいてから再度お試しください。')
+        }
       } else if (msg.includes('already registered') || msg.includes('already been registered')) {
         setError('このメールアドレスはすでに登録されています。ログインしてください。')
       } else if (msg.includes('invalid email')) {
