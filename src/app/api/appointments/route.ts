@@ -177,6 +177,40 @@ export async function GET() {
   }
 }
 
+// ── DELETE：アポイント削除 ─────────────────────────────────────────
+export async function DELETE(req: NextRequest) {
+  try {
+    const supabase = await createUserClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    const { id } = await req.json()
+    if (!id) return NextResponse.json({ error: 'Bad Request' }, { status: 400 })
+
+    const admin = getAdmin()
+
+    // 自分のカードに紐づくアポイントのみ削除可
+    const { data: cards } = await admin
+      .from('business_cards')
+      .select('id')
+      .eq('user_id', user.id)
+
+    const cardIds = cards?.map(c => c.id) ?? []
+
+    const { error } = await admin
+      .from('appointments')
+      .delete()
+      .eq('id', id)
+      .in('card_id', cardIds)
+
+    if (error) return NextResponse.json({ error: 'DB error' }, { status: 500 })
+    return NextResponse.json({ ok: true })
+  } catch (err) {
+    console.error('[appointments DELETE]', err)
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+  }
+}
+
 // ── PATCH：ステータス更新 ─────────────────────────────────────────
 export async function PATCH(req: NextRequest) {
   try {

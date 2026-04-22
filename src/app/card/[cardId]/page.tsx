@@ -460,16 +460,33 @@ export default function CardPage() {
 
           {/* アバター＋プロフィール */}
           <div className="flex flex-col items-center -mt-8 px-5 pb-5">
-            <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-xl text-white mb-4"
-              style={{
-                background: 'linear-gradient(135deg, #E05A18, #F5843A)',
-                boxShadow: '0 0 0 3px rgba(242,103,34,0.3), 0 0 40px rgba(242,103,34,0.2)',
-                border: '2px solid rgba(242,103,34,0.4)',
-              }}
-            >
-              {initial}
-            </div>
+            {card.profiles?.avatar_url ? (
+              <div
+                className="w-16 h-16 rounded-2xl mb-4 overflow-hidden"
+                style={{
+                  boxShadow: '0 0 0 3px rgba(242,103,34,0.3), 0 0 40px rgba(242,103,34,0.2)',
+                  border: '2px solid rgba(242,103,34,0.4)',
+                  flexShrink: 0,
+                }}
+              >
+                <img
+                  src={card.profiles.avatar_url}
+                  alt={card.full_name ?? ''}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+              </div>
+            ) : (
+              <div
+                className="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-xl text-white mb-4"
+                style={{
+                  background: 'linear-gradient(135deg, #E05A18, #F5843A)',
+                  boxShadow: '0 0 0 3px rgba(242,103,34,0.3), 0 0 40px rgba(242,103,34,0.2)',
+                  border: '2px solid rgba(242,103,34,0.4)',
+                }}
+              >
+                {initial}
+              </div>
+            )}
 
             <h1 className="text-xl font-bold text-center mb-1" style={{ color: '#FFF0E8' }}>{card.full_name}</h1>
             {card.title && (

@@ -54,8 +54,12 @@ export default function DashboardPage() {
   const [monthlySessionCount, setMonthlySessionCount] = useState(0)
   const [maxSessions, setMaxSessions]             = useState(-1)
   const [appointments, setAppointments]           = useState<Appointment[]>([])
-  const personaIdsRef = useRef<string[]>([])
+  const personaIdsRef  = useRef<string[]>([])
+  const avatarInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
+  const [userId, setUserId]               = useState<string | null>(null)
+  const [avatarUrl, setAvatarUrl]         = useState<string | null>(null)
+  const [avatarUploading, setAvatarUploading] = useState(false)
 
   type QuickUpdate = { id: string; persona_id: string; content: string; created_at: string }
   const [quickUpdates, setQuickUpdates]       = useState<Record<string, QuickUpdate[]>>({})
@@ -107,6 +111,10 @@ export default function DashboardPage() {
   const checkAuth = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/auth/login'); return }
+    setUserId(user.id)
+    // プロフィール写真を取得
+    const { data: profile } = await supabase.from('profiles').select('avatar_url').eq('id', user.id).single()
+    if (profile?.avatar_url) setAvatarUrl(profile.avatar_url)
     loadData(user.id)
   }, [router, supabase])
 
@@ -217,6 +225,15 @@ export default function DashboardPage() {
     setDeleteSessionConfirm(null)
   }
 
+  const handleDeleteAppt = async (id: string) => {
+    await fetch('/api/appointments', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+    setAppointments(prev => prev.filter(a => a.id !== id))
+  }
+
   const handleApptStatus = async (id: string, status: string) => {
     const res = await fetch('/api/appointments', {
       method: 'PATCH',
@@ -224,6 +241,27 @@ export default function DashboardPage() {
       body: JSON.stringify({ id, status }),
     })
     if (res.ok) setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a))
+  }
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !userId) return
+    setAvatarUploading(true)
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(`${userId}.jpg`, file, { upsert: true, contentType: file.type })
+      if (uploadError) throw uploadError
+      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(`${userId}.jpg`)
+      const urlWithCache = `${publicUrl}?t=${Date.now()}`
+      await supabase.from('profiles').update({ avatar_url: urlWithCache }).eq('id', userId)
+      setAvatarUrl(urlWithCache)
+    } catch (err) {
+      console.error('アバターアップロード失敗:', err)
+    } finally {
+      setAvatarUploading(false)
+      if (avatarInputRef.current) avatarInputRef.current.value = ''
+    }
   }
 
   const handleQuickUpdate = async (personaId: string) => {
@@ -471,7 +509,59 @@ export default function DashboardPage() {
         style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)', borderColor: '#EDD9C8' }}
       >
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-2">
-          <Logo size={26} variant="dark" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Logo size={26} variant="dark" />
+            {/* プロフィール写真アップロード */}
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <button
+                onClick={() => avatarInputRef.current?.click()}
+                disabled={avatarUploading}
+                title="プロフィール写真をアップロード"
+                style={{
+                  position: 'relative', width: 32, height: 32, borderRadius: '50%',
+                  overflow: 'hidden', cursor: 'pointer', border: '2px solid #EDD9C8',
+                  background: avatarUrl ? 'transparent' : 'rgba(242,103,34,0.12)',
+                  padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F26722" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                  </svg>
+                )}
+                {/* カメラオーバーレイ */}
+                <div style={{
+                  position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  opacity: avatarUploading ? 1 : 0, transition: 'opacity 0.15s',
+                }}
+                  className="avatar-hover-overlay"
+                  onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                  onMouseLeave={e => !avatarUploading && (e.currentTarget.style.opacity = '0')}
+                >
+                  {avatarUploading ? (
+                    <div style={{ width: 12, height: 12, border: '2px solid rgba(255,255,255,0.4)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                  ) : (
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                      <circle cx="12" cy="13" r="4"/>
+                    </svg>
+                  )}
+                </div>
+              </button>
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleAvatarUpload}
+              />
+            </div>
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
             {/* プランバッジ */}
             <Link
@@ -1067,21 +1157,29 @@ export default function DashboardPage() {
                     </div>
 
                     {/* アクションボタン */}
-                    {isPending && (
-                      <div className="flex gap-2">
-                        <button onClick={() => handleApptStatus(appt.id, 'confirmed')}
-                          className="flex-1 text-xs font-bold py-2 rounded-xl"
-                          style={{ background: 'rgba(52,211,153,0.12)', color: '#059669', border: '1px solid rgba(52,211,153,0.3)', cursor: 'pointer' }}
-                        >✓ 確認済みにする</button>
-                        <button onClick={() => handleApptStatus(appt.id, 'cancelled')}
-                          className="text-xs px-4 py-2 rounded-xl"
-                          style={{ background: 'transparent', color: '#9CA3AF', border: '1px solid #EDD9C8', cursor: 'pointer' }}
-                        >キャンセル</button>
-                      </div>
-                    )}
-                    {isConfirmed && (
-                      <p className="text-xs text-center" style={{ color: '#34D399' }}>✓ 確認済み — 連絡してアポイントを確定しましょう</p>
-                    )}
+                    <div className="flex gap-2">
+                      {isPending && (
+                        <>
+                          <button onClick={() => handleApptStatus(appt.id, 'confirmed')}
+                            className="flex-1 text-xs font-bold py-2 rounded-xl"
+                            style={{ background: 'rgba(52,211,153,0.12)', color: '#059669', border: '1px solid rgba(52,211,153,0.3)', cursor: 'pointer' }}
+                          >✓ 確認済み</button>
+                          <button onClick={() => handleApptStatus(appt.id, 'cancelled')}
+                            className="text-xs px-3 py-2 rounded-xl"
+                            style={{ background: 'transparent', color: '#9CA3AF', border: '1px solid #EDD9C8', cursor: 'pointer' }}
+                          >キャンセル</button>
+                        </>
+                      )}
+                      {isConfirmed && (
+                        <p className="flex-1 text-xs" style={{ color: '#34D399', margin: 0, lineHeight: '32px' }}>✓ 確認済み — 連絡してアポを確定しましょう</p>
+                      )}
+                      {/* 削除ボタン（常に表示） */}
+                      <button
+                        onClick={() => handleDeleteAppt(appt.id)}
+                        className="text-xs px-3 py-2 rounded-xl transition hover:bg-red-50"
+                        style={{ background: 'transparent', color: '#EF4444', border: '1px solid #FECACA', cursor: 'pointer', flexShrink: 0 }}
+                      >削除</button>
+                    </div>
                   </div>
                 )
               })}
