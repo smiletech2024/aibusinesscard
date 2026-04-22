@@ -35,27 +35,28 @@ export default function ChatPage() {
     loadSession()
   }, [sessionId])
 
-  // 本人メッセージのポーリング（3秒ごとに新着チェック）
+  // 本人メッセージのポーリング（3秒ごと・ブラウザ側Supabaseクライアントで直接取得）
   const knownOwnerMsgIds = useRef<Set<string>>(new Set())
   useEffect(() => {
     if (viewOnly) return
-    const poll = async () => {
-      try {
-        const res = await fetch(`/api/human-chat?sessionId=${sessionId}`)
-        if (!res.ok) return
-        const { chats } = await res.json()
-        if (!chats) return
-        const ownerChats = (chats as { id: string; sender_role: string; content: string }[])
-          .filter(c => c.sender_role === 'owner')
-        const newOnes = ownerChats.filter(c => !knownOwnerMsgIds.current.has(c.id))
-        if (newOnes.length === 0) return
-        newOnes.forEach(c => knownOwnerMsgIds.current.add(c.id))
-        setMessages(prev => [
-          ...prev,
-          ...newOnes.map(c => ({ role: 'owner' as const, content: c.content })),
-        ])
+
+    const fetchOwnerChats = async (notify: boolean) => {
+      const { data: chats } = await supabase
+        .from('human_chats')
+        .select('*')
+        .eq('session_id', sessionId)
+        .eq('sender_role', 'owner')
+        .order('created_at', { ascending: true })
+      if (!chats) return
+      const newOnes = chats.filter((c: { id: string; content: string }) => !knownOwnerMsgIds.current.has(c.id))
+      if (newOnes.length === 0) return
+      newOnes.forEach((c: { id: string }) => knownOwnerMsgIds.current.add(c.id))
+      setMessages(prev => [
+        ...prev,
+        ...newOnes.map((c: { content: string }) => ({ role: 'owner' as const, content: c.content })),
+      ])
+      if (notify) {
         setOwnerMessageAlert(true)
-        // 通知音
         try {
           const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
           const osc = ctx.createOscillator(); const gain = ctx.createGain()
@@ -66,32 +67,13 @@ export default function ChatPage() {
           gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5)
           osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.5)
         } catch { /* ignore */ }
-      } catch { /* ignore */ }
+      }
     }
-    // 初回ロード時：既存メッセージをknown扱いにする（通知しない）
-    const init = async () => {
-      try {
-        const res = await fetch(`/api/human-chat?sessionId=${sessionId}`)
-        if (!res.ok) return
-        const { chats } = await res.json()
-        if (!chats) return
-        const ownerChats = (chats as { id: string; sender_role: string; content: string }[])
-          .filter(c => c.sender_role === 'owner')
-        ownerChats.forEach(c => knownOwnerMsgIds.current.add(c.id))
-        // 既存の本人メッセージをチャットに表示
-        if (ownerChats.length > 0) {
-          setMessages(prev => {
-            const existing = new Set(prev.filter(m => m.role === 'owner').map(m => m.content))
-            const toAdd = ownerChats.filter(c => !existing.has(c.content))
-            return toAdd.length > 0
-              ? [...prev, ...toAdd.map(c => ({ role: 'owner' as const, content: c.content }))]
-              : prev
-          })
-        }
-      } catch { /* ignore */ }
-    }
-    init()
-    const timer = setInterval(poll, 3000)
+
+    // 初回：既存メッセージを表示するが通知しない
+    fetchOwnerChats(false)
+    // 以降：新着のみ通知あり
+    const timer = setInterval(() => fetchOwnerChats(true), 3000)
     return () => clearInterval(timer)
   }, [sessionId, viewOnly])
 
