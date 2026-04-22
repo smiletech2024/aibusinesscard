@@ -58,12 +58,17 @@ export default function LoginPage() {
     setMessage('')
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: `${location.origin}/auth/callback` },
+        const res  = await fetch('/api/auth/signup', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ email, password }),
         })
-        if (error) throw error
+        const data = await res.json()
+        if (res.status === 409) {
+          setError('このメールアドレスはすでに登録されています。ログインしてください。')
+          return
+        }
+        if (!res.ok) throw new Error(data.error || 'signup_failed')
         setMessage('📩 確認メールをお送りしました。\nメール内の「メールアドレスを確認する」をタップすると、あなたの分身AI作成が始まります。\n（届かない場合は迷惑メールフォルダもご確認ください）')
       } else {
         // レート制限付きログイン API を使用
