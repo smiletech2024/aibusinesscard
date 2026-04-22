@@ -2,13 +2,15 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { BusinessCard } from '@/types'
+import { CardLayout, LayoutEl, LAYOUT_DEFAULTS } from '@/app/card-editor/[cardId]/page'
 
 type CardPageData = BusinessCard & {
   profiles?: { full_name: string | null; avatar_url: string | null }
+  layout_json?: CardLayout | null
 }
 
 const SESSION_KEY = (cardId: string) => `aimeishi_session_${cardId}`
@@ -432,6 +434,30 @@ export default function CardPage() {
 
   const initial = card.full_name?.[0] || '?'
 
+  // ── カスタムレイアウトレンダラー ─────────────────────────────────
+  const layout = card.layout_json
+  if (layout?.elements) {
+    return (
+      <CustomLayoutCard
+        card={card}
+        layout={layout}
+        showAppt={showAppt}
+        setShowAppt={setShowAppt}
+        showNameInput={showNameInput}
+        setShowNameInput={setShowNameInput}
+        customerName={customerName}
+        setCustomerName={setCustomerName}
+        existingSession={existingSession}
+        proceeding={proceeding}
+        proceedToChat={proceedToChat}
+        continueSession={continueSession}
+        resetSession={resetSession}
+        saveVCard={saveVCard}
+        cardId={cardId}
+      />
+    )
+  }
+
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4 py-10"
@@ -732,6 +758,232 @@ export default function CardPage() {
 
         <p className="text-center text-xs" style={{ color: '#6B4030' }}>Powered by AI名刺</p>
       </div>
+    </div>
+  )
+}
+
+// ── カスタムレイアウトカード ────────────────────────────────────────
+const CANVAS_W = 375
+const CANVAS_H = 720
+
+function CustomLayoutCard({ card, layout, showAppt, setShowAppt, showNameInput, setShowNameInput, customerName, setCustomerName, existingSession, proceeding, proceedToChat, continueSession, resetSession, saveVCard, cardId }: {
+  card: CardPageData
+  layout: CardLayout
+  showAppt: boolean
+  setShowAppt: (v: boolean) => void
+  showNameInput: boolean
+  setShowNameInput: (v: boolean) => void
+  customerName: string
+  setCustomerName: (v: string) => void
+  existingSession: { id: string; status: string } | null
+  proceeding: boolean
+  proceedToChat: () => void
+  continueSession: () => void
+  resetSession: () => void
+  saveVCard: () => void
+  cardId: string
+}) {
+  const [scale, setScale] = useState(1)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const update = () => {
+      if (containerRef.current) {
+        const w = containerRef.current.clientWidth
+        setScale(Math.min(1, w / CANVAS_W))
+      }
+    }
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+
+  const els = layout.elements
+  const get = (id: string) => els.find(e => e.id === id)
+  const vis = (id: string) => get(id)?.visible !== false
+
+  const elStyle = (id: string): React.CSSProperties => {
+    const el = get(id)
+    if (!el) return { display: 'none' }
+    return {
+      position: 'absolute',
+      left: el.x, top: el.y, width: el.w, height: el.h,
+      boxSizing: 'border-box',
+      overflow: 'hidden',
+    }
+  }
+
+  if (showAppt) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: '#07060F' }}>
+        <div className="w-full max-w-sm">
+          <div className="rounded-2xl overflow-hidden" style={{ background: '#0F0E20', border: '1px solid rgba(242,103,34,0.25)' }}>
+            <AppointmentForm cardId={cardId} ownerName={card.full_name || '担当者'} onClose={() => setShowAppt(false)} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#07060F', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 20, paddingBottom: 20 }}>
+      <div ref={containerRef} style={{ width: '100%', maxWidth: CANVAS_W, padding: '0 0' }}>
+        <div style={{ width: CANVAS_W * scale, height: CANVAS_H * scale, position: 'relative', margin: '0 auto' }}>
+          <div style={{
+            position: 'absolute', top: 0, left: 0,
+            width: CANVAS_W, height: CANVAS_H,
+            background: layout.bgColor ?? '#0F0E20',
+            borderRadius: 28,
+            boxShadow: '0 24px 60px rgba(0,0,0,0.6)',
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left',
+            overflow: 'hidden',
+          }}>
+            {/* グラデーション */}
+            <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 100% 40% at 50% 0%, rgba(242,103,34,0.2) 0%, transparent 60%)', pointerEvents: 'none' }} />
+
+            {/* 分身AI バッジ */}
+            <div style={{ position: 'absolute', top: 16, left: 16, display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', borderRadius: 99, background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#34D399', display: 'inline-block' }} />
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#34D399' }}>分身AI オンライン</span>
+            </div>
+
+            {/* 写真 */}
+            {vis('avatar') && (
+              <div style={{ ...elStyle('avatar'), borderRadius: 14, overflow: 'hidden', boxShadow: '0 0 0 3px rgba(242,103,34,0.3)' }}>
+                {card.profiles?.avatar_url
+                  ? <img src={card.profiles.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  : <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg,#E05A18,#F5843A)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: get('avatar')!.h * 0.4, fontWeight: 900, color: 'white' }}>{card.full_name?.[0]}</div>
+                }
+              </div>
+            )}
+
+            {/* 氏名 */}
+            {vis('name') && card.full_name && (
+              <div style={elStyle('name')}>
+                <p style={{ margin: 0, color: '#FFF0E8', fontWeight: 900, fontSize: get('name')?.fontSize ?? 22, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{card.full_name}</p>
+              </div>
+            )}
+
+            {/* 肩書き */}
+            {vis('title') && card.title && (
+              <div style={elStyle('title')}>
+                <p style={{ margin: 0, color: '#F5843A', fontWeight: 600, fontSize: get('title')?.fontSize ?? 15, lineHeight: 1.3 }}>{card.title}</p>
+              </div>
+            )}
+
+            {/* 会社名 */}
+            {vis('company') && card.company && (
+              <div style={elStyle('company')}>
+                <p style={{ margin: 0, color: '#6B4030', fontSize: get('company')?.fontSize ?? 13, lineHeight: 1.3 }}>{card.company}</p>
+              </div>
+            )}
+
+            {/* 自己紹介 */}
+            {vis('intro') && card.short_intro && (
+              <div style={{ ...elStyle('intro'), borderLeft: '3px solid rgba(242,103,34,0.5)', paddingLeft: 10, background: 'rgba(28,15,5,0.5)', borderRadius: '0 8px 8px 0' }}>
+                <p style={{ margin: 0, color: '#A08068', fontSize: get('intro')?.fontSize ?? 13, lineHeight: 1.6, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical' as const }}>{card.short_intro}</p>
+              </div>
+            )}
+
+            {/* メール */}
+            {vis('email') && card.email && (
+              <div style={elStyle('email')}>
+                <a href={`mailto:${card.email}`} style={{ display: 'flex', alignItems: 'center', gap: 8, height: '100%', textDecoration: 'none' }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(242,103,34,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F5843A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  </div>
+                  <span style={{ color: '#A08068', fontSize: get('email')?.fontSize ?? 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{card.email}</span>
+                </a>
+              </div>
+            )}
+
+            {/* 電話 */}
+            {vis('phone') && card.phone && (
+              <div style={elStyle('phone')}>
+                <a href={`tel:${card.phone}`} style={{ display: 'flex', alignItems: 'center', gap: 8, height: '100%', textDecoration: 'none' }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(242,103,34,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F5843A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.16 6.16l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 17z"/></svg>
+                  </div>
+                  <span style={{ color: '#A08068', fontSize: get('phone')?.fontSize ?? 13 }}>{card.phone}</span>
+                </a>
+              </div>
+            )}
+
+            {/* ウェブサイト */}
+            {vis('website') && card.website && (
+              <div style={elStyle('website')}>
+                <a href={card.website} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 8, height: '100%', textDecoration: 'none' }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(242,103,34,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F5843A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  </div>
+                  <span style={{ color: '#A08068', fontSize: get('website')?.fontSize ?? 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{card.website.replace(/https?:\/\//, '')}</span>
+                </a>
+              </div>
+            )}
+
+            {/* 連絡先を保存 */}
+            {vis('save_contact') && (card.email || card.phone) && (
+              <div style={elStyle('save_contact')}>
+                <button onClick={saveVCard} style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: 'transparent', border: '1px solid rgba(242,103,34,0.3)', borderRadius: 12, color: '#F5843A', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  連絡先に保存
+                </button>
+              </div>
+            )}
+
+            {/* AI相談ボタン */}
+            {vis('ai_button') && (
+              <div style={elStyle('ai_button')}>
+                {existingSession ? (
+                  <button onClick={continueSession} style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg,#F5843A,#F59340)', border: 'none', borderRadius: 14, color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer', boxShadow: '0 4px 20px rgba(242,103,34,0.4)' }}>
+                    続きから話す →
+                  </button>
+                ) : showNameInput ? (
+                  <div style={{ width: '100%', height: '100%', display: 'flex', gap: 6 }}>
+                    <input
+                      type="text" value={customerName} onChange={e => setCustomerName(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && proceedToChat()}
+                      placeholder="お名前（任意）"
+                      style={{ flex: 1, background: 'rgba(28,15,5,0.8)', border: '1.5px solid rgba(242,103,34,0.3)', borderRadius: 10, padding: '0 12px', color: '#FFF0E8', fontSize: 13, outline: 'none' }}
+                    />
+                    <button onClick={proceedToChat} disabled={proceeding}
+                      style={{ padding: '0 14px', background: 'linear-gradient(135deg,#F5843A,#F59340)', border: 'none', borderRadius: 10, color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                      {proceeding ? '...' : '話す →'}
+                    </button>
+                  </div>
+                ) : (
+                  <button onClick={() => setShowNameInput(true)} style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg,#F5843A,#F59340)', border: 'none', borderRadius: 14, color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer', boxShadow: '0 4px 20px rgba(242,103,34,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    本人の分身AIに相談する
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* CTA */}
+            {vis('cta_button') && card.cta_url && card.cta_label && (
+              <div style={elStyle('cta_button')}>
+                <a href={card.cta_url} target="_blank" rel="noopener noreferrer"
+                  style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: 'rgba(242,103,34,0.15)', border: '1.5px solid rgba(242,103,34,0.5)', borderRadius: 12, color: '#F5843A', fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
+                  🎯 {card.cta_label}
+                </a>
+              </div>
+            )}
+
+            {/* アポイント */}
+            {vis('appt_button') && (
+              <div style={elStyle('appt_button')}>
+                <button onClick={() => setShowAppt(true)}
+                  style={{ width: '100%', height: '100%', background: 'transparent', border: '1.5px solid rgba(242,103,34,0.4)', borderRadius: 12, color: '#F5843A', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+                  📅 アポイントを取る
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      <p style={{ fontSize: 11, color: '#3D2010', marginTop: 12 }}>Powered by AI名刺</p>
     </div>
   )
 }

@@ -1021,6 +1021,13 @@ export default function DashboardPage() {
                             AIを強化
                           </Link>
                           <Link
+                            href={`/card-editor/${card.id}`}
+                            className="text-xs px-4 py-2 rounded-xl font-semibold transition"
+                            style={{ background: '#F0FFF4', color: '#059669', border: '1.5px solid #A7F3D0' }}
+                          >
+                            ✦ レイアウト編集
+                          </Link>
+                          <Link
                             href={`/print/${card.id}`}
                             className="text-xs px-4 py-2 rounded-xl font-semibold transition"
                             style={{ background: '#F0F4FF', color: '#3B5BDB', border: '1.5px solid #C5D0F5' }}
