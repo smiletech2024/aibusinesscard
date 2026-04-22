@@ -219,67 +219,61 @@ function KaoriChat() {
       {/* ヘッダー — 常に表示 */}
       <div style={{
         background: 'linear-gradient(135deg,#C4511A,#F26722)',
-        padding: '14px 18px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
+        padding: '12px 16px',
       }}>
-        <div style={{
-          width: 44, height: 44, borderRadius: '50%',
-          background: 'rgba(255,255,255,0.25)',
-          border: '2px solid rgba(255,255,255,0.6)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 22, flexShrink: 0,
-        }}>👩</div>
-        <div>
-          <div style={{ color: '#fff', fontWeight: 900, fontSize: 16 }}>香里（かおり）</div>
-          <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: 11 }}>AI名刺 サポートスタッフ</div>
-        </div>
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+        {/* 1行目: アバター + 名前 + オンラインバッジ */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
+            background: 'rgba(255,255,255,0.25)',
+            border: '2px solid rgba(255,255,255,0.6)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 20,
+          }}>👩</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ color: '#fff', fontWeight: 900, fontSize: 15, lineHeight: 1.2 }}>香里（かおり）</div>
+            <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: 11, marginTop: 1 }}>AI名刺 サポートスタッフ</div>
+          </div>
           <div style={{
             background: 'rgba(255,255,255,0.2)',
-            color: '#fff',
-            fontSize: 10,
-            fontWeight: 700,
-            padding: '3px 10px',
-            borderRadius: 99,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
+            color: '#fff', fontSize: 10, fontWeight: 700,
+            padding: '3px 9px', borderRadius: 99, flexShrink: 0,
+            display: 'flex', alignItems: 'center', gap: 4,
           }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80', display: 'inline-block' }} />
             24時間対応
           </div>
+        </div>
+        {/* 2行目: 人に対応してもらうボタン */}
+        <div style={{ marginTop: 10 }}>
           {!escalated ? (
             <button
               onClick={escalate}
               disabled={escalating}
               style={{
-                background: 'rgba(255,255,255,0.15)',
+                width: '100%',
+                background: 'rgba(255,255,255,0.18)',
                 color: '#fff',
                 border: '1.5px solid rgba(255,255,255,0.5)',
-                borderRadius: 99,
-                padding: '5px 12px',
-                fontSize: 11, fontWeight: 700,
-                display: 'flex', alignItems: 'center', gap: 4,
+                borderRadius: 10,
+                padding: '8px 0',
+                fontSize: 13, fontWeight: 700,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                 cursor: escalating ? 'not-allowed' : 'pointer',
-                whiteSpace: 'nowrap',
                 opacity: escalating ? 0.6 : 1,
               }}
             >
-              🙋 人に対応してもらう
+              🙋 解決しない場合は人に対応してもらう
             </button>
           ) : (
             <div style={{
+              width: '100%',
               background: 'rgba(255,255,255,0.15)',
-              color: '#fff',
-              borderRadius: 99,
-              padding: '5px 12px',
-              fontSize: 11, fontWeight: 700,
-              display: 'flex', alignItems: 'center', gap: 4,
-              whiteSpace: 'nowrap',
+              color: '#fff', borderRadius: 10, padding: '8px 0',
+              fontSize: 13, fontWeight: 700,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
             }}>
-              ✅ 担当者に繋ぎました
+              ✅ 担当者に繋ぎました。このままお待ちください
             </div>
           )}
         </div>
