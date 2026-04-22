@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { createClient as createUserClient } from '@/lib/supabase/server'
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY!
+const RESEND_API_KEY = process.env.RESEND_API_KEY
 const FROM = 'AI名刺 <noreply@aimeishi.biz>'
 const SITE_URL = 'https://www.aimeishi.biz'
 
@@ -16,8 +16,10 @@ function getAdmin() {
 // ── POST：アポイント作成（QRスキャンした顧客が実行） ─────────────────
 export async function POST(req: NextRequest) {
   try {
-    const { cardId, customerName, customerEmail, customerPhone, preferredDate, preferredTime, message } =
-      await req.json()
+    const body = await req.json()
+    const { cardId, customerName, customerEmail, customerPhone, preferredDate, preferredTime, message } = body
+
+    console.log('[appointments POST] body:', { cardId, customerName, customerEmail, customerPhone })
 
     if (!cardId || !customerName) {
       return NextResponse.json({ error: 'cardId と customerName は必須です' }, { status: 400 })
@@ -25,17 +27,21 @@ export async function POST(req: NextRequest) {
 
     const admin = getAdmin()
 
-    // カード情報＋オーナーのメールアドレスを取得
-    const { data: card } = await admin
+    // カード情報を取得
+    const { data: card, error: cardError } = await admin
       .from('business_cards')
-      .select('id, full_name, user_id, profiles:user_id(email, full_name)')
+      .select('id, full_name, user_id')
       .eq('id', cardId)
       .single()
 
-    if (!card) return NextResponse.json({ error: 'Card not found' }, { status: 404 })
+    console.log('[appointments POST] card:', card, 'cardError:', cardError)
+
+    if (cardError || !card) {
+      return NextResponse.json({ error: 'Card not found', detail: cardError?.message }, { status: 404 })
+    }
 
     // アポイントを保存
-    const { data: appt, error } = await admin
+    const { data: appt, error: insertError } = await admin
       .from('appointments')
       .insert({
         card_id:        cardId,
@@ -50,13 +56,24 @@ export async function POST(req: NextRequest) {
       .select()
       .single()
 
-    if (error) {
-      console.error('[appointments POST]', error)
-      return NextResponse.json({ error: 'DB error' }, { status: 500 })
+    console.log('[appointments POST] insert:', appt, 'insertError:', insertError)
+
+    if (insertError) {
+      console.error('[appointments POST] DB error:', insertError)
+      return NextResponse.json({ error: 'DB error', detail: insertError.message }, { status: 500 })
     }
 
+    // オーナーのメールアドレスをprofilesテーブルから取得
+    const { data: profile } = await admin
+      .from('profiles')
+      .select('email, full_name')
+      .eq('id', card.user_id)
+      .single()
+
+    console.log('[appointments POST] owner profile:', profile)
+
     // オーナーへのメール通知（Resend）
-    const ownerEmail = (card.profiles as { email?: string } | null)?.email
+    const ownerEmail = profile?.email
     if (ownerEmail && RESEND_API_KEY) {
       const dateStr = preferredDate
         ? `${preferredDate}${preferredTime ? ' ' + preferredTime : ''}`
@@ -73,8 +90,8 @@ export async function POST(req: NextRequest) {
                 <td style="padding:10px 0;color:#A08068;width:120px;font-weight:600;">お名前</td>
                 <td style="padding:10px 0;color:#1C0F05;">${customerName}</td>
               </tr>
-              ${customerEmail ? `<tr style="border-bottom:1px solid #F5E8DC;"><td style="padding:10px 0;color:#A08068;font-weight:600;">メール</td><td style="padding:10px 0;color:#1C0F05;"><a href="mailto:${customerEmail}" style="color:#F26722;">${customerEmail}</a></td></tr>` : ''}
-              ${customerPhone ? `<tr style="border-bottom:1px solid #F5E8DC;"><td style="padding:10px 0;color:#A08068;font-weight:600;">電話番号</td><td style="padding:10px 0;color:#1C0F05;"><a href="tel:${customerPhone}" style="color:#F26722;">${customerPhone}</a></td></tr>` : ''}
+              ${customerEmail ? `<tr style="border-bottom:1px solid #F5E8DC;"><td style="padding:10px 0;color:#A08068;font-weight:600;">メール</td><td style="padding:10px 0;"><a href="mailto:${customerEmail}" style="color:#F26722;">${customerEmail}</a></td></tr>` : ''}
+              ${customerPhone ? `<tr style="border-bottom:1px solid #F5E8DC;"><td style="padding:10px 0;color:#A08068;font-weight:600;">電話番号</td><td style="padding:10px 0;"><a href="tel:${customerPhone}" style="color:#F26722;">${customerPhone}</a></td></tr>` : ''}
               <tr style="border-bottom:1px solid #F5E8DC;">
                 <td style="padding:10px 0;color:#A08068;font-weight:600;">希望日時</td>
                 <td style="padding:10px 0;color:#1C0F05;">${dateStr}</td>
@@ -93,7 +110,7 @@ export async function POST(req: NextRequest) {
         </div>
       `
 
-      await fetch('https://api.resend.com/emails', {
+      const resendRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND_API_KEY}` },
         body: JSON.stringify({
@@ -103,17 +120,20 @@ export async function POST(req: NextRequest) {
           html,
         }),
       })
+      console.log('[appointments POST] resend status:', resendRes.status)
+    } else {
+      console.log('[appointments POST] skipping email: ownerEmail=', ownerEmail, 'RESEND_API_KEY=', !!RESEND_API_KEY)
     }
 
     return NextResponse.json({ ok: true, appointment: appt })
   } catch (err) {
-    console.error('[appointments POST]', err)
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+    console.error('[appointments POST] unexpected error:', err)
+    return NextResponse.json({ error: 'Internal error', detail: String(err) }, { status: 500 })
   }
 }
 
 // ── GET：オーナーが自分のアポイントを取得 ─────────────────────────
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createUserClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -121,7 +141,6 @@ export async function GET(req: NextRequest) {
 
     const admin = getAdmin()
 
-    // オーナーの全カードIDを取得
     const { data: cards } = await admin
       .from('business_cards')
       .select('id, full_name')
@@ -130,16 +149,21 @@ export async function GET(req: NextRequest) {
     if (!cards?.length) return NextResponse.json({ appointments: [] })
 
     const cardIds = cards.map(c => c.id)
+    const cardMap = Object.fromEntries(cards.map(c => [c.id, c.full_name]))
 
-    const { data: appointments } = await admin
+    const { data: appts, error } = await admin
       .from('appointments')
       .select('*')
       .in('card_id', cardIds)
       .order('created_at', { ascending: false })
 
-    // カード名をマージ
-    const cardMap = Object.fromEntries(cards.map(c => [c.id, c.full_name]))
-    const enriched = (appointments ?? []).map(a => ({
+    if (error) {
+      // テーブルが存在しない場合は空配列を返す
+      console.error('[appointments GET]', error)
+      return NextResponse.json({ appointments: [] })
+    }
+
+    const enriched = (appts ?? []).map(a => ({
       ...a,
       card_name: cardMap[a.card_id] ?? '不明',
     }))
@@ -147,11 +171,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ appointments: enriched })
   } catch (err) {
     console.error('[appointments GET]', err)
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+    return NextResponse.json({ appointments: [] })
   }
 }
 
-// ── PATCH：ステータス更新（confirmed / cancelled） ────────────────
+// ── PATCH：ステータス更新 ─────────────────────────────────────────
 export async function PATCH(req: NextRequest) {
   try {
     const supabase = await createUserClient()
@@ -162,13 +186,19 @@ export async function PATCH(req: NextRequest) {
     if (!id || !status) return NextResponse.json({ error: 'Bad Request' }, { status: 400 })
 
     const admin = getAdmin()
+
+    const { data: cards } = await admin
+      .from('business_cards')
+      .select('id')
+      .eq('user_id', user.id)
+
+    const cardIds = cards?.map(c => c.id) ?? []
+
     const { error } = await admin
       .from('appointments')
       .update({ status, owner_note: ownerNote ?? null, updated_at: new Date().toISOString() })
       .eq('id', id)
-      .in('card_id', (
-        await admin.from('business_cards').select('id').eq('user_id', user.id)
-      ).data?.map(c => c.id) ?? [])
+      .in('card_id', cardIds)
 
     if (error) return NextResponse.json({ error: 'DB error' }, { status: 500 })
     return NextResponse.json({ ok: true })
