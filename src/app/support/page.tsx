@@ -442,28 +442,30 @@ function KaoriChat() {
               <button
                 onClick={escalate}
                 disabled={escalating}
-                title="人間のサポートに繋ぐ"
                 style={{
                   background: escalating ? '#EDD9C8' : '#FFF0E8',
                   color: escalating ? '#A08068' : '#F26722',
                   border: '1.5px solid #F26722',
                   borderRadius: 12,
-                  width: 42, height: 42,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  height: 42,
+                  padding: '0 12px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
                   cursor: escalating ? 'not-allowed' : 'pointer',
-                  fontSize: 18, flexShrink: 0,
+                  fontSize: 12, fontWeight: 700, flexShrink: 0,
+                  whiteSpace: 'nowrap',
                   transition: 'background 0.2s',
                 }}
               >
-                🙋
+                🙋 人に対応してもらう
               </button>
             )}
             {escalated && (
               <div style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                width: 42, height: 42, borderRadius: 12,
-                background: '#D1FAE5', fontSize: 18, flexShrink: 0,
-              }}>✅</div>
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+                height: 42, padding: '0 10px', borderRadius: 12,
+                background: '#D1FAE5', fontSize: 12, fontWeight: 700,
+                color: '#059669', flexShrink: 0, whiteSpace: 'nowrap',
+              }}>✅ 担当者に繋ぎました</div>
             )}
           </div>
         </>
@@ -494,7 +496,7 @@ export default function SupportPage() {
     <LegalLayout title="サポート">
       <p style={{ fontSize: 13.5, color: '#4A2C1A', lineHeight: 1.8, marginBottom: 24 }}>
         ご質問はAIサポートスタッフの<strong>香里</strong>が24時間即答します。<br />
-        <span style={{ fontSize: 12, color: '#A08068' }}>解決しない場合はチャット内の 🙋 ボタンで運営スタッフに繋げます。</span>
+        <span style={{ fontSize: 12, color: '#A08068' }}>解決しない場合は「🙋 人に対応してもらう」ボタンで運営スタッフに繋げます。</span>
       </p>
       <KaoriChat />
     </LegalLayout>
