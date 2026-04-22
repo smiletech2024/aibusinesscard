@@ -141,7 +141,7 @@ function FrontBrandMark({ theme }: { theme: 'light' | 'dark' }) {
   return (
     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
       <LogoIcon size={13} />
-      <span style={{ fontSize: 12, fontWeight: 700, color, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>AI名刺</span>
+      <span style={{ fontSize: 18, fontWeight: 700, color, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>AI名刺</span>
     </div>
   )
 }
@@ -152,8 +152,8 @@ function BackBrandLogo() {
     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
       <LogoIcon size={20} />
       <div>
-        <div style={{ fontSize: 10, fontWeight: 900, color: 'white', letterSpacing: '-0.01em', lineHeight: 1 }}>AI名刺</div>
-        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', fontWeight: 600, letterSpacing: '0.08em', marginTop: 1 }}>次世代名刺</div>
+        <div style={{ fontSize: 18, fontWeight: 900, color: 'white', letterSpacing: '-0.01em', lineHeight: 1 }}>AI名刺</div>
+        <div style={{ fontSize: 18, color: 'rgba(255,255,255,0.45)', fontWeight: 600, letterSpacing: '0.08em', marginTop: 1 }}>次世代名刺</div>
       </div>
     </div>
   )
@@ -182,7 +182,7 @@ function ExecutiveFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 
 
         {/* Company */}
         {card.company && (
-          <p style={{ fontSize: 16, color: '#F26722', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', margin: '0 0 8px' }}>
+          <p style={{ fontSize: 18, color: '#F26722', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', margin: '0 0 8px' }}>
             {card.company}
           </p>
         )}
@@ -230,10 +230,10 @@ function ExecutiveFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 
         <div style={{ position: 'absolute', right: 20, bottom: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
             <LogoIcon size={12} />
-            <span style={{ fontSize: 12, fontWeight: 800, color: '#F26722', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
+            <span style={{ fontSize: 18, fontWeight: 800, color: '#F26722', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
           </div>
           <QRCodeSVG url={qrUrl} size={76} style={{ border: '1.5px solid #E0E7FF', borderRadius: 8 }} />
-          <p style={{ fontSize: 13, color: '#A5B4FC', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
+          <p style={{ fontSize: 18, color: '#A5B4FC', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
         </div>
       )}
 
@@ -320,7 +320,7 @@ function MidnightFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 1
       <div style={{ position: 'absolute', left: 32, top: 36, bottom: 36, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
           {card.company && (
-            <p style={{ fontSize: 16, color: '#F5A47A', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 10px' }}>
+            <p style={{ fontSize: 18, color: '#F5A47A', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 10px' }}>
               {card.company}
             </p>
           )}
@@ -358,12 +358,12 @@ function MidnightFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 1
         <div style={{ position: 'absolute', right: 22, bottom: 18, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
             <LogoIcon size={12} />
-            <span style={{ fontSize: 12, fontWeight: 800, color: '#F5C09A', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
+            <span style={{ fontSize: 18, fontWeight: 800, color: '#F5C09A', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
           </div>
           <div style={{ background: 'white', padding: 5, borderRadius: 10, boxShadow: '0 0 20px rgba(242,103,34,0.3)' }}>
             <QRCodeSVG url={qrUrl} size={68} style={{ borderRadius: 4 }} />
           </div>
-          <p style={{ fontSize: 13, color: '#F5A47A', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
+          <p style={{ fontSize: 18, color: '#F5A47A', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
         </div>
       )}
 
@@ -433,7 +433,7 @@ function VividFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }
       <div style={{ position: 'absolute', left: 32, top: 32, bottom: 44, right: 120, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
           {card.company && (
-            <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.7)', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', margin: '0 0 10px' }}>
+            <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.7)', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', margin: '0 0 10px' }}>
               {card.company}
             </p>
           )}
@@ -473,19 +473,19 @@ function VividFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }
         <div style={{ position: 'absolute', right: 20, bottom: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
             <LogoIcon size={12} />
-            <span style={{ fontSize: 12, fontWeight: 800, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
+            <span style={{ fontSize: 18, fontWeight: 800, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
           </div>
           <div style={{ background: 'white', padding: 5, borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.25)' }}>
             <QRCodeSVG url={qrUrl} size={70} style={{ borderRadius: 5 }} />
           </div>
-          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
+          <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.6)', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
         </div>
       )}
 
       {/* Bottom left: online badge のみ */}
       <div style={{ position: 'absolute', bottom: 14, left: 20, display: 'flex', alignItems: 'center', gap: 5 }}>
         <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#4ADE80', flexShrink: 0 }} />
-        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', fontWeight: 600, whiteSpace: 'nowrap' }}>分身AI オンライン</span>
+        <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.5)', fontWeight: 600, whiteSpace: 'nowrap' }}>分身AI オンライン</span>
       </div>
     </div>
   )
@@ -546,7 +546,7 @@ function OceanFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }
       {/* Content */}
       <div style={{ position: 'absolute', left: 32, top: 30, bottom: 36, right: 120, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
-          {card.company && <p style={{ fontSize: 16, color: '#7EF2E8', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 10px' }}>{card.company}</p>}
+          {card.company && <p style={{ fontSize: 18, color: '#7EF2E8', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 10px' }}>{card.company}</p>}
           <h2 style={{ fontSize: 28, fontWeight: 900, color: '#FFFFFF', margin: '0 0 6px', lineHeight: 1.05, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
           {card.title && <p style={{ fontSize: 18, color: '#7EF2E8', fontWeight: 600, margin: 0 }}>{card.title}</p>}
         </div>
@@ -559,12 +559,12 @@ function OceanFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }
       {qrUrl && (
         <div style={{ position: 'absolute', right: 20, bottom: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
-            <LogoIcon size={12} /><span style={{ fontSize: 12, fontWeight: 800, color: '#7EF2E8', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
+            <LogoIcon size={12} /><span style={{ fontSize: 18, fontWeight: 800, color: '#7EF2E8', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
           </div>
           <div style={{ background: 'white', padding: 5, borderRadius: 10, boxShadow: '0 0 20px rgba(13,212,200,0.4)' }}>
             <QRCodeSVG url={qrUrl} size={68} />
           </div>
-          <p style={{ fontSize: 13, color: '#7EF2E8', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
+          <p style={{ fontSize: 18, color: '#7EF2E8', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
         </div>
       )}
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, #0DD4C8, transparent)' }} />
@@ -610,7 +610,7 @@ function ForestFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 
       {/* Content */}
       <div style={{ position: 'absolute', left: 36, top: 30, bottom: 36, right: 118, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
-          {card.company && <p style={{ fontSize: 16, color: '#6EE7B7', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 10px' }}>{card.company}</p>}
+          {card.company && <p style={{ fontSize: 18, color: '#6EE7B7', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 10px' }}>{card.company}</p>}
           <h2 style={{ fontSize: 27, fontWeight: 900, color: '#FFFFFF', margin: '0 0 6px', lineHeight: 1.05, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
           {card.title && <p style={{ fontSize: 18, color: '#6EE7B7', fontWeight: 600, margin: 0 }}>{card.title}</p>}
         </div>
@@ -623,12 +623,12 @@ function ForestFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 
       {qrUrl && (
         <div style={{ position: 'absolute', right: 20, bottom: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
-            <LogoIcon size={12} /><span style={{ fontSize: 12, fontWeight: 800, color: '#6EE7B7', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
+            <LogoIcon size={12} /><span style={{ fontSize: 18, fontWeight: 800, color: '#6EE7B7', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
           </div>
           <div style={{ background: 'white', padding: 5, borderRadius: 10, boxShadow: '0 0 18px rgba(52,211,153,0.35)' }}>
             <QRCodeSVG url={qrUrl} size={68} />
           </div>
-          <p style={{ fontSize: 13, color: '#6EE7B7', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
+          <p style={{ fontSize: 18, color: '#6EE7B7', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
         </div>
       )}
       <div style={{ position: 'absolute', bottom: 0, left: 5, right: 0, height: 2, background: 'linear-gradient(90deg, #34D399, #A7F3D0 60%, transparent)' }} />
@@ -674,7 +674,7 @@ function CrimsonFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14
       {/* Content */}
       <div style={{ position: 'absolute', left: 32, top: 30, bottom: 36, right: 125, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
-          {card.company && <p style={{ fontSize: 16, color: '#FECDD3', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 10px' }}>{card.company}</p>}
+          {card.company && <p style={{ fontSize: 18, color: '#FECDD3', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 10px' }}>{card.company}</p>}
           <h2 style={{ fontSize: 27, fontWeight: 900, color: '#FFFFFF', margin: '0 0 6px', lineHeight: 1.05, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
           {card.title && <p style={{ fontSize: 18, color: '#FECDD3', fontWeight: 600, margin: 0 }}>{card.title}</p>}
         </div>
@@ -687,12 +687,12 @@ function CrimsonFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14
       {qrUrl && (
         <div style={{ position: 'absolute', right: 22, bottom: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
-            <LogoIcon size={12} /><span style={{ fontSize: 12, fontWeight: 800, color: '#FECDD3', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
+            <LogoIcon size={12} /><span style={{ fontSize: 18, fontWeight: 800, color: '#FECDD3', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
           </div>
           <div style={{ background: 'white', padding: 5, borderRadius: 10, boxShadow: '0 0 18px rgba(244,63,94,0.4)' }}>
             <QRCodeSVG url={qrUrl} size={68} />
           </div>
-          <p style={{ fontSize: 13, color: '#FECDD3', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
+          <p style={{ fontSize: 18, color: '#FECDD3', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
         </div>
       )}
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 5, height: 2, background: 'linear-gradient(90deg, transparent 20%, #FB7185, #FECDD3)' }} />
@@ -741,7 +741,7 @@ function GoldFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }:
       {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', filter: 'sepia(1) saturate(2) hue-rotate(5deg) brightness(1.2)', opacity: 0.9, pointerEvents: 'none' }} />}
       {/* Content */}
       <div style={{ position: 'absolute', left: 32, top: 0, bottom: 0, right: 112, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        {card.company && <p style={{ fontSize: 16, color: '#D4AF37', fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', margin: '0 0 12px' }}>{card.company}</p>}
+        {card.company && <p style={{ fontSize: 18, color: '#D4AF37', fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', margin: '0 0 12px' }}>{card.company}</p>}
         <h2 style={{ fontSize: 27, fontWeight: 900, color: '#F5E6A3', margin: '0 0 4px', lineHeight: 1.05, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
         {card.title && <p style={{ fontSize: 18, color: '#D4AF37', fontWeight: 600, margin: '0 0 18px' }}>{card.title}</p>}
         <div style={{ width: 36, height: 1, background: 'linear-gradient(90deg, #D4AF37, transparent)', marginBottom: 16 }} />
@@ -754,12 +754,12 @@ function GoldFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }:
       {qrUrl && (
         <div style={{ position: 'absolute', right: 18, bottom: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
-            <LogoIcon size={12} /><span style={{ fontSize: 12, fontWeight: 800, color: '#D4AF37', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
+            <LogoIcon size={12} /><span style={{ fontSize: 18, fontWeight: 800, color: '#D4AF37', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
           </div>
           <div style={{ background: 'white', padding: 5, borderRadius: 10, boxShadow: '0 0 20px rgba(212,175,55,0.4)' }}>
             <QRCodeSVG url={qrUrl} size={68} />
           </div>
-          <p style={{ fontSize: 13, color: '#D4AF37', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
+          <p style={{ fontSize: 18, color: '#D4AF37', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
         </div>
       )}
       <div style={{ position: 'absolute', bottom: 0, left: 4, right: 0, height: 1, background: 'linear-gradient(90deg, #B8960C, #F0D060 60%, transparent)' }} />
@@ -788,8 +788,8 @@ function GoldBack({ card, fontFamily }: { card: BusinessCard; fontFamily?: strin
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <LogoIcon size={20} />
             <div>
-              <div style={{ fontSize: 10, fontWeight: 900, color: '#D4AF37', letterSpacing: '-0.01em', lineHeight: 1 }}>AI名刺</div>
-              <div style={{ fontSize: 10, color: 'rgba(212,175,55,0.5)', fontWeight: 600, letterSpacing: '0.08em', marginTop: 1 }}>次世代名刺</div>
+              <div style={{ fontSize: 18, fontWeight: 900, color: '#D4AF37', letterSpacing: '-0.01em', lineHeight: 1 }}>AI名刺</div>
+              <div style={{ fontSize: 18, color: 'rgba(212,175,55,0.5)', fontWeight: 600, letterSpacing: '0.08em', marginTop: 1 }}>次世代名刺</div>
             </div>
           </div>
         </div>
@@ -820,7 +820,7 @@ function PinkFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }:
       {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', pointerEvents: 'none' }} />}
       {/* Content */}
       <div style={{ position: 'absolute', left: 32, top: 0, bottom: 0, right: 112, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
-        {card.company && <p style={{ fontSize: 16, color: '#BE185D', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, margin: '0 0 8px' }}>{card.company}</p>}
+        {card.company && <p style={{ fontSize: 18, color: '#BE185D', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, margin: '0 0 8px' }}>{card.company}</p>}
         <h2 style={{ fontSize: 26, fontWeight: 900, color: '#831843', margin: '0 0 4px', lineHeight: 1.1, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
         {card.title && <p style={{ fontSize: 18, color: '#EC4899', fontWeight: 600, margin: '0 0 18px' }}>{card.title}</p>}
         <div style={{ width: 36, height: 2, background: 'linear-gradient(90deg, #EC4899, #F9A8D4)', borderRadius: 2, marginBottom: 16 }} />
@@ -833,10 +833,10 @@ function PinkFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }:
       {qrUrl && (
         <div style={{ position: 'absolute', right: 18, bottom: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
-            <LogoIcon size={12} /><span style={{ fontSize: 12, fontWeight: 800, color: '#BE185D', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
+            <LogoIcon size={12} /><span style={{ fontSize: 18, fontWeight: 800, color: '#BE185D', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
           </div>
           <QRCodeSVG url={qrUrl} size={74} style={{ border: '1.5px solid #FBCFE8', borderRadius: 8 }} />
-          <p style={{ fontSize: 13, color: '#F472B6', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
+          <p style={{ fontSize: 18, color: '#F472B6', margin: 0, fontWeight: 700, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
         </div>
       )}
       <div style={{ position: 'absolute', bottom: 0, left: 5, right: 0, height: 3, background: 'linear-gradient(90deg, #EC4899 0%, #F472B6 50%, transparent 100%)' }} />
@@ -882,7 +882,7 @@ function CenteredFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 1
       {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 24, maxWidth: 80, objectFit: 'contain', objectPosition: 'left', filter: isDark ? 'brightness(0) invert(1)' : undefined, opacity: 0.85, pointerEvents: 'none' }} />}
       {/* センター本文 */}
       <div style={{ position: 'absolute', left: 28, right: 112, top: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-        {card.company && <p style={{ fontSize: 16, color: textCompany, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' as const, margin: '0 0 14px' }}>{card.company}</p>}
+        {card.company && <p style={{ fontSize: 18, color: textCompany, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' as const, margin: '0 0 14px' }}>{card.company}</p>}
         <h2 style={{ fontSize: 28, fontWeight: 900, color: textName, margin: '0 0 7px', lineHeight: 1.05, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
         {card.title && <p style={{ fontSize: 18, color: accent, fontWeight: 600, margin: '0 0 18px' }}>{card.title}</p>}
         <div style={{ width: 50, height: 1, background: `linear-gradient(90deg, transparent, ${accent}, transparent)`, marginBottom: 16 }} />
@@ -897,10 +897,10 @@ function CenteredFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 1
       {qrUrl && (
         <div style={{ position: 'absolute', right: 18, bottom: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 2 }}>
-            <LogoIcon size={11} /><span style={{ fontSize: 12, fontWeight: 800, color: accent, letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
+            <LogoIcon size={11} /><span style={{ fontSize: 18, fontWeight: 800, color: accent, letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>AI名刺</span>
           </div>
           <div style={qrWrap}><QRCodeSVG url={qrUrl} size={64} /></div>
-          <p style={{ fontSize: 13, color: accent, margin: 0, fontWeight: 700, whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
+          <p style={{ fontSize: 18, color: accent, margin: 0, fontWeight: 700, whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
         </div>
       )}
     </div>
@@ -933,13 +933,13 @@ function SplitFront({ card, qrUrl, fontFamily, logoUrl, logoX = SPLIT_X + 18, lo
         {/* パネル下部ブランドマーク */}
         <div style={{ position: 'absolute', bottom: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
           <LogoIcon size={10} />
-          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>AI名刺</span>
+          <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>AI名刺</span>
         </div>
       </div>
       {/* 右パネル */}
       <div style={{ position: 'absolute', left: SPLIT_X, top: 0, right: 0, bottom: 0, background: rightBg, padding: '22px 16px 18px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
-          {card.company && <p style={{ fontSize: 16, color: accent, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, margin: '0 0 10px' }}>{card.company}</p>}
+          {card.company && <p style={{ fontSize: 18, color: accent, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, margin: '0 0 10px' }}>{card.company}</p>}
           <div style={{ width: 22, height: 2.5, background: accent, borderRadius: 2, marginBottom: 14 }} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
             {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: rightSecondary, fontSize: 19 }}><span style={{ color: accent }}><IconMail /></span>{card.email}</div>}
@@ -950,7 +950,7 @@ function SplitFront({ card, qrUrl, fontFamily, logoUrl, logoX = SPLIT_X + 18, lo
         {qrUrl && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3 }}>
             <div style={qrWrap}><QRCodeSVG url={qrUrl} size={60} /></div>
-            <p style={{ fontSize: 13, color: accent, margin: 0, fontWeight: 700, whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
+            <p style={{ fontSize: 18, color: accent, margin: 0, fontWeight: 700, whiteSpace: 'nowrap' }}>スキャンして分身AIに相談</p>
           </div>
         )}
       </div>
@@ -988,12 +988,12 @@ function PulseFront({ card, qrUrl, fontFamily, logoUrl, logoX = 238, logoY = 13,
       {/* AI LIVE バッジ */}
       <div style={{ position: 'absolute', top: 14, left: 20, display: 'flex', alignItems: 'center', gap: 5 }}>
         <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80', boxShadow: '0 0 8px #4ADE8088' }} />
-        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', fontWeight: 800, letterSpacing: '0.16em' }}>AI LIVE</span>
+        <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.45)', fontWeight: 800, letterSpacing: '0.16em' }}>AI LIVE</span>
       </div>
       {/* 会社名 */}
       {card.company && (
         <div style={{ position: 'absolute', top: 13, right: 18 }}>
-          <span style={{ fontSize: 13, color: accent, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase' as const, opacity: 0.9 }}>{card.company}</span>
+          <span style={{ fontSize: 18, color: accent, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase' as const, opacity: 0.9 }}>{card.company}</span>
         </div>
       )}
 
@@ -1011,11 +1011,11 @@ function PulseFront({ card, qrUrl, fontFamily, logoUrl, logoX = 238, logoY = 13,
         </div>
         {/* SCAN CTA */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-          <span style={{ fontSize: 12, color: accent, fontWeight: 900, letterSpacing: '0.14em' }}>SCAN</span>
+          <span style={{ fontSize: 18, color: accent, fontWeight: 900, letterSpacing: '0.14em' }}>SCAN</span>
           <svg width="14" height="8" viewBox="0 0 14 8" fill="none">
             <path d="M0 4h12M9 1l3 3-3 3" stroke={accent} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', fontWeight: 600, letterSpacing: '0.06em' }}>分身AIと対話</span>
+          <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.4)', fontWeight: 600, letterSpacing: '0.06em' }}>分身AIと対話</span>
         </div>
       </div>
 
@@ -1028,7 +1028,7 @@ function PulseFront({ card, qrUrl, fontFamily, logoUrl, logoX = 238, logoY = 13,
         <h2 style={{ fontSize: 26, fontWeight: 900, color: '#FFFFFF', margin: '0 0 5px', lineHeight: 1.05, letterSpacing: '-0.025em' }}>{card.full_name}</h2>
         {/* 役職 */}
         {card.title && (
-          <p style={{ fontSize: 17, color: accent, fontWeight: 700, margin: '0 0 16px', letterSpacing: '0.02em' }}>{card.title}</p>
+          <p style={{ fontSize: 18, color: accent, fontWeight: 700, margin: '0 0 16px', letterSpacing: '0.02em' }}>{card.title}</p>
         )}
         {/* EKG 鼓動ライン */}
         <div style={{ marginBottom: 14, overflow: 'visible' }}>
@@ -1121,8 +1121,8 @@ function PulseBack({ card, fontFamily, tc }: { card: BusinessCard; fontFamily?: 
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <LogoIcon size={16} />
           <div>
-            <div style={{ fontSize: 12, fontWeight: 900, color: accent, letterSpacing: '-0.01em', lineHeight: 1 }}>AI名刺</div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', fontWeight: 600, letterSpacing: '0.08em', marginTop: 1 }}>次世代名刺</div>
+            <div style={{ fontSize: 18, fontWeight: 900, color: accent, letterSpacing: '-0.01em', lineHeight: 1 }}>AI名刺</div>
+            <div style={{ fontSize: 18, color: 'rgba(255,255,255,0.3)', fontWeight: 600, letterSpacing: '0.08em', marginTop: 1 }}>次世代名刺</div>
           </div>
         </div>
       </div>
