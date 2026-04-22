@@ -8,7 +8,117 @@ import { createClient } from '@/lib/supabase/client'
 import { CustomerSession, AiConversation } from '@/types'
 import { subscribePush } from '@/lib/push'
 
-interface Message { role: 'user' | 'assistant' | 'owner'; content: string; saved?: boolean }
+interface Message { role: 'user' | 'assistant' | 'owner' | 'booking'; content: string; saved?: boolean }
+
+// ── インライン予約フォームコンポーネント ─────────────────────────────
+function BookingCard({ cardId, ownerName, sessionId, done, onDone }: {
+  cardId: string; ownerName: string; sessionId: string; done: boolean; onDone: () => void
+}) {
+  const [name, setName]       = useState('')
+  const [contact, setContact] = useState('')
+  const [message, setMessage] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError]     = useState('')
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%', padding: '10px 12px', fontSize: 13, borderRadius: 10,
+    border: '1.5px solid rgba(242,103,34,0.25)', background: '#1C0F05',
+    color: '#FFF0E8', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit',
+  }
+
+  const submit = async () => {
+    if (!name.trim()) { setError('お名前を入力してください'); return }
+    if (!contact.trim()) { setError('連絡先（メールまたは電話）を入力してください'); return }
+    setSubmitting(true); setError('')
+    const isEmail = contact.includes('@')
+    try {
+      const res = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cardId,
+          customerName:  name.trim(),
+          customerEmail: isEmail ? contact.trim() : null,
+          customerPhone: isEmail ? null : contact.trim(),
+          message:       message.trim() || null,
+          sessionId,
+        }),
+      })
+      if (res.ok) { onDone() }
+      else { setError('送信に失敗しました。もう一度お試しください。') }
+    } catch { setError('通信エラーが発生しました。') }
+    finally { setSubmitting(false) }
+  }
+
+  if (done) {
+    return (
+      <div className="fade-up" style={{
+        background: 'linear-gradient(135deg, rgba(5,150,105,0.12), rgba(5,150,105,0.06))',
+        border: '1px solid rgba(5,150,105,0.3)', borderRadius: 18, padding: '18px 16px',
+        maxWidth: 320,
+      }}>
+        <div style={{ fontSize: 28, textAlign: 'center', marginBottom: 8 }}>📅</div>
+        <p style={{ color: '#34D399', fontWeight: 800, fontSize: 14, textAlign: 'center', marginBottom: 4 }}>
+          予約リクエストを送りました！
+        </p>
+        <p style={{ color: '#A08068', fontSize: 12, textAlign: 'center', lineHeight: 1.6 }}>
+          {ownerName}から連絡が届くまでお待ちください
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="fade-up" style={{
+      background: '#0F0E20', border: '1.5px solid rgba(242,103,34,0.3)',
+      borderRadius: 18, padding: '16px', maxWidth: 320,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+        <span style={{ fontSize: 18 }}>📅</span>
+        <p style={{ color: '#FFF0E8', fontWeight: 800, fontSize: 14, margin: 0 }}>
+          {ownerName}にアポイントを取る
+        </p>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <input
+          type="text" value={name} onChange={e => setName(e.target.value)}
+          placeholder="お名前 *"
+          style={inputStyle}
+          onFocus={e => e.target.style.borderColor = '#F26722'}
+          onBlur={e => e.target.style.borderColor = 'rgba(242,103,34,0.25)'}
+        />
+        <input
+          type="text" value={contact} onChange={e => setContact(e.target.value)}
+          placeholder="メールアドレスまたは電話番号 *"
+          style={inputStyle}
+          onFocus={e => e.target.style.borderColor = '#F26722'}
+          onBlur={e => e.target.style.borderColor = 'rgba(242,103,34,0.25)'}
+        />
+        <textarea
+          value={message} onChange={e => setMessage(e.target.value)}
+          placeholder="相談内容・希望日時など（任意）"
+          rows={2}
+          style={{ ...inputStyle, resize: 'none', lineHeight: 1.5 }}
+          onFocus={e => e.target.style.borderColor = '#F26722'}
+          onBlur={e => e.target.style.borderColor = 'rgba(242,103,34,0.25)'}
+        />
+        {error && <p style={{ color: '#F87171', fontSize: 12 }}>{error}</p>}
+        <button
+          onClick={submit}
+          disabled={submitting}
+          style={{
+            width: '100%', padding: '11px', borderRadius: 12, fontSize: 14, fontWeight: 700,
+            background: submitting ? '#F5C09A' : 'linear-gradient(135deg, #F26722, #F59340)',
+            color: 'white', border: 'none', cursor: submitting ? 'not-allowed' : 'pointer',
+            boxShadow: '0 4px 14px rgba(242,103,34,0.35)',
+          }}
+        >
+          {submitting ? '送信中...' : '予約リクエストを送る →'}
+        </button>
+      </div>
+    </div>
+  )
+}
 
 export default function ChatPage() {
   const params = useParams()
@@ -24,6 +134,7 @@ export default function ChatPage() {
   const [turnCount, setTurnCount] = useState(0)
   const [showSummaryPrompt, setShowSummaryPrompt] = useState(false)
   const [autoHandingOff, setAutoHandingOff]       = useState(false)
+  const [bookingDone, setBookingDone]             = useState(false)
   const [pushEnabled, setPushEnabled] = useState(false)
   const [pushAsked, setPushAsked] = useState(false)
   const [showBranding, setShowBranding] = useState(false)
@@ -122,10 +233,10 @@ export default function ChatPage() {
         const { done, value } = await reader.read()
         if (done) break
         aiText += decoder.decode(value)
-        // [[HANDOFF]]トークンは表示しない
-        setMessages([{ role: 'assistant', content: aiText.replace(HANDOFF_TOKEN, '').trimEnd() }])
+        setMessages([{ role: 'assistant', content: aiText.replace(HANDOFF_TOKEN, '').replace(BOOKING_TOKEN, '').trimEnd() }])
       }
       setLoading(false)
+      if (checkAndShowBooking(aiText)) return
       await checkAndAutoHandoff(aiText)
     } catch {
       setLoading(false)
@@ -164,13 +275,15 @@ export default function ChatPage() {
         // [[HANDOFF]]トークンはストリーミング中も表示しない
         setMessages(prev => {
           const arr = [...prev]
-          arr[arr.length - 1] = { role: 'assistant', content: aiText.replace(HANDOFF_TOKEN, '').trimEnd() }
+          arr[arr.length - 1] = { role: 'assistant', content: aiText.replace(HANDOFF_TOKEN, '').replace(BOOKING_TOKEN, '').trimEnd() }
           return arr
         })
       }
       // 3往復目で通知許可を提案
       if (newTurnCount === 3 && !pushAsked) setPushAsked(true)
       setLoading(false)
+      // 予約フォーム表示を先に判定
+      if (checkAndShowBooking(aiText)) return
       // 自動引き継ぎ判定（手動バナーより優先）
       const didHandoff = await checkAndAutoHandoff(aiText)
       if (!didHandoff && newTurnCount >= 8) setShowSummaryPrompt(true)
@@ -179,7 +292,8 @@ export default function ChatPage() {
     }
   }
 
-  const HANDOFF_TOKEN = '[[HANDOFF]]'
+  const HANDOFF_TOKEN  = '[[HANDOFF]]'
+  const BOOKING_TOKEN  = '[[SHOW_BOOKING]]'
 
   const createSummary = async (auto = false) => {
     if (summarizing) return
@@ -196,6 +310,18 @@ export default function ChatPage() {
       setSummarizing(false)
       setAutoHandingOff(false)
     }
+  }
+
+  // [[SHOW_BOOKING]] 検出 → インライン予約フォームをメッセージとして追加
+  const checkAndShowBooking = (aiText: string): boolean => {
+    if (!aiText.includes(BOOKING_TOKEN)) return false
+    const cleaned = aiText.replace(BOOKING_TOKEN, '').trimEnd()
+    setMessages(prev => {
+      const arr = [...prev]
+      arr[arr.length - 1] = { role: 'assistant', content: cleaned }
+      return [...arr, { role: 'booking', content: '' }]
+    })
+    return true
   }
 
   // AIの応答に [[HANDOFF]] が含まれているか検出し自動引き継ぎ
@@ -367,9 +493,25 @@ export default function ChatPage() {
           </div>
         )}
         {messages.map((msg, i) => {
-          const isUser     = msg.role === 'user'
-          const isOwner    = msg.role === 'owner'
-          const isAssist   = msg.role === 'assistant'
+          const isUser    = msg.role === 'user'
+          const isOwner   = msg.role === 'owner'
+          const isAssist  = msg.role === 'assistant'
+          const isBooking = msg.role === 'booking'
+
+          // ── インライン予約フォーム ──
+          if (isBooking) {
+            return (
+              <BookingCard
+                key={i}
+                cardId={session?.business_cards?.id ?? ''}
+                ownerName={ownerName}
+                sessionId={sessionId}
+                done={bookingDone}
+                onDone={() => setBookingDone(true)}
+              />
+            )
+          }
+
           return (
             <div key={i} className={`flex gap-2.5 fade-up ${isUser ? 'justify-end' : 'justify-start'}`}>
               {/* アバター */}
