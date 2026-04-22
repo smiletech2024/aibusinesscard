@@ -1302,6 +1302,7 @@ export default function PrintCardPage() {
   const [printEls, setPrintEls] = useState<PrintEls>(DEFAULT_PRINT_ELS)
   const [logoUploading, setLogoUploading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [editMode, setEditMode] = useState(true)   // true=編集モード, false=プレビュー
   const [savedBanner, setSavedBanner] = useState(false)
   const [dlState, setDlState] = useState<'idle' | 'front' | 'back' | 'both' | 'qr' | 'pdf'>('idle')
   const frontRef  = useRef<HTMLDivElement>(null)
@@ -1707,19 +1708,50 @@ export default function PrintCardPage() {
             </div>
           </div>
 
-          {/* 編集ヒントバー（常時表示） */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: '#FFF7F0', border: '1px solid #FDD5B5', borderRadius: 8, padding: '6px 10px' }}>
-            <span style={{ fontSize: 10, color: '#C4511A', fontWeight: 700 }}>
-              ✥ カード上の点線枠をドラッグ → 要素を移動　右下◢ → リサイズ
-            </span>
-            <button
-              onClick={() => setPrintEls(DEFAULT_PRINT_ELS)}
-              style={{
-                fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 6,
-                background: 'white', color: '#C4511A', border: '1px solid #FDD5B5',
-                cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap',
-              }}
-            >リセット</button>
+          {/* 編集 / プレビュー 切替バー */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {/* トグルボタン */}
+            <div style={{ display: 'flex', background: '#F0E8E0', borderRadius: 10, padding: 3, gap: 2 }}>
+              <button
+                onClick={() => setEditMode(true)}
+                style={{
+                  padding: '5px 14px', borderRadius: 8, fontSize: 11, fontWeight: 700, border: 'none', cursor: 'pointer',
+                  background: editMode ? '#1C0F05' : 'transparent',
+                  color: editMode ? 'white' : '#A08068',
+                  transition: 'all 0.15s',
+                }}
+              >✏️ 編集</button>
+              <button
+                onClick={() => setEditMode(false)}
+                style={{
+                  padding: '5px 14px', borderRadius: 8, fontSize: 11, fontWeight: 700, border: 'none', cursor: 'pointer',
+                  background: !editMode ? '#F26722' : 'transparent',
+                  color: !editMode ? 'white' : '#A08068',
+                  transition: 'all 0.15s',
+                }}
+              >👁 仕上がり</button>
+            </div>
+            {/* 編集モード時のヒント＋リセット */}
+            {editMode && (
+              <>
+                <span style={{ fontSize: 10, color: '#C4511A', fontWeight: 600, flex: 1 }}>
+                  点線枠をドラッグ移動・右下◢でリサイズ
+                </span>
+                <button
+                  onClick={() => setPrintEls(DEFAULT_PRINT_ELS)}
+                  style={{
+                    fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 6,
+                    background: 'white', color: '#C4511A', border: '1px solid #FDD5B5',
+                    cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap',
+                  }}
+                >リセット</button>
+              </>
+            )}
+            {!editMode && (
+              <span style={{ fontSize: 10, color: '#A08068', fontWeight: 600 }}>
+                印刷・ダウンロード時と同じ仕上がりです
+              </span>
+            )}
           </div>
 
           {/* 行3: 配置プリセット選択 */}
@@ -1887,7 +1919,7 @@ export default function PrintCardPage() {
           disabled={dlState !== 'idle'}
           btnLabel="表面を保存"
           captureRef={frontRef}
-          overlay={(scale) => (
+          overlay={editMode ? (scale) => (
             <>
               {/* ロゴドラッグハンドル */}
               {logoUrl && (
@@ -1979,7 +2011,7 @@ export default function PrintCardPage() {
                 </div>
               ))}
             </>
-          )}
+          ) : undefined}
         >
           <FrontComponent card={card} qrUrl={cardQrUrl} fontFamily={currentFontFamily} logoUrl={logoUrl || undefined} logoX={logoX} logoY={logoY} />
         </CardPreview>
