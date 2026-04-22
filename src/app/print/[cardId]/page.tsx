@@ -1302,7 +1302,7 @@ export default function PrintCardPage() {
   const [printEls, setPrintEls] = useState<PrintEls>(DEFAULT_PRINT_ELS)
   const [logoUploading, setLogoUploading] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [editMode, setEditMode] = useState(true)   // true=編集モード, false=プレビュー
+  const [editMode, setEditMode] = useState(false)  // true=編集モード, false=プレビュー
   const [savedBanner, setSavedBanner] = useState(false)
   const [dlState, setDlState] = useState<'idle' | 'front' | 'back' | 'both' | 'qr' | 'pdf'>('idle')
   const frontRef  = useRef<HTMLDivElement>(null)
