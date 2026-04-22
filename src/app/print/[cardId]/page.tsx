@@ -1710,12 +1710,13 @@ export default function PrintCardPage() {
 
           {/* 編集 / プレビュー 切替バー */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {/* トグルボタン */}
-            <div style={{ display: 'flex', background: '#F0E8E0', borderRadius: 10, padding: 3, gap: 2 }}>
+            {/* トグル（コンパクト・折り返しなし） */}
+            <div style={{ display: 'flex', background: '#F0E8E0', borderRadius: 8, padding: 2, gap: 2, flexShrink: 0 }}>
               <button
                 onClick={() => setEditMode(true)}
                 style={{
-                  padding: '5px 14px', borderRadius: 8, fontSize: 11, fontWeight: 700, border: 'none', cursor: 'pointer',
+                  padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700,
+                  border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
                   background: editMode ? '#1C0F05' : 'transparent',
                   color: editMode ? 'white' : '#A08068',
                   transition: 'all 0.15s',
@@ -1724,33 +1725,28 @@ export default function PrintCardPage() {
               <button
                 onClick={() => setEditMode(false)}
                 style={{
-                  padding: '5px 14px', borderRadius: 8, fontSize: 11, fontWeight: 700, border: 'none', cursor: 'pointer',
+                  padding: '5px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700,
+                  border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
                   background: !editMode ? '#F26722' : 'transparent',
                   color: !editMode ? 'white' : '#A08068',
                   transition: 'all 0.15s',
                 }}
               >👁 仕上がり</button>
             </div>
-            {/* 編集モード時のヒント＋リセット */}
+            {/* サブテキスト */}
+            <span style={{ fontSize: 10, color: editMode ? '#C4511A' : '#A08068', fontWeight: 600, flex: 1, minWidth: 0 }}>
+              {editMode ? '点線枠をドラッグ移動' : '印刷と同じ仕上がり'}
+            </span>
+            {/* リセット（編集時のみ） */}
             {editMode && (
-              <>
-                <span style={{ fontSize: 10, color: '#C4511A', fontWeight: 600, flex: 1 }}>
-                  点線枠をドラッグ移動・右下◢でリサイズ
-                </span>
-                <button
-                  onClick={() => setPrintEls(DEFAULT_PRINT_ELS)}
-                  style={{
-                    fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 6,
-                    background: 'white', color: '#C4511A', border: '1px solid #FDD5B5',
-                    cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap',
-                  }}
-                >リセット</button>
-              </>
-            )}
-            {!editMode && (
-              <span style={{ fontSize: 10, color: '#A08068', fontWeight: 600 }}>
-                印刷・ダウンロード時と同じ仕上がりです
-              </span>
+              <button
+                onClick={() => setPrintEls(DEFAULT_PRINT_ELS)}
+                style={{
+                  fontSize: 10, fontWeight: 700, padding: '4px 10px', borderRadius: 6,
+                  background: 'white', color: '#C4511A', border: '1px solid #FDD5B5',
+                  cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap',
+                }}
+              >リセット</button>
             )}
           </div>
 
