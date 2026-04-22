@@ -54,7 +54,16 @@ export async function POST(req: NextRequest) {
 
     const ownerName  = card?.full_name || (persona.profiles as { full_name?: string } | null)?.full_name || 'オーナー'
     const ownerTitle = card?.title || ''
-    const systemPrompt = getAvatarSystemPrompt(persona, ownerName, ownerTitle)
+
+    // 最新情報（quick_updates）を取得
+    const { data: quickUpdates } = await admin
+      .from('quick_updates')
+      .select('content, created_at')
+      .eq('persona_id', personaId)
+      .order('created_at', { ascending: false })
+      .limit(10)
+
+    const systemPrompt = getAvatarSystemPrompt(persona, ownerName, ownerTitle, quickUpdates ?? [])
 
     // ユーザーメッセージを保存
     if (sessionId && userMessage) {

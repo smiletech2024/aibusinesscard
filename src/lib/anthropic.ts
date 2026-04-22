@@ -49,7 +49,7 @@ export function getAvatarSystemPrompt(persona: {
   achievements_json: Array<{ title: string; description: string }>
   forbidden_rules_json: string[]
   routing_rules_json: Array<{ intent: string; action: string }>
-}, ownerName: string, ownerTitle: string): string {
+}, ownerName: string, ownerTitle: string, quickUpdates?: Array<{ content: string; created_at: string }>): string {
   const faqText = persona.faq_json?.length > 0
     ? persona.faq_json.map(f => `Q: ${f.question}\nA: ${f.answer}`).join('\n\n')
     : '（FAQ未設定）'
@@ -70,6 +70,17 @@ export function getAvatarSystemPrompt(persona: {
   const baseValues = rawVoiceMatch
     ? persona.values_summary!.replace(/\n\n【本人の生の声・文体サンプル】[\s\S]*$/, '').trim()
     : (persona.values_summary || '（情報未設定）')
+
+  // 最新情報セクション
+  const quickUpdatesText = (quickUpdates && quickUpdates.length > 0)
+    ? quickUpdates
+        .map(u => {
+          const d = new Date(u.created_at)
+          const label = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`
+          return `・[${label}] ${u.content}`
+        })
+        .join('\n')
+    : null
 
   return `あなたは${ownerName}（${ownerTitle}）の分身AIです。本人に代わって、初めて訪れたお客様と自然に会話します。
 
@@ -116,7 +127,11 @@ ${faqText}
 【実績・強み】
 ${achievementsText}
 
-【やってはいけないこと】
+${quickUpdatesText ? `【最新情報・近況アップデート】
+これは${ownerName}本人が直近に入力した最新情報です。古い情報より優先して使うこと。
+${quickUpdatesText}
+
+` : ''}【やってはいけないこと】
 ・契約の確約・価格の断定・未確認情報を断言する
 ・【実績・強み】に記載されていない実績・事例・数字を作り上げる（例：「〜社の支援実績」「売上〇〇%改善」など記載外の情報）
 ・実績を聞かれて記載がない場合に「いろいろあります」「多くの実績があります」と曖昧にごまかす→正直に「詳しくは本人から聞いてください」と言う

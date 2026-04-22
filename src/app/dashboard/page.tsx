@@ -57,6 +57,11 @@ export default function DashboardPage() {
   const personaIdsRef = useRef<string[]>([])
   const supabase = createClient()
 
+  type QuickUpdate = { id: string; persona_id: string; content: string; created_at: string }
+  const [quickUpdates, setQuickUpdates]       = useState<Record<string, QuickUpdate[]>>({})
+  const [quickInput, setQuickInput]           = useState<Record<string, string>>({})
+  const [quickSubmitting, setQuickSubmitting] = useState<Record<string, boolean>>({})
+
   type Appointment = {
     id: string; card_id: string; card_name: string
     customer_name: string; customer_email: string | null; customer_phone: string | null
@@ -109,6 +114,22 @@ export default function DashboardPage() {
     if (personasData?.length) {
       const ids = personasData.map(p => p.id)
       personaIdsRef.current = ids
+
+      // クイックアップデート読み込み
+      const { data: quData } = await supabase
+        .from('quick_updates')
+        .select('*')
+        .in('persona_id', ids)
+        .order('created_at', { ascending: false })
+        .limit(50)
+      if (quData) {
+        const grouped: Record<string, QuickUpdate[]> = {}
+        for (const u of quData) {
+          if (!grouped[u.persona_id]) grouped[u.persona_id] = []
+          grouped[u.persona_id].push(u)
+        }
+        setQuickUpdates(grouped)
+      }
 
       const { data: sessionsData } = await supabase
         .from('customer_sessions').select('*, business_cards(*)')
@@ -190,6 +211,37 @@ export default function DashboardPage() {
       body: JSON.stringify({ id, status }),
     })
     if (res.ok) setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a))
+  }
+
+  const handleQuickUpdate = async (personaId: string) => {
+    const content = (quickInput[personaId] ?? '').trim()
+    if (!content) return
+    setQuickSubmitting(prev => ({ ...prev, [personaId]: true }))
+    try {
+      const res = await fetch('/api/quick-update', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ personaId, content }),
+      })
+      if (res.ok) {
+        const { update } = await res.json()
+        setQuickUpdates(prev => ({
+          ...prev,
+          [personaId]: [update, ...(prev[personaId] ?? [])],
+        }))
+        setQuickInput(prev => ({ ...prev, [personaId]: '' }))
+      }
+    } finally {
+      setQuickSubmitting(prev => ({ ...prev, [personaId]: false }))
+    }
+  }
+
+  const handleDeleteQuickUpdate = async (personaId: string, updateId: string) => {
+    await fetch(`/api/quick-update?id=${updateId}`, { method: 'DELETE' })
+    setQuickUpdates(prev => ({
+      ...prev,
+      [personaId]: (prev[personaId] ?? []).filter(u => u.id !== updateId),
+    }))
   }
 
   const handleLogout = async () => {
@@ -659,6 +711,66 @@ export default function DashboardPage() {
                       {card.title && <p className="text-sm font-medium mt-0.5" style={{ color: '#F26722' }}>{card.title}</p>}
                       {card.company && <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>{card.company}</p>}
                     </div>
+
+                    {/* クイックアップデート */}
+                    {card.persona_id && (() => {
+                      const pid = card.persona_id as string
+                      const updates = quickUpdates[pid] ?? []
+                      return (
+                        <div className="mx-5 mb-4 rounded-xl overflow-hidden" style={{ border: '1px solid rgba(242,103,34,0.2)', background: 'rgba(255,248,244,0.8)' }}>
+                          <div className="px-4 pt-3 pb-2 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(242,103,34,0.12)' }}>
+                            <span style={{ fontSize: 14 }}>⚡</span>
+                            <span className="text-xs font-bold" style={{ color: '#1C0F05' }}>AIにクイック情報を追加</span>
+                            <span className="text-xs ml-auto" style={{ color: '#A08068' }}>入力するとAIがすぐに使います</span>
+                          </div>
+                          <div className="px-3 pt-2 pb-3">
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                value={quickInput[pid] ?? ''}
+                                onChange={e => setQuickInput(prev => ({ ...prev, [pid]: e.target.value }))}
+                                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleQuickUpdate(pid) } }}
+                                placeholder="例：先月、○○社のDXを支援し売上30%改善"
+                                style={{
+                                  flex: 1, padding: '8px 12px', fontSize: 13, borderRadius: 10,
+                                  border: '1.5px solid #DEC4AD', background: '#fff', color: '#1C0F05',
+                                  outline: 'none', minWidth: 0,
+                                }}
+                              />
+                              <button
+                                onClick={() => handleQuickUpdate(pid)}
+                                disabled={quickSubmitting[pid] || !(quickInput[pid] ?? '').trim()}
+                                style={{
+                                  padding: '8px 14px', borderRadius: 10, fontSize: 12, fontWeight: 700,
+                                  background: (quickSubmitting[pid] || !(quickInput[pid] ?? '').trim()) ? '#F5C09A' : 'linear-gradient(135deg, #F26722, #F59340)',
+                                  color: 'white', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+                                }}
+                              >
+                                {quickSubmitting[pid] ? '...' : '送信'}
+                              </button>
+                            </div>
+                            {updates.length > 0 && (
+                              <div className="mt-2 space-y-1.5">
+                                {updates.slice(0, 5).map(u => (
+                                  <div key={u.id} className="flex items-start gap-2 group">
+                                    <span style={{ fontSize: 10, color: '#C4511A', marginTop: 3, flexShrink: 0 }}>●</span>
+                                    <span className="text-xs flex-1" style={{ color: '#4A2C1A', lineHeight: 1.5 }}>{u.content}</span>
+                                    <span className="text-xs flex-shrink-0" style={{ color: '#C4A882' }}>
+                                      {new Date(u.created_at).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' })}
+                                    </span>
+                                    <button
+                                      onClick={() => handleDeleteQuickUpdate(pid, u.id)}
+                                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                      style={{ fontSize: 11, color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', padding: '0 2px', flexShrink: 0 }}
+                                    >✕</button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })()}
 
                     {/* QR + actions */}
                     <div className="px-5 pb-5 flex items-center gap-4">

@@ -36,7 +36,20 @@
       "Bash(npx supabase:*)",
       "Bash(npx next:*)",
       "Bash(node -e ':*)",
-      "Bash(ls /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/api/card/[cardId]/)"
+      "Bash(ls /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/api/card/[cardId]/)",
+      "Bash(curl -s -X POST https://www.aimeishi.biz/api/auth/send-email -H 'Content-Type: application/json' -d '{\"user\":{\"email\":\"test@example.com\"},\"email_data\":{\"token_hash\":\"test123\",\"email_action_type\":\"signup\",\"site_url\":\"https://www.aimeishi.biz\"}}' -w '\\\\nHTTP Status: %{http_code}\\\\n')",
+      "Bash(curl -s -X POST https://www.aimeishi.biz/api/auth/send-email -H 'Content-Type: application/json' -d '{\"user\":{\"email\":\"arigatou39777@yahoo.co.jp\"},\"email_data\":{\"token_hash\":\"testtoken456\",\"email_action_type\":\"signup\",\"site_url\":\"https://www.aimeishi.biz\"}}' -w '\\\\nHTTP: %{http_code}\\\\n')",
+      "Bash(find /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/edit* -name \"*.tsx\")",
+      "Bash(grep -n \"short_intro\" /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/edit/[cardId]/page.tsx)",
+      "WebFetch(domain:support.stripe.com)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "WebFetch(domain:stripe.com)",
+      "WebFetch(domain:docs.stripe.com)",
+      "Bash(sed -i '' 's/fontSize: 10 }}>$/fontSize: 13 }}>/g' '/Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/print/[cardId]/page.tsx')",
+      "Bash(sed -i '' 's/fontSize: 9\\\\.5 }}/fontSize: 13 }}/g' '/Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/print/[cardId]/page.tsx')",
+      "Bash(python3)",
+      "Bash(awk -F': ' '{n=$2+0; if\\(n<13 && n>0\\) print}')",
+      "Bash(xargs cat *)"
     ]
   }
 }
