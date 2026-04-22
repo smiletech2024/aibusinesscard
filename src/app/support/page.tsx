@@ -235,20 +235,53 @@ function KaoriChat() {
           <div style={{ color: '#fff', fontWeight: 900, fontSize: 16 }}>香里（かおり）</div>
           <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: 11 }}>AI名刺 サポートスタッフ</div>
         </div>
-        <div style={{
-          marginLeft: 'auto',
-          background: 'rgba(255,255,255,0.2)',
-          color: '#fff',
-          fontSize: 10,
-          fontWeight: 700,
-          padding: '3px 10px',
-          borderRadius: 99,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
-        }}>
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80', display: 'inline-block' }} />
-          24時間対応
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <div style={{
+            background: 'rgba(255,255,255,0.2)',
+            color: '#fff',
+            fontSize: 10,
+            fontWeight: 700,
+            padding: '3px 10px',
+            borderRadius: 99,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+          }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80', display: 'inline-block' }} />
+            24時間対応
+          </div>
+          {!escalated ? (
+            <button
+              onClick={escalate}
+              disabled={escalating}
+              style={{
+                background: 'rgba(255,255,255,0.15)',
+                color: '#fff',
+                border: '1.5px solid rgba(255,255,255,0.5)',
+                borderRadius: 99,
+                padding: '5px 12px',
+                fontSize: 11, fontWeight: 700,
+                display: 'flex', alignItems: 'center', gap: 4,
+                cursor: escalating ? 'not-allowed' : 'pointer',
+                whiteSpace: 'nowrap',
+                opacity: escalating ? 0.6 : 1,
+              }}
+            >
+              🙋 人に対応してもらう
+            </button>
+          ) : (
+            <div style={{
+              background: 'rgba(255,255,255,0.15)',
+              color: '#fff',
+              borderRadius: 99,
+              padding: '5px 12px',
+              fontSize: 11, fontWeight: 700,
+              display: 'flex', alignItems: 'center', gap: 4,
+              whiteSpace: 'nowrap',
+            }}>
+              ✅ 担当者に繋ぎました
+            </div>
+          )}
         </div>
       </div>
 
@@ -438,35 +471,6 @@ function KaoriChat() {
                 ? <span style={{ display: 'inline-block', width: 16, height: 16, border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
                 : '➤'}
             </button>
-            {!escalated && (
-              <button
-                onClick={escalate}
-                disabled={escalating}
-                style={{
-                  background: escalating ? '#EDD9C8' : '#FFF0E8',
-                  color: escalating ? '#A08068' : '#F26722',
-                  border: '1.5px solid #F26722',
-                  borderRadius: 12,
-                  height: 42,
-                  padding: '0 12px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                  cursor: escalating ? 'not-allowed' : 'pointer',
-                  fontSize: 12, fontWeight: 700, flexShrink: 0,
-                  whiteSpace: 'nowrap',
-                  transition: 'background 0.2s',
-                }}
-              >
-                🙋 人に対応してもらう
-              </button>
-            )}
-            {escalated && (
-              <div style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-                height: 42, padding: '0 10px', borderRadius: 12,
-                background: '#D1FAE5', fontSize: 12, fontWeight: 700,
-                color: '#059669', flexShrink: 0, whiteSpace: 'nowrap',
-              }}>✅ 担当者に繋ぎました</div>
-            )}
           </div>
         </>
       )}
