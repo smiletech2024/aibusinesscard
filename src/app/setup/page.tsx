@@ -655,6 +655,7 @@ export default function SetupPage() {
           </section>
 
           <button
+            type="button"
             onClick={() => setStep('card')}
             disabled={!selToneId || !selValueId || selFaqIds.size === 0}
             style={{
@@ -705,6 +706,7 @@ export default function SetupPage() {
               </div>
             ))}
             <button
+              type="button"
               onClick={savePersona}
               disabled={!cardData.full_name}
               style={{
