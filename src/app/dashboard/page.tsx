@@ -1050,7 +1050,7 @@ export default function DashboardPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="mb-1">
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full inline-block mb-1" style={{ background: 'rgba(232,96,28,0.3)', color: '#F5903A' }}>先着無料</span>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full inline-block mb-1" style={{ background: 'rgba(232,96,28,0.3)', color: '#F5903A', whiteSpace: 'nowrap' }}>先着無料</span>
                   <h3 className="font-black text-sm" style={{ color: 'white' }}>バーチャルオフィスに入居する</h3>
                 </div>
                 <p className="text-xs leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.7)' }}>
