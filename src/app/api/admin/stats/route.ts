@@ -39,6 +39,9 @@ export async function GET() {
     personasResult,
     unreadFeedbackResult,
     recentSignupsResult,
+    needsResult,
+    skillsResult,
+    matchesResult,
   ] = await Promise.all([
     // 総ユーザー数
     admin.from('profiles').select('*', { count: 'exact', head: true }),
@@ -67,6 +70,10 @@ export async function GET() {
     admin.from('feedback').select('*', { count: 'exact', head: true }).eq('is_read', false),
     // 最近の登録者（直近10名）
     admin.from('profiles').select('id, email, full_name, created_at').order('created_at', { ascending: false }).limit(10),
+    // 課題・スキル・マッチング数
+    admin.from('user_needs').select('*', { count: 'exact', head: true }).eq('is_active', true),
+    admin.from('user_skills').select('*', { count: 'exact', head: true }).eq('is_active', true),
+    admin.from('agent_matches').select('*', { count: 'exact', head: true }),
   ])
 
   // MRR計算
@@ -136,5 +143,10 @@ export async function GET() {
     personas: personasResult.count ?? 0,
     unreadFeedback: unreadFeedbackResult.count ?? 0,
     recentSignups: recentSignupsResult.data ?? [],
+    matching: {
+      needsCount:   needsResult.count   ?? 0,
+      skillsCount:  skillsResult.count  ?? 0,
+      matchesCount: matchesResult.count ?? 0,
+    },
   })
 }

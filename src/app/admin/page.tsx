@@ -15,6 +15,7 @@ type Stats = {
   personas: number
   unreadFeedback: number
   recentSignups: { id: string; email: string; full_name: string | null; created_at: string }[]
+  matching: { needsCount: number; skillsCount: number; matchesCount: number }
 }
 
 type Feedback = {
@@ -511,6 +512,13 @@ export default function AdminPage() {
               <KpiCard label="累計購入" value={formatTokens(stats.tokens.totalPurchased)} color="#F26722" />
               <KpiCard label="残高合計" value={formatTokens(stats.tokens.totalSubBalance + stats.tokens.totalPaidBalance)} />
               <KpiCard label="未読FBK" value={stats.unreadFeedback} alert={stats.unreadFeedback > 0} />
+            </div>
+
+            <div style={{ fontSize: 11, color: '#64748B', fontWeight: 700, letterSpacing: '0.06em', marginBottom: 8 }}>エージェントマッチング</div>
+            <div style={{ display: 'grid', gridTemplateColumns: gridCols, gap: 10, marginBottom: 20 }}>
+              <KpiCard label="課題登録数" value={stats.matching.needsCount.toLocaleString('ja-JP')} sub="有効な課題" color="#7C3AED" />
+              <KpiCard label="スキル登録数" value={stats.matching.skillsCount.toLocaleString('ja-JP')} sub="有効なスキル" color="#0EA5E9" />
+              <KpiCard label="マッチング数" value={stats.matching.matchesCount.toLocaleString('ja-JP')} sub="累計" color="#F26722" />
             </div>
           </>
         )}
