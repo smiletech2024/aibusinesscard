@@ -1056,9 +1056,9 @@ export default function DashboardPage() {
             <div className="flex items-start gap-4">
               <div
                 className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)' }}
+                style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)', overflow: 'hidden' }}
               >
-                <span style={{ fontSize: 24 }}>🤖</span>
+                <img src="/interviewer.png" alt="AI" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
