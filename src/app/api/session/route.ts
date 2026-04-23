@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { PLANS, canStartSession, type PlanId } from '@/lib/plans'
+import webpush from 'web-push'
 
 export async function POST(req: NextRequest) {
   try {
@@ -67,6 +68,38 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       return NextResponse.json({ error: 'Failed to create session' }, { status: 500 })
+    }
+
+    // ── オーナーへプッシュ通知 ────────────────────────────────────
+    if (persona?.user_id) {
+      try {
+        const { data: ownerSubs } = await admin
+          .from('push_subscriptions')
+          .select('subscription')
+          .eq('user_id', persona.user_id)
+          .eq('role', 'owner')
+
+        if (ownerSubs?.length) {
+          webpush.setVapidDetails(
+            process.env.VAPID_SUBJECT!,
+            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+            process.env.VAPID_PRIVATE_KEY!
+          )
+          const payload = JSON.stringify({
+            title: '🔔 新しい相談が来ました',
+            body: `${customerName || 'お客様'}があなたのAI名刺に話しかけています`,
+            url: '/dashboard',
+          })
+          await Promise.allSettled(
+            ownerSubs.map(({ subscription }) =>
+              webpush.sendNotification(subscription as webpush.PushSubscription, payload)
+            )
+          )
+        }
+      } catch (pushErr) {
+        // 通知失敗はセッション作成に影響させない
+        console.error('Owner push notification failed:', pushErr)
+      }
     }
 
     return NextResponse.json({ session })

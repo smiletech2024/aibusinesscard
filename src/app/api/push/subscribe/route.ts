@@ -4,15 +4,26 @@ import { createClient } from '@/lib/supabase/server'
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient()
-    const { sessionId, role, subscription } = await req.json()
+    const { sessionId, userId, role, subscription } = await req.json()
 
-    // upsert: 同じsessionId+roleの購読を上書き
-    const { error } = await supabase
-      .from('push_subscriptions')
-      .upsert(
-        { session_id: sessionId, role, subscription },
-        { onConflict: 'session_id,role' }
-      )
+    let error
+    if (userId && !sessionId) {
+      // ユーザーレベル購読（オーナー向け新規セッション通知）
+      await supabase.from('push_subscriptions').delete().match({ user_id: userId, role: 'owner' })
+      const { error: e } = await supabase
+        .from('push_subscriptions')
+        .insert({ user_id: userId, role: 'owner', subscription })
+      error = e
+    } else {
+      // セッションレベル購読（既存の動作）
+      const { error: e } = await supabase
+        .from('push_subscriptions')
+        .upsert(
+          { session_id: sessionId, role, subscription },
+          { onConflict: 'session_id,role' }
+        )
+      error = e
+    }
 
     if (error) {
       console.error('push subscribe error:', error)

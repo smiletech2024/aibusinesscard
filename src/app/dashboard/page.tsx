@@ -198,12 +198,21 @@ export default function DashboardPage() {
     setLoading(false)
   }
 
-  // ブラウザ通知の許可リクエスト
+  // ブラウザ通知許可 + オーナー向けプッシュ購読登録
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission()
+    if (typeof window === 'undefined' || !('Notification' in window) || !userId) return
+    const setup = async () => {
+      let permission = Notification.permission
+      if (permission === 'default') {
+        permission = await Notification.requestPermission()
+      }
+      if (permission === 'granted') {
+        const { subscribePushUser } = await import('@/lib/push')
+        await subscribePushUser(userId)
+      }
     }
-  }, [])
+    setup().catch(() => {})
+  }, [userId])
 
   const handleDeleteCard = async (cardId: string) => {
     await supabase.from('business_cards').update({ is_active: false }).eq('id', cardId)
@@ -1335,7 +1344,7 @@ export default function DashboardPage() {
                           className="btn-ghost text-xs px-3 py-1.5"
                           style={{ borderRadius: 10 }}
                         >
-                          確認
+                          💬 会話を見る
                         </Link>
                       )}
                       <button

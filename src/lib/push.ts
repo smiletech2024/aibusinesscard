@@ -1,5 +1,33 @@
 // Web Push 購読ヘルパー
 
+// オーナー向け：ユーザーIDで登録（新規セッション通知用）
+export async function subscribePushUser(userId: string): Promise<boolean> {
+  if (typeof window === 'undefined') return false
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false
+  if (Notification.permission !== 'granted') return false
+
+  try {
+    const reg = await navigator.serviceWorker.register('/sw.js')
+    await navigator.serviceWorker.ready
+    let sub = await reg.pushManager.getSubscription()
+    if (!sub) {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!),
+      })
+    }
+    await fetch('/api/push/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, role: 'owner', subscription: sub.toJSON() }),
+    })
+    return true
+  } catch (e) {
+    console.error('push subscribe user failed:', e)
+    return false
+  }
+}
+
 export async function subscribePush(sessionId: string, role: 'customer' | 'owner'): Promise<boolean> {
   if (typeof window === 'undefined') return false
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false

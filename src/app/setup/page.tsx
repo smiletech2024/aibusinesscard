@@ -325,9 +325,10 @@ export default function SetupPage() {
             </div>
 
             {/* よく聞かれること */}
-            <div>
-              <label className="block text-sm font-semibold mb-1.5" style={{ color: '#4A2C1A' }}>
-                よく聞かれること・得意な相談 <span style={{ color: '#A08068', fontSize: 11, fontWeight: 400 }}>（任意）</span>
+            <div style={{ background: '#FFF7F2', border: '1.5px solid #F26722', borderRadius: 12, padding: '14px' }}>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: '#1C0F05' }}>
+                💬 お客様によく聞かれること
+                <span style={{ marginLeft: 8, fontSize: 10, fontWeight: 700, background: '#F26722', color: 'white', padding: '2px 7px', borderRadius: 99 }}>AIの品質に直結</span>
               </label>
               <textarea
                 value={qFaq}
@@ -336,13 +337,15 @@ export default function SetupPage() {
                 rows={4}
                 style={{
                   width: '100%', padding: '10px 12px', fontSize: 13, borderRadius: 10,
-                  border: '1.5px solid #DEC4AD', background: '#FAF5F0', color: '#1C0F05',
+                  border: '1.5px solid #DEC4AD', background: 'white', color: '#1C0F05',
                   outline: 'none', resize: 'vertical', lineHeight: 1.6, boxSizing: 'border-box' as const,
                 }}
-                onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.background = 'white' }}
-                onBlur={e => { e.target.style.borderColor = '#DEC4AD'; e.target.style.background = '#FAF5F0' }}
+                onFocus={e => { e.target.style.borderColor = '#F26722' }}
+                onBlur={e => { e.target.style.borderColor = '#DEC4AD' }}
               />
-              <p style={{ fontSize: 11, color: '#A08068', marginTop: 4 }}>AIがこの内容をもとに回答を生成します</p>
+              <p style={{ fontSize: 11, color: '#A08068', marginTop: 6 }}>
+                ここを埋めるほどAIの回答が的確になります。空白でも進めますが品質が下がります。
+              </p>
             </div>
 
             <button
