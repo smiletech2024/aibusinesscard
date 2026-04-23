@@ -25,9 +25,48 @@ export async function GET() {
 
     if (e1) return NextResponse.json({ error: e1.message }, { status: 500 })
 
+    // 相手のカードIDを動的取得（マイグレーション不要・既存マッチも対応）
+    const needUserIds  = [...new Set((outgoing  ?? []).map(m => m.need_user_id))]
+    const skillUserIds = [...new Set((incoming  ?? []).map(m => m.skill_user_id))]
+    const allUserIds   = [...new Set([...needUserIds, ...skillUserIds])]
+
+    const cardIdMap: Record<string, string> = {}
+    if (allUserIds.length > 0) {
+      const { data: cards } = await supabase
+        .from('business_cards')
+        .select('id, user_id')
+        .in('user_id', allUserIds)
+        .eq('is_active', true)
+      for (const card of cards ?? []) {
+        cardIdMap[card.user_id] = card.id
+      }
+    }
+
+    // 自分のカードIDも取得（incoming 側が skill_user のカードを見るため）
+    const { data: myCards } = await supabase
+      .from('business_cards')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .order('created_at', { ascending: true })
+      .limit(1)
+    const myCardId = myCards?.[0]?.id ?? null
+
+    const outgoingWithCards = (outgoing ?? []).map(m => ({
+      ...m,
+      need_user_card_id:  cardIdMap[m.need_user_id]  ?? m.need_user_card_id  ?? null,
+      skill_user_card_id: myCardId,
+    }))
+
+    const incomingWithCards = (incoming ?? []).map(m => ({
+      ...m,
+      skill_user_card_id: cardIdMap[m.skill_user_id] ?? m.skill_user_card_id ?? null,
+      need_user_card_id:  myCardId,
+    }))
+
     return NextResponse.json({
-      outgoing: outgoing ?? [],
-      incoming: incoming ?? [],
+      outgoing: outgoingWithCards,
+      incoming: incomingWithCards,
     })
   } catch (err) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
