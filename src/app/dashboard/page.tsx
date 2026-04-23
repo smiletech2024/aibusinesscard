@@ -213,9 +213,12 @@ export default function DashboardPage() {
   }
 
   // 通知許可状態を管理
-  const [notifPermission, setNotifPermission] = useState<NotificationPermission | null>(null)
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission | 'unsupported' | null>(null)
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
+    if (typeof window === 'undefined') return
+    if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+      setNotifPermission('unsupported')
+    } else {
       setNotifPermission(Notification.permission)
     }
   }, [])
@@ -673,7 +676,7 @@ export default function DashboardPage() {
 
       {/* フリープランの対話上限バナー */}
       {/* 通知許可バナー */}
-      {notifPermission === 'default' && (
+      {(notifPermission === 'default' || notifPermission === null) && !loading && (
         <div style={{ background: '#FFF7ED', borderBottom: '1px solid #FED7AA', padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ fontSize: 12, color: '#92400E' }}>
             🔔 お客様が話しかけたとき、スマホに通知を受け取れます
