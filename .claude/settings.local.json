@@ -49,7 +49,8 @@
       "Bash(sed -i '' 's/fontSize: 9\\\\.5 }}/fontSize: 13 }}/g' '/Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/print/[cardId]/page.tsx')",
       "Bash(python3)",
       "Bash(awk -F': ' '{n=$2+0; if\\(n<13 && n>0\\) print}')",
-      "Bash(xargs cat *)"
+      "Bash(xargs cat *)",
+      "Bash(grep -E \"^.*\\(error|Error\\).*$\")"
     ]
   }
 }

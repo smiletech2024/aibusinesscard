@@ -1044,6 +1044,42 @@ export default function DashboardPage() {
           )}
         </div>
 
+        {/* AIエージェントバナー */}
+        {cards.length > 0 && (
+          <div
+            className="rounded-2xl p-5"
+            style={{
+              background: 'linear-gradient(135deg, #E8601C 0%, #C4511A 100%)',
+              boxShadow: '0 6px 24px rgba(232,96,28,0.3)',
+            }}
+          >
+            <div className="flex items-start gap-4">
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)' }}
+              >
+                <span style={{ fontSize: 24 }}>🤖</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-black text-sm" style={{ color: 'white' }}>AIエージェントが仕事を探す</h3>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}>New</span>
+                </div>
+                <p className="text-xs leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.85)' }}>
+                  あなたのスキルを登録するだけ。AIが他のユーザーの課題を自動検索して、<strong style={{ color: 'white' }}>マッチングした案件</strong>を届けます。
+                </p>
+                <Link
+                  href="/agent"
+                  className="inline-block text-xs font-bold px-4 py-2 rounded-xl transition hover:opacity-90"
+                  style={{ background: 'white', color: '#E8601C', textDecoration: 'none' }}
+                >
+                  エージェントを起動する →
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* AIを育てる 機能アピールバナー */}
         {cards.length > 0 && (
           <div
