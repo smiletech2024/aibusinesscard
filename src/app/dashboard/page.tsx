@@ -212,21 +212,24 @@ export default function DashboardPage() {
     setLoading(false)
   }
 
-  // ブラウザ通知許可 + オーナー向けプッシュ購読登録
+  // 通知許可状態を管理
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission | null>(null)
   useEffect(() => {
-    if (typeof window === 'undefined' || !('Notification' in window) || !userId) return
-    const setup = async () => {
-      let permission = Notification.permission
-      if (permission === 'default') {
-        permission = await Notification.requestPermission()
-      }
-      if (permission === 'granted') {
-        const { subscribePushUser } = await import('@/lib/push')
-        await subscribePushUser(userId)
-      }
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      setNotifPermission(Notification.permission)
     }
-    setup().catch(() => {})
-  }, [userId])
+  }, [])
+
+  // 通知を許可するボタンのハンドラ
+  const enableNotifications = async () => {
+    if (!userId || typeof window === 'undefined' || !('Notification' in window)) return
+    const permission = await Notification.requestPermission()
+    setNotifPermission(permission)
+    if (permission === 'granted') {
+      const { subscribePushUser } = await import('@/lib/push')
+      await subscribePushUser(userId)
+    }
+  }
 
   const handleDeleteCard = async (cardId: string) => {
     await supabase.from('business_cards').update({ is_active: false }).eq('id', cardId)
@@ -669,6 +672,26 @@ export default function DashboardPage() {
       )}
 
       {/* フリープランの対話上限バナー */}
+      {/* 通知許可バナー */}
+      {notifPermission === 'default' && (
+        <div style={{ background: '#FFF7ED', borderBottom: '1px solid #FED7AA', padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ fontSize: 12, color: '#92400E' }}>
+            🔔 お客様が話しかけたとき、スマホに通知を受け取れます
+          </div>
+          <button
+            onClick={enableNotifications}
+            style={{ fontSize: 12, fontWeight: 700, color: 'white', background: '#F26722', border: 'none', borderRadius: 8, padding: '6px 14px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+          >
+            通知を受け取る
+          </button>
+        </div>
+      )}
+      {notifPermission === 'granted' && (
+        <div style={{ background: '#F0FDF4', borderBottom: '1px solid #BBF7D0', padding: '8px 20px', fontSize: 11, color: '#166534', display: 'flex', alignItems: 'center', gap: 6 }}>
+          ✅ 通知設定済み — お客様が話しかけると通知が届きます
+        </div>
+      )}
+
       {maxSessions !== -1 && monthlySessionCount >= maxSessions && (
         <div style={{ background: '#FEF2F2', borderBottom: '1px solid #FECACA', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
