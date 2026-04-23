@@ -34,7 +34,7 @@ const cardFields = [
   { key: 'full_name',   label: '氏名',     placeholder: '山田 太郎',                  required: true },
   { key: 'title',       label: '肩書き',   placeholder: 'マーケティングコンサルタント', required: false },
   { key: 'company',     label: '会社名',   placeholder: '株式会社 Example',            required: false },
-  { key: 'short_intro', label: '一言紹介', placeholder: 'ROI改善が得意なWebマーケター', required: false },
+  { key: 'short_intro', label: '自己紹介', placeholder: 'Webマーケティング歴10年。ROI改善・新規顧客開拓を得意とし、累計50社以上の支援実績があります。お気軽にご相談ください！', required: false },
   { key: 'email',       label: 'メール',   placeholder: 'you@example.com',             required: false },
   { key: 'phone',       label: '電話番号', placeholder: '090-xxxx-xxxx',               required: false },
   { key: 'website',     label: 'Web',      placeholder: 'https://yoursite.com',        required: false },
