@@ -214,14 +214,22 @@ export default function DashboardPage() {
 
   // 通知許可状態を管理
   const [notifPermission, setNotifPermission] = useState<NotificationPermission | 'unsupported' | null>(null)
+  const [pushRegistered, setPushRegistered] = useState(false)
+
+  // userId確定後に許可状態チェック＆既許可なら自動登録
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || !userId) return
     if (!('Notification' in window) || !('serviceWorker' in navigator)) {
-      setNotifPermission('unsupported')
-    } else {
-      setNotifPermission(Notification.permission)
+      setNotifPermission('unsupported'); return
     }
-  }, [])
+    const perm = Notification.permission
+    setNotifPermission(perm)
+    if (perm === 'granted') {
+      import('@/lib/push').then(({ subscribePushUser }) =>
+        subscribePushUser(userId).then(() => setPushRegistered(true)).catch(() => {})
+      )
+    }
+  }, [userId])
 
   // 通知を許可するボタンのハンドラ
   const enableNotifications = async () => {
@@ -231,6 +239,7 @@ export default function DashboardPage() {
     if (permission === 'granted') {
       const { subscribePushUser } = await import('@/lib/push')
       await subscribePushUser(userId)
+      setPushRegistered(true)
     }
   }
 
@@ -689,7 +698,7 @@ export default function DashboardPage() {
           </button>
         </div>
       )}
-      {notifPermission === 'granted' && (
+      {notifPermission === 'granted' && pushRegistered && (
         <div style={{ background: '#F0FDF4', borderBottom: '1px solid #BBF7D0', padding: '8px 20px', fontSize: 11, color: '#166534', display: 'flex', alignItems: 'center', gap: 6 }}>
           ✅ 通知設定済み — お客様が話しかけると通知が届きます
         </div>
