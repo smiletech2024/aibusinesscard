@@ -263,25 +263,6 @@ export default function SetupPage() {
               </div>
 
               {/* 自由入力 */}
-              {/* カスタム追加済みキーワード */}
-              {keywords.filter(k => !KEYWORD_PRESETS.flatMap(g => g.items).includes(k)).length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
-                  {keywords.filter(k => !KEYWORD_PRESETS.flatMap(g => g.items).includes(k)).map(kw => (
-                    <span key={kw} style={{
-                      background: '#1C0F05', color: 'white', fontSize: 12, fontWeight: 600,
-                      padding: '4px 10px', borderRadius: 20, display: 'flex', alignItems: 'center', gap: 4,
-                    }}>
-                      {kw}
-                      <button
-                        type="button"
-                        onClick={() => setKeywords(p => p.filter(k => k !== kw))}
-                        style={{ color: 'rgba(255,255,255,0.6)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, lineHeight: 1 }}
-                      >×</button>
-                    </span>
-                  ))}
-                </div>
-              )}
-
               {keywords.length < 6 && (
                 <div className="flex gap-2" style={{ borderTop: '1px solid #EDD9C8', paddingTop: 10 }}>
                   <input
@@ -307,6 +288,25 @@ export default function SetupPage() {
                       border: 'none', cursor: kwInput.trim() ? 'pointer' : 'not-allowed',
                     }}
                   >追加</button>
+                </div>
+              )}
+
+              {/* カスタム追加済みキーワード */}
+              {keywords.filter(k => !KEYWORD_PRESETS.flatMap(g => g.items).includes(k)).length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+                  {keywords.filter(k => !KEYWORD_PRESETS.flatMap(g => g.items).includes(k)).map(kw => (
+                    <span key={kw} style={{
+                      background: '#F26722', color: 'white', fontSize: 12, fontWeight: 600,
+                      padding: '4px 10px', borderRadius: 20, display: 'flex', alignItems: 'center', gap: 4,
+                    }}>
+                      ✓ {kw}
+                      <button
+                        type="button"
+                        onClick={() => setKeywords(p => p.filter(k => k !== kw))}
+                        style={{ color: 'rgba(255,255,255,0.7)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, lineHeight: 1, fontSize: 14 }}
+                      >×</button>
+                    </span>
+                  ))}
                 </div>
               )}
             </div>
