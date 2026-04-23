@@ -306,40 +306,46 @@ export default function VirtualOfficePage() {
                           background: occupied
                             ? isMySlot ? 'rgba(232,96,28,0.12)' : '#FBF4EC'
                             : 'rgba(255,255,255,0.02)',
-                          padding: '10px 8px',
-                          minHeight: 84,
+                          padding: '8px 6px',
+                          height: 90,
                           display: 'flex',
                           flexDirection: 'column',
                           justifyContent: 'space-between',
                           position: 'relative',
+                          overflow: 'hidden',
                         }}
                       >
                         {occupied && slot ? (
                           <>
                             {isMySlot && (
                               <div
-                                style={{ position: 'absolute', top: 4, right: 4, width: 6, height: 6, borderRadius: '50%', background: '#E8601C' }}
+                                style={{ position: 'absolute', top: 4, right: 4, width: 6, height: 6, borderRadius: '50%', background: '#E8601C', flexShrink: 0 }}
                               />
                             )}
-                            <div style={{ flex: 1 }}>
+                            <div style={{ overflow: 'hidden', flex: 1, minHeight: 0 }}>
                               <p
                                 className="font-black leading-tight mb-0.5"
-                                style={{ fontSize: 11, color: '#1C0F05', lineHeight: 1.3 }}
+                                style={{
+                                  fontSize: 10, color: '#1C0F05', lineHeight: 1.3,
+                                  overflow: 'hidden', display: '-webkit-box',
+                                  WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                                  wordBreak: 'break-all',
+                                } as React.CSSProperties}
                               >
                                 {slot.company_name || '（社名）'}
                               </p>
-                              <p style={{ fontSize: 10, color: '#7A4A28', lineHeight: 1.3 }}>
+                              <p style={{ fontSize: 9, color: '#7A4A28', lineHeight: 1.2, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
                                 {slot.display_name || ''}
                               </p>
                               {slot.card_title && (
-                                <p style={{ fontSize: 9, color: '#A08068', marginTop: 1 }}>{slot.card_title}</p>
+                                <p style={{ fontSize: 8, color: '#A08068', marginTop: 1, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{slot.card_title}</p>
                               )}
                             </div>
                             {slot.card_id && (
                               <Link
                                 href={`/card/${slot.card_id}`}
-                                className="block text-center font-bold rounded-lg mt-2"
-                                style={{ fontSize: 10, padding: '4px 6px', background: '#E8601C', color: 'white', textDecoration: 'none' }}
+                                className="block text-center font-bold rounded-lg"
+                                style={{ fontSize: 9, padding: '3px 4px', background: '#E8601C', color: 'white', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}
                               >
                                 窓口を開く
                               </Link>
