@@ -43,7 +43,7 @@ export const PLANS: Record<PlanId, Plan> = {
     priceJpy:             0,
     maxCards:             1,
     maxPersonas:          1,
-    maxSessionsPerMonth:  5,          // A: 月5件まで
+    maxSessionsPerMonth:  15,         // 月15件まで（トライアル体験を改善）
     monthlyTokens:        0,
     showBranding:         true,       // A: ブランド表示あり
     analysisHistoryLimit: 3,          // A: 直近3件のみ

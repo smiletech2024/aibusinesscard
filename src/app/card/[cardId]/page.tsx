@@ -682,6 +682,36 @@ export default function CardPage() {
               </div>
             ) : !showNameInput ? (
               <div className="space-y-3">
+
+                {/* AI グリーティングバブル */}
+                <div style={{
+                  background: '#0F0E20',
+                  border: '1px solid rgba(52,211,153,0.25)',
+                  borderRadius: 16,
+                  padding: '14px 16px',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                    <div style={{
+                      width: 34, height: 34, borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #E05A18, #F5843A)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0, fontSize: 16,
+                    }}>🤖</div>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ color: '#34D399', fontSize: 10, fontWeight: 700, margin: '0 0 5px', letterSpacing: '0.05em' }}>
+                        ● {card.full_name}のAI分身 · オンライン
+                      </p>
+                      <p style={{ color: '#FFF0E8', fontSize: 13, margin: 0, lineHeight: 1.65 }}>
+                        こんにちは！{card.full_name}の分身AIです。
+                        {card.short_intro
+                          ? ` ${card.short_intro.split('。')[0].substring(0, 40)}。`
+                          : ' 何でもお気軽にご質問ください。'}
+                        👇 話しかけてみてください
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* こんなことを聞けます */}
                 {faqPreview.length > 0 && !existingSession && (
                   <div style={{ marginBottom: 12 }}>

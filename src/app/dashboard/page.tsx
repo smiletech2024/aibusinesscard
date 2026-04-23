@@ -215,6 +215,8 @@ export default function DashboardPage() {
   // 通知許可状態を管理
   const [notifPermission, setNotifPermission] = useState<NotificationPermission | 'unsupported' | null>(null)
   const [pushRegistered, setPushRegistered] = useState(false)
+  const [sessionSearch, setSessionSearch] = useState('')
+  const [sessionStatusFilter, setSessionStatusFilter] = useState<string>('all')
 
   // マウント時に即座に通知権限を確認（userIdを待たない）
   useEffect(() => {
@@ -957,9 +959,25 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="pt-10 px-5 pb-3">
-                      <h3 className="font-black text-base" style={{ color: '#1C0F05' }}>{card.full_name}</h3>
-                      {card.title && <p className="text-sm font-medium mt-0.5" style={{ color: '#F26722' }}>{card.title}</p>}
-                      {card.company && <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>{card.company}</p>}
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <h3 className="font-black text-base" style={{ color: '#1C0F05' }}>{card.full_name}</h3>
+                          {card.title && <p className="text-sm font-medium mt-0.5" style={{ color: '#F26722' }}>{card.title}</p>}
+                          {card.company && <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>{card.company}</p>}
+                        </div>
+                        {(() => {
+                          const cardSessionCount = sessions.filter(s => s.card_id === card.id).length
+                          const thisMonth = new Date(); thisMonth.setDate(1); thisMonth.setHours(0,0,0,0)
+                          const monthCount = sessions.filter(s => s.card_id === card.id && new Date(s.created_at) >= thisMonth).length
+                          return cardSessionCount > 0 ? (
+                            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                              <div style={{ fontSize: 18, fontWeight: 900, color: '#F26722', lineHeight: 1 }}>{cardSessionCount}</div>
+                              <div style={{ fontSize: 9, color: '#A08068', marginTop: 2 }}>累計相談</div>
+                              {monthCount > 0 && <div style={{ fontSize: 9, color: '#34D399', fontWeight: 700 }}>今月{monthCount}件</div>}
+                            </div>
+                          ) : null
+                        })()}
+                      </div>
 
                       {/* 写真登録ボタン */}
                       <button
@@ -1350,42 +1368,52 @@ export default function DashboardPage() {
         {/* セッション一覧 */}
         {sessions.length > 0 && (
           <div id="sessions">
-            <div className="mb-5">
+            <div className="mb-4">
               <p className="section-label mb-1">顧客管理</p>
               <h2 className="text-lg font-black" style={{ color: '#1C0F05' }}>AIが受けた相談</h2>
             </div>
 
-            {/* お客様フロー説明 */}
-            <div
-              className="mb-4 px-4 py-3 rounded-2xl"
-              style={{ background: 'white', border: '1px solid #EDD9C8' }}
-            >
-              <p className="text-xs font-bold mb-2.5" style={{ color: '#A08068' }}>お客様の流れ</p>
-              <div className="flex items-center gap-1 flex-wrap">
+            {/* 検索・フィルター */}
+            <div className="mb-4 flex gap-2 flex-wrap">
+              <input
+                type="text"
+                placeholder="お客様名で検索..."
+                value={sessionSearch}
+                onChange={e => setSessionSearch(e.target.value)}
+                style={{
+                  flex: '1 1 160px', padding: '8px 12px', fontSize: 13, borderRadius: 10,
+                  border: '1.5px solid #EDD9C8', background: 'white', color: '#1C0F05',
+                  outline: 'none', minWidth: 0,
+                }}
+                onFocus={e => e.target.style.borderColor = '#F26722'}
+                onBlur={e => e.target.style.borderColor = '#EDD9C8'}
+              />
+              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                 {[
-                  { label: 'QRスキャン', color: '#F26722', bg: 'rgba(242,103,34,0.08)' },
-                  { label: 'AIと会話中', color: '#F5A47A', bg: 'rgba(242,103,34,0.08)' },
-                  { label: 'まとめ確認中', color: '#34D399', bg: 'rgba(52,211,153,0.08)' },
-                  { label: 'チャット希望', color: '#F5C09A', bg: 'rgba(242,103,34,0.08)' },
-                ].map((s, i) => (
-                  <div key={s.label} className="flex items-center gap-1">
-                    <span
-                      className="text-xs font-bold px-2.5 py-1 rounded-full"
-                      style={{ background: s.bg, color: s.color }}
-                    >
-                      {s.label}
-                    </span>
-                    {i < 3 && (
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C4C2D8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="9 18 15 12 9 6" />
-                      </svg>
-                    )}
-                  </div>
+                  { key: 'all', label: 'すべて' },
+                  { key: 'ai_chat', label: '会話中' },
+                  { key: 'summarized', label: 'まとめ済' },
+                  { key: 'owner_chat', label: 'チャット希望' },
+                ].map(f => (
+                  <button key={f.key} type="button" onClick={() => setSessionStatusFilter(f.key)}
+                    style={{
+                      padding: '7px 12px', borderRadius: 99, fontSize: 11, fontWeight: 700,
+                      border: `1.5px solid ${sessionStatusFilter === f.key ? '#F26722' : '#EDD9C8'}`,
+                      background: sessionStatusFilter === f.key ? 'rgba(242,103,34,0.1)' : 'white',
+                      color: sessionStatusFilter === f.key ? '#F26722' : '#A08068',
+                      cursor: 'pointer', whiteSpace: 'nowrap',
+                    }}
+                  >{f.label}</button>
                 ))}
               </div>
             </div>
+
             <div className="space-y-2">
-              {sessions.map(session => {
+              {sessions.filter(s => {
+                const matchSearch = !sessionSearch || (s.customer_name || '名無し').toLowerCase().includes(sessionSearch.toLowerCase()) || (s.customer_email || '').toLowerCase().includes(sessionSearch.toLowerCase())
+                const matchStatus = sessionStatusFilter === 'all' || s.status === sessionStatusFilter
+                return matchSearch && matchStatus
+              }).map(session => {
                 const st = statusConfig[session.status] || statusConfig.ai_chat
                 const name = session.customer_name || '名無し'
                 const needsAttention = session.status === 'summarized' || session.status === 'owner_chat'
@@ -1432,39 +1460,40 @@ export default function DashboardPage() {
                         })}
                       </p>
                     </div>
-                    <div className="flex gap-2 flex-shrink-0">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flexShrink: 0, alignItems: 'flex-end' }}>
                       {(session.status === 'summarized' || session.status === 'owner_chat') ? (
                         <>
                           <Link
-                            href={`/summary/${session.id}`}
-                            className="btn-ghost text-xs px-3 py-1.5"
-                            style={{ borderRadius: 10 }}
-                          >
-                            まとめ
-                          </Link>
-                          <Link
                             href={`/owner/chat/${session.id}`}
                             className="btn-primary text-xs px-3 py-1.5"
-                            style={{ borderRadius: 10 }}
+                            style={{ borderRadius: 10, whiteSpace: 'nowrap' }}
                           >
-                            チャット
+                            チャット →
+                          </Link>
+                          <Link
+                            href={`/summary/${session.id}`}
+                            className="btn-ghost text-xs px-3 py-1.5"
+                            style={{ borderRadius: 10, whiteSpace: 'nowrap' }}
+                          >
+                            まとめ
                           </Link>
                         </>
                       ) : (
                         <Link
                           href={`/owner/chat/${session.id}`}
                           className="btn-ghost text-xs px-3 py-1.5"
-                          style={{ borderRadius: 10 }}
+                          style={{ borderRadius: 10, whiteSpace: 'nowrap' }}
                         >
                           💬 会話を見る
                         </Link>
                       )}
                       <button
+                        type="button"
                         onClick={() => setDeleteSessionConfirm({ id: session.id, name })}
-                        className="text-xs px-3 py-1.5 rounded-xl transition hover:bg-red-50"
+                        className="text-xs px-3 py-1.5 rounded-xl"
                         style={{
                           color: '#EF4444', background: 'transparent',
-                          border: '1px solid #FECACA', cursor: 'pointer', flexShrink: 0,
+                          border: '1px solid #FECACA', cursor: 'pointer', whiteSpace: 'nowrap',
                         }}
                       >
                         削除
