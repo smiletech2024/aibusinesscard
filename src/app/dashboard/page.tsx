@@ -169,8 +169,11 @@ export default function DashboardPage() {
       const { data: sessionsData } = await supabase
         .from('customer_sessions').select('*, business_cards(*)')
         .in('persona_id', ids)
-        .order('updated_at', { ascending: false }).limit(20)
-      if (sessionsData) setSessions(sessionsData as CustomerSession[])
+        .order('updated_at', { ascending: false }).limit(30)
+      if (sessionsData) {
+        setSessions(sessionsData as CustomerSession[])
+        setSessionHasMore(sessionsData.length === 30)
+      }
       setLoading(false)
 
       // リアルタイム購読：owner_chat / summarized になったら通知
@@ -217,6 +220,8 @@ export default function DashboardPage() {
   const [pushRegistered, setPushRegistered] = useState(false)
   const [sessionSearch, setSessionSearch] = useState('')
   const [sessionStatusFilter, setSessionStatusFilter] = useState<string>('all')
+  const [sessionHasMore, setSessionHasMore] = useState(false)
+  const [sessionLoadingMore, setSessionLoadingMore] = useState(false)
 
   // マウント時に即座に通知権限を確認（userIdを待たない）
   useEffect(() => {
@@ -306,6 +311,21 @@ export default function DashboardPage() {
       setAvatarUploading(false)
       if (avatarInputRef.current) avatarInputRef.current.value = ''
     }
+  }
+
+  const handleLoadMoreSessions = async () => {
+    if (!personaIdsRef.current.length || sessionLoadingMore) return
+    setSessionLoadingMore(true)
+    const { data } = await supabase
+      .from('customer_sessions').select('*, business_cards(*)')
+      .in('persona_id', personaIdsRef.current)
+      .order('updated_at', { ascending: false })
+      .range(sessions.length, sessions.length + 29)
+    if (data) {
+      setSessions(prev => [...prev, ...(data as CustomerSession[])])
+      setSessionHasMore(data.length === 30)
+    }
+    setSessionLoadingMore(false)
   }
 
   const handleQuickUpdate = async (personaId: string) => {
@@ -908,26 +928,43 @@ export default function DashboardPage() {
           </div>
 
           {cards.length === 0 ? (
-            <div
-              className="p-12 text-center rounded-2xl"
-              style={{ background: 'white', border: '1px solid #EDD9C8' }}
-            >
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5"
-                style={{ background: '#FFF0E8' }}>
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#F26722" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="7" width="20" height="14" rx="3" />
-                  <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
-                  <circle cx="12" cy="14" r="2" />
-                </svg>
+            <div className="rounded-2xl overflow-hidden" style={{ background: 'white', border: '1px solid #EDD9C8' }}>
+              {/* ウェルカムヘッダー */}
+              <div className="px-6 pt-8 pb-6 text-center" style={{ borderBottom: '1px solid #F5EAE0' }}>
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                  style={{ background: 'linear-gradient(135deg, #F26722, #F59340)', boxShadow: '0 8px 24px rgba(242,103,34,0.3)' }}>
+                  <span style={{ fontSize: 28 }}>🤖</span>
+                </div>
+                <h3 className="font-black text-lg mb-1" style={{ color: '#1C0F05' }}>ようこそ！AI名刺へ</h3>
+                <p className="text-sm" style={{ color: '#A08068' }}>3分で分身AIが完成します。まずは以下の手順で始めましょう。</p>
               </div>
-              <h3 className="font-black text-lg mb-2" style={{ color: '#1C0F05' }}>最初の分身AIを、作りましょう</h3>
-              <p className="text-sm mb-6" style={{ color: '#A08068' }}>
-                3分のヒアリングで完成します。<br />
-                名刺のQRを渡した瞬間から、AIが24時間対応を始めます。
-              </p>
-              <Link href="/setup" className="btn-primary text-sm px-7 py-3" style={{ borderRadius: 14 }}>
-                はじめての分身AIを作る →
-              </Link>
+              {/* ステップチェックリスト */}
+              <div className="px-6 py-5 space-y-3">
+                {[
+                  { step: 1, done: true,  icon: '✅', label: 'アカウント登録', sub: '完了しました！' },
+                  { step: 2, done: false, icon: '🤖', label: 'AI名刺を作成する', sub: '3分のヒアリングで完成', href: '/setup' },
+                  { step: 3, done: false, icon: '📱', label: 'QRをスキャンして試してみる', sub: '作成後にQRコードが表示されます' },
+                  { step: 4, done: false, icon: '🔔', label: 'スマホに通知を設定する', sub: 'お客様が話しかけたらすぐ気づける' },
+                ].map(({ step, done, icon, label, sub, href }) => (
+                  <div key={step} className="flex items-center gap-3 p-3 rounded-xl"
+                    style={{ background: done ? 'rgba(52,211,153,0.06)' : step === 2 ? 'rgba(242,103,34,0.06)' : '#FAFAFA', border: `1px solid ${done ? 'rgba(52,211,153,0.2)' : step === 2 ? 'rgba(242,103,34,0.2)' : '#F0E8E0'}` }}>
+                    <div style={{
+                      width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                      background: done ? 'rgba(52,211,153,0.15)' : step === 2 ? 'rgba(242,103,34,0.12)' : '#F5EAE0',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15,
+                    }}>{icon}</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold" style={{ color: done ? '#059669' : '#1C0F05' }}>{label}</p>
+                      <p className="text-xs" style={{ color: '#A08068' }}>{sub}</p>
+                    </div>
+                    {href && !done && (
+                      <Link href={href} className="btn-primary text-xs px-4 py-2 flex-shrink-0" style={{ borderRadius: 10 }}>
+                        始める →
+                      </Link>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -1130,136 +1167,6 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* AIエージェントバナー */}
-        {cards.length > 0 && (
-          <div
-            className="rounded-2xl p-5"
-            style={{
-              background: 'linear-gradient(135deg, #E8601C 0%, #C4511A 100%)',
-              boxShadow: '0 6px 24px rgba(232,96,28,0.3)',
-            }}
-          >
-            <div className="flex items-start gap-4">
-              <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)', overflow: 'hidden' }}
-              >
-                <img src="/interviewer.png" alt="AI" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="mb-1">
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full inline-block mb-1" style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}>New</span>
-                  <h3 className="font-black text-sm" style={{ color: 'white' }}>眠っている間に、案件が届く</h3>
-                </div>
-                <p className="text-xs leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.85)' }}>
-                  スキルを登録すると、AIが他ユーザーの課題を自動スキャンして<strong style={{ color: 'white' }}>対応できる案件</strong>を届けます。
-                </p>
-                <Link
-                  href="/agent"
-                  className="inline-block text-xs font-bold px-4 py-2 rounded-xl transition hover:opacity-90"
-                  style={{ background: 'white', color: '#E8601C', textDecoration: 'none' }}
-                >
-                  案件を探させる →
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* バーチャルオフィス バナー */}
-        {cards.length > 0 && (
-          <div
-            className="rounded-2xl p-5"
-            style={{
-              background: 'linear-gradient(135deg, #1C0F05 0%, #2C1A08 100%)',
-              boxShadow: '0 6px 24px rgba(28,15,5,0.35)',
-            }}
-          >
-            <div className="flex items-start gap-4">
-              <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'rgba(232,96,28,0.2)', border: '1px solid rgba(232,96,28,0.3)' }}
-              >
-                <span style={{ fontSize: 24 }}>🏢</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="mb-1">
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full inline-block mb-1" style={{ background: 'rgba(232,96,28,0.3)', color: '#F5903A', whiteSpace: 'nowrap' }}>先着無料</span>
-                  <h3 className="font-black text-sm" style={{ color: 'white' }}>バーチャルオフィスに入居する</h3>
-                </div>
-                <p className="text-xs leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                  関東・関西の仮想ビルに窓口を構える。名刺を渡さなくても、<strong style={{ color: 'white' }}>相手がその場でAIと話せます。</strong>
-                </p>
-                <Link
-                  href="/virtual-office"
-                  className="inline-block text-xs font-bold px-4 py-2 rounded-xl transition hover:opacity-90"
-                  style={{ background: '#E8601C', color: 'white', textDecoration: 'none' }}
-                >
-                  空き状況を見る →
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* AIを育てる 機能アピールバナー */}
-        {cards.length > 0 && (
-          <div
-            className="rounded-2xl p-5"
-            style={{
-              background: 'linear-gradient(135deg, rgba(242,103,34,0.08) 0%, rgba(242,103,34,0.12) 100%)',
-              border: '1.5px solid rgba(242,103,34,0.2)',
-            }}
-          >
-            <div className="flex items-start gap-4">
-              <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg, #F26722, #F59340)', boxShadow: '0 4px 12px rgba(242,103,34,0.35)' }}
-              >
-                <span style={{ fontSize: 22 }}>🧠</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="mb-1">
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full inline-block mb-1" style={{ background: 'rgba(242,103,34,0.12)', color: '#F26722' }}>New</span>
-                  <h3 className="font-black text-sm" style={{ color: '#1C0F05' }}>AIの回答を、あなたの言葉に直す</h3>
-                </div>
-                <p className="text-xs leading-relaxed mb-3" style={{ color: '#6B7280' }}>
-                  AIの回答に「惜しい」と感じたとき、正解を一言添えるだけ。<br />
-                  次回から、あなたらしい答え方に変わります。
-                </p>
-                <a
-                  href="#sessions"
-                  className="inline-block text-xs font-bold px-4 py-2 rounded-xl transition"
-                  style={{
-                    background: 'linear-gradient(135deg, #F26722, #F59340)',
-                    color: 'white',
-                    boxShadow: '0 2px 8px rgba(242,103,34,0.3)',
-                    textDecoration: 'none',
-                  }}
-                >
-                  回答を磨きに行く →
-                </a>
-              </div>
-            </div>
-            <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(242,103,34,0.15)' }}>
-              <p className="text-xs font-bold mb-2" style={{ color: '#A08068' }}>AIを鍛える3つの方法</p>
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { icon: '📚', title: 'スキル登録', desc: '専門領域をAIに伝える' },
-                  { icon: '💼', title: '案件事例', desc: '実績をストーリーで学習' },
-                  { icon: '✏️', title: '回答修正', desc: '惜しい回答を直接直す' },
-                ].map(({ icon, title, desc }) => (
-                  <div key={title} className="rounded-xl p-2.5 text-center"
-                    style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(242,103,34,0.1)' }}>
-                    <div style={{ fontSize: 18, marginBottom: 4 }}>{icon}</div>
-                    <p className="text-xs font-bold" style={{ color: '#1C0F05' }}>{title}</p>
-                    <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>{desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* ── アポイント一覧 ── */}
         {appointments.length > 0 && (
@@ -1503,6 +1410,21 @@ export default function DashboardPage() {
                 )
               })}
             </div>
+            {/* もっと見る */}
+            {sessionHasMore && !sessionSearch && sessionStatusFilter === 'all' && (
+              <button
+                type="button"
+                onClick={handleLoadMoreSessions}
+                disabled={sessionLoadingMore}
+                style={{
+                  width: '100%', padding: '12px', borderRadius: 14, fontSize: 13, fontWeight: 700,
+                  background: 'white', border: '1.5px solid #EDD9C8', color: '#A08068',
+                  cursor: sessionLoadingMore ? 'not-allowed' : 'pointer', marginTop: 8,
+                }}
+              >
+                {sessionLoadingMore ? '読み込み中...' : 'もっと見る'}
+              </button>
+            )}
           </div>
         )}
       </div>
