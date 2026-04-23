@@ -71,6 +71,7 @@ export default function SetupPage() {
   })
 
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
+  const [saveError, setSaveError] = useState('')
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -121,6 +122,7 @@ export default function SetupPage() {
   /* ── 保存 ── */
   const savePersona = async () => {
     if (!cardData.full_name || !draft) return
+    setSaveError('')
     setStep('saving')
     const tone = draft.tones.find(t => t.id === selToneId)
     const value = draft.values.find(v => v.id === selValueId)
@@ -139,9 +141,19 @@ export default function SetupPage() {
         }),
       })
       const data = await res.json()
-      if (data.personaId) { setStep('done') }
-      else setStep('select')
-    } catch { setStep('select') }
+      if (data.personaId) {
+        setStep('done')
+      } else if (data.upgradeRequired) {
+        setStep('card')
+        setSaveError('すでに分身AIを作成済みです。ダッシュボードから編集してください。')
+      } else {
+        setStep('card')
+        setSaveError(data.message ?? '保存に失敗しました。もう一度お試しください。')
+      }
+    } catch {
+      setStep('card')
+      setSaveError('通信エラーが発生しました。もう一度お試しください。')
+    }
   }
 
   /* ════════════════════════════════
@@ -705,6 +717,14 @@ export default function SetupPage() {
                 />
               </div>
             ))}
+            {saveError && (
+              <div style={{
+                background: '#FEE2E2', color: '#B91C1C', borderRadius: 10,
+                padding: '12px 14px', fontSize: 13, fontWeight: 600, marginTop: 4,
+              }}>
+                {saveError}
+              </div>
+            )}
             <button
               type="button"
               onClick={savePersona}
