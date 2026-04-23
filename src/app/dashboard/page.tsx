@@ -698,7 +698,7 @@ export default function DashboardPage() {
           </button>
         </div>
       )}
-      {notifPermission === 'granted' && pushRegistered && (
+      {notifPermission === 'granted' && (
         <div style={{ background: '#F0FDF4', borderBottom: '1px solid #BBF7D0', padding: '8px 20px', fontSize: 11, color: '#166534', display: 'flex', alignItems: 'center', gap: 6 }}>
           ✅ 通知設定済み — お客様が話しかけると通知が届きます
         </div>
