@@ -181,7 +181,7 @@ export default function EditPersonaPage() {
       {/* Header */}
       <div className="sticky top-0 z-10" style={{ background: 'white', borderBottom: '1px solid #EDD9C8' }}>
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">
-          <button
+          <button type="button"
             onClick={() => router.push('/dashboard')}
             style={{
               width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center',
@@ -216,7 +216,7 @@ export default function EditPersonaPage() {
             {TONE_PRESETS.map(preset => {
               const selected = tonePreset === preset.id
               return (
-                <button
+                <button type="button"
                   key={preset.id}
                   onClick={() => setTonePreset(preset.id)}
                   style={{
@@ -235,7 +235,7 @@ export default function EditPersonaPage() {
               )
             })}
             {/* カスタム */}
-            <button
+            <button type="button"
               onClick={() => setTonePreset('custom')}
               style={{
                 padding: '12px 10px', borderRadius: 12, textAlign: 'left',
@@ -362,7 +362,7 @@ export default function EditPersonaPage() {
                   {group.items.map(item => {
                     const selected = skills.includes(item)
                     return (
-                      <button
+                      <button type="button"
                         key={item}
                         onClick={() => {
                           if (selected) {
@@ -407,7 +407,7 @@ export default function EditPersonaPage() {
                   onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.background = '#fff' }}
                   onBlur={e => { e.target.style.borderColor = '#DEC4AD'; e.target.style.background = '#FAF5F0' }}
                 />
-                <button
+                <button type="button"
                   onClick={() => addSkill(kwInput)}
                   disabled={!kwInput.trim()}
                   style={{
@@ -434,7 +434,7 @@ export default function EditPersonaPage() {
                     style={{ background: '#1C0F05', color: 'white' }}
                   >
                     {sk}
-                    <button
+                    <button type="button"
                       onClick={() => setSkills(p => p.filter(s => s !== sk))}
                       style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1 }}
                     >×</button>
@@ -452,7 +452,7 @@ export default function EditPersonaPage() {
               <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>よく来る質問を先読みする</h2>
               <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>ここに仕込んでおくと、AIが24時間代わりに答えます</p>
             </div>
-            <button
+            <button type="button"
               onClick={addFaq}
               style={{
                 fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 10,
@@ -472,7 +472,7 @@ export default function EditPersonaPage() {
               <div key={faq.id} className="card p-4 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-black" style={{ color: '#F26722' }}>FAQ {idx + 1}</span>
-                  <button
+                  <button type="button"
                     onClick={() => removeFaq(faq.id)}
                     style={{ color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
                   >削除</button>
@@ -525,7 +525,7 @@ export default function EditPersonaPage() {
               <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>実績・プロジェクト事例</h2>
               <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>「何を変えたか」を数字で書くと、相手の信頼が変わります</p>
             </div>
-            <button
+            <button type="button"
               onClick={addProject}
               style={{
                 fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 10,
@@ -543,7 +543,7 @@ export default function EditPersonaPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-black" style={{ color: '#F26722' }}>案件 {idx + 1}</span>
                   {projects.length > 1 && (
-                    <button
+                    <button type="button"
                       onClick={() => removeProject(proj.id)}
                       style={{ color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', fontSize: 12 }}
                     >
@@ -589,7 +589,7 @@ export default function EditPersonaPage() {
 
         {/* 保存ボタン */}
         <div className="flex gap-3 pb-8">
-          <button
+          <button type="button"
             onClick={() => router.push('/dashboard')}
             style={{
               flex: 1, padding: '13px', fontSize: 14, fontWeight: 600,
@@ -599,7 +599,7 @@ export default function EditPersonaPage() {
           >
             キャンセル
           </button>
-          <button
+          <button type="button"
             onClick={handleSave}
             disabled={saving}
             style={{
