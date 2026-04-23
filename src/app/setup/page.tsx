@@ -197,6 +197,7 @@ export default function SetupPage() {
               <div className="flex flex-wrap gap-2">
                 {INDUSTRIES.map(ind => (
                   <button
+                    type="button"
                     key={ind}
                     onClick={() => setQIndustry(ind)}
                     style={{
@@ -236,6 +237,7 @@ export default function SetupPage() {
                         const selected = keywords.includes(item)
                         return (
                           <button
+                            type="button"
                             key={item}
                             onClick={() => {
                               if (selected) setKeywords(p => p.filter(k => k !== item))
@@ -261,21 +263,41 @@ export default function SetupPage() {
               </div>
 
               {/* 自由入力 */}
+              {/* カスタム追加済みキーワード */}
+              {keywords.filter(k => !KEYWORD_PRESETS.flatMap(g => g.items).includes(k)).length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+                  {keywords.filter(k => !KEYWORD_PRESETS.flatMap(g => g.items).includes(k)).map(kw => (
+                    <span key={kw} style={{
+                      background: '#1C0F05', color: 'white', fontSize: 12, fontWeight: 600,
+                      padding: '4px 10px', borderRadius: 20, display: 'flex', alignItems: 'center', gap: 4,
+                    }}>
+                      {kw}
+                      <button
+                        type="button"
+                        onClick={() => setKeywords(p => p.filter(k => k !== kw))}
+                        style={{ color: 'rgba(255,255,255,0.6)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, lineHeight: 1 }}
+                      >×</button>
+                    </span>
+                  ))}
+                </div>
+              )}
+
               {keywords.length < 6 && (
                 <div className="flex gap-2" style={{ borderTop: '1px solid #EDD9C8', paddingTop: 10 }}>
                   <input
                     type="text" value={kwInput}
                     onChange={e => setKwInput(e.target.value)}
                     onKeyDown={handleKwKey}
-                    onBlur={() => kwInput && addKeyword(kwInput)}
                     placeholder="例: 補助金, 中国語, ..."
                     style={{
                       flex: 1, padding: '8px 12px', fontSize: 13, borderRadius: 8,
                       border: '1.5px solid #DEC4AD', background: '#FAF5F0', color: '#1C0F05', outline: 'none',
                     }}
                     onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.background = 'white' }}
+                    onBlur={e => { e.target.style.borderColor = '#DEC4AD'; e.target.style.background = '#FAF5F0' }}
                   />
                   <button
+                    type="button"
                     onClick={() => addKeyword(kwInput)}
                     disabled={!kwInput.trim()}
                     style={{
@@ -290,6 +312,7 @@ export default function SetupPage() {
             </div>
 
             <button
+              type="button"
               onClick={generateDraft}
               disabled={!canGenerate}
               style={{
