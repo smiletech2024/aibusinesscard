@@ -112,18 +112,19 @@ function CreditsContent() {
           ) : (
             <>
               <div style={{ fontSize: 12, color: '#A08068', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>現在の残高</div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexWrap: 'nowrap' }}>
                 <span style={{
-                  fontSize: 42,
+                  fontSize: 40,
                   fontWeight: 800,
                   color: balanceEmpty ? '#EF4444' : balanceLow ? '#F59E0B' : '#1C0F05',
                   lineHeight: 1,
+                  whiteSpace: 'nowrap',
                 }}>
                   {tokensToConversations(balance ?? 0)}
                 </span>
-                <span style={{ fontSize: 15, color: '#A08068', fontWeight: 600 }}>のAI会話</span>
-                <div style={{ fontSize: 12, color: '#A08068', marginTop: 4 }}>{formatTokens(balance ?? 0)}トークン</div>
+                <span style={{ fontSize: 15, color: '#A08068', fontWeight: 600, whiteSpace: 'nowrap' }}>のAI会話</span>
               </div>
+              <div style={{ fontSize: 12, color: '#A08068', marginTop: 6 }}>{formatTokens(balance ?? 0)}トークン</div>
               {balanceEmpty && (
                 <div style={{ marginTop: 8, fontSize: 13, color: '#EF4444', fontWeight: 600 }}>
                   ⚠️ 残高がありません。分身AIが応答できない状態です。
