@@ -157,6 +157,11 @@ const IconGlobe = () => (
     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
   </svg>
 )
+const IconLocation = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>
+  </svg>
+)
 
 /* ─── QRコード SVG レンダラー (全デバイス対応) ─── */
 // canvas は iOS Safari で描画失敗するケースがあるため、
@@ -298,6 +303,12 @@ function ExecutiveFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 
               {card.website.replace(/https?:\/\//, '')}
             </div>
           )}
+          {card.address && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#4A2C1A', fontSize: 19 }}>
+              <span style={{ color: '#F26722' }}><IconLocation /></span>
+              {card.address}
+            </div>
+          )}
         </div>
       </div>
 
@@ -417,6 +428,11 @@ function MidnightFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 1
               <span style={{ color: '#F5A47A' }}><IconGlobe /></span> {card.website.replace(/https?:\/\//, '')}
             </div>
           )}
+          {card.address && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.55)', fontSize: 19 }}>
+              <span style={{ color: '#F5A47A' }}><IconLocation /></span> {card.address}
+            </div>
+          )}
         </div>
       </div>
 
@@ -524,6 +540,11 @@ function VividFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }
               <IconGlobe /> {card.website.replace(/https?:\/\//, '')}
             </div>
           )}
+          {card.address && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.75)', fontSize: 19 }}>
+              <IconLocation /> {card.address}
+            </div>
+          )}
         </div>
       </div>
 
@@ -602,6 +623,7 @@ function OceanFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }
           {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19 }}><span style={{ color: '#7EF2E8' }}><IconMail /></span>{card.email}</div>}
           {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19 }}><span style={{ color: '#7EF2E8' }}><IconPhone /></span>{card.phone}</div>}
           {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19 }}><span style={{ color: '#7EF2E8' }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
+          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19 }}><span style={{ color: '#7EF2E8' }}><IconLocation /></span>{card.address}</div>}
         </div>
       </div>
       {qrUrl && (
@@ -665,6 +687,7 @@ function ForestFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 
           {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19 }}><span style={{ color: '#6EE7B7' }}><IconMail /></span>{card.email}</div>}
           {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19 }}><span style={{ color: '#6EE7B7' }}><IconPhone /></span>{card.phone}</div>}
           {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19 }}><span style={{ color: '#6EE7B7' }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
+          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19 }}><span style={{ color: '#6EE7B7' }}><IconLocation /></span>{card.address}</div>}
         </div>
       </div>
       {qrUrl && (
@@ -728,6 +751,7 @@ function CrimsonFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14
           {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.65)', fontSize: 19 }}><span style={{ color: '#FECDD3' }}><IconMail /></span>{card.email}</div>}
           {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.65)', fontSize: 19 }}><span style={{ color: '#FECDD3' }}><IconPhone /></span>{card.phone}</div>}
           {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.65)', fontSize: 19 }}><span style={{ color: '#FECDD3' }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
+          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.65)', fontSize: 19 }}><span style={{ color: '#FECDD3' }}><IconLocation /></span>{card.address}</div>}
         </div>
       </div>
       {qrUrl && (
@@ -794,6 +818,7 @@ function GoldFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }:
           {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(245,230,163,0.6)', fontSize: 19 }}><span style={{ color: '#D4AF37' }}><IconMail /></span>{card.email}</div>}
           {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(245,230,163,0.6)', fontSize: 19 }}><span style={{ color: '#D4AF37' }}><IconPhone /></span>{card.phone}</div>}
           {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(245,230,163,0.6)', fontSize: 19 }}><span style={{ color: '#D4AF37' }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
+          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(245,230,163,0.6)', fontSize: 19 }}><span style={{ color: '#D4AF37' }}><IconLocation /></span>{card.address}</div>}
         </div>
       </div>
       {qrUrl && (
@@ -864,6 +889,7 @@ function PinkFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }:
           {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#9D174D', fontSize: 19 }}><span style={{ color: '#EC4899' }}><IconMail /></span>{card.email}</div>}
           {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#9D174D', fontSize: 19 }}><span style={{ color: '#EC4899' }}><IconPhone /></span>{card.phone}</div>}
           {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#9D174D', fontSize: 19 }}><span style={{ color: '#EC4899' }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
+          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#9D174D', fontSize: 19 }}><span style={{ color: '#EC4899' }}><IconLocation /></span>{card.address}</div>}
         </div>
       </div>
       {qrUrl && (
@@ -926,6 +952,7 @@ function CenteredFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 1
           {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: textContact, fontSize: 19 }}><span style={{ color: accent }}><IconMail /></span>{card.email}</div>}
           {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: textContact, fontSize: 19 }}><span style={{ color: accent }}><IconPhone /></span>{card.phone}</div>}
           {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: textContact, fontSize: 19 }}><span style={{ color: accent }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
+          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: textContact, fontSize: 19 }}><span style={{ color: accent }}><IconLocation /></span>{card.address}</div>}
         </div>
       </div>
       {/* QR + ブランド — 右下 */}
@@ -980,6 +1007,7 @@ function SplitFront({ card, qrUrl, fontFamily, logoUrl, logoX = SPLIT_X + 18, lo
             {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: rightSecondary, fontSize: 19 }}><span style={{ color: accent }}><IconMail /></span>{card.email}</div>}
             {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: rightSecondary, fontSize: 19 }}><span style={{ color: accent }}><IconPhone /></span>{card.phone}</div>}
             {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: rightSecondary, fontSize: 19 }}><span style={{ color: accent }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
+            {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: rightSecondary, fontSize: 19 }}><span style={{ color: accent }}><IconLocation /></span>{card.address}</div>}
           </div>
         </div>
         {qrUrl && (

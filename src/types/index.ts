@@ -47,6 +47,7 @@ export interface BusinessCard {
   email: string | null
   phone: string | null
   website: string | null
+  address: string | null
   qr_url: string | null
   cta_label: string | null
   cta_url: string | null
