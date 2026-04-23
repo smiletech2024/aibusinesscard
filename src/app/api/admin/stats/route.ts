@@ -42,6 +42,8 @@ export async function GET() {
     needsResult,
     skillsResult,
     matchesResult,
+    aiMsgAllResult,
+    aiMsgMonthResult,
   ] = await Promise.all([
     // 総ユーザー数
     admin.from('profiles').select('*', { count: 'exact', head: true }),
@@ -74,6 +76,9 @@ export async function GET() {
     admin.from('user_needs').select('*', { count: 'exact', head: true }).eq('is_active', true),
     admin.from('user_skills').select('*', { count: 'exact', head: true }).eq('is_active', true),
     admin.from('agent_matches').select('*', { count: 'exact', head: true }),
+    // AIメッセージ数（実際のやりとり回数）
+    admin.from('ai_conversations').select('*', { count: 'exact', head: true }).eq('role', 'assistant'),
+    admin.from('ai_conversations').select('*', { count: 'exact', head: true }).eq('role', 'assistant').gte('created_at', startOfMonth),
   ])
 
   // MRR計算
@@ -131,6 +136,8 @@ export async function GET() {
       total:      sessionsAllResult.count ?? 0,
       thisMonth:  sessionsThisMonthResult.count ?? 0,
       dailyLast30,
+      aiMsgTotal:    aiMsgAllResult.count   ?? 0,
+      aiMsgThisMonth: aiMsgMonthResult.count ?? 0,
     },
     activeUsers30d: activeUserCount,
     tokens: {

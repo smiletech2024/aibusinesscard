@@ -8,7 +8,7 @@ import { formatTokens, tokensToConversations } from '@/lib/credits'
 type Stats = {
   users: { total: number; newThisMonth: number; newLastMonth: number; momGrowthPct: number }
   subscriptions: { byPlan: Record<string, number>; totalPaying: number; mrr: number }
-  sessions: { total: number; thisMonth: number; dailyLast30: { day: string; count: number }[] }
+  sessions: { total: number; thisMonth: number; dailyLast30: { day: string; count: number }[]; aiMsgTotal: number; aiMsgThisMonth: number }
   activeUsers30d: number
   tokens: { totalConsumed: number; totalPurchased: number; totalSubBalance: number; totalPaidBalance: number }
   cards: number
@@ -497,10 +497,12 @@ export default function AdminPage() {
 
             <div style={{ fontSize: 11, color: '#64748B', fontWeight: 700, letterSpacing: '0.06em', marginBottom: 8 }}>AI会話</div>
             <div style={{ display: 'grid', gridTemplateColumns: gridCols, gap: 10, marginBottom: 20 }}>
-              <KpiCard label="累計セッション" value={stats.sessions.total.toLocaleString('ja-JP')} />
-              <KpiCard label="今月のセッション" value={stats.sessions.thisMonth.toLocaleString('ja-JP')} />
+              <KpiCard label="累計AIメッセージ" value={stats.sessions.aiMsgTotal.toLocaleString('ja-JP')} sub="AIの返答回数" color="#F26722" />
+              <KpiCard label="今月のAIメッセージ" value={stats.sessions.aiMsgThisMonth.toLocaleString('ja-JP')} sub="今月の返答回数" color="#F59340" />
+              <KpiCard label="累計セッション" value={stats.sessions.total.toLocaleString('ja-JP')} sub="訪問者開始数" />
+              <KpiCard label="今月のセッション" value={stats.sessions.thisMonth.toLocaleString('ja-JP')} sub="今月の訪問" />
               <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #EDD9C8', padding: '14px 16px' }}>
-                <div style={{ fontSize: 11, color: '#A08068', fontWeight: 700, marginBottom: 6 }}>過去30日の推移</div>
+                <div style={{ fontSize: 11, color: '#A08068', fontWeight: 700, marginBottom: 6 }}>過去30日の推移（セッション）</div>
                 <Sparkline data={stats.sessions.dailyLast30} />
               </div>
               <KpiCard label="アクティブ名刺" value={stats.cards} sub={`ペルソナ ${stats.personas}個`} />
