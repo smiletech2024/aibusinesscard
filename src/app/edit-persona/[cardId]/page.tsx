@@ -399,14 +399,13 @@ export default function EditPersonaPage() {
                   type="text" value={kwInput}
                   onChange={e => setKwInput(e.target.value)}
                   onKeyDown={handleKwKey}
-                  onBlur={() => kwInput && addSkill(kwInput)}
                   placeholder="例: 補助金申請, 中国語, ..."
                   style={{
                     flex: 1, padding: '8px 12px', fontSize: 13, borderRadius: 8,
                     border: '1.5px solid #DEC4AD', background: '#FAF5F0', color: '#1C0F05', outline: 'none',
                   }}
                   onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.background = '#fff' }}
-                  onBlurCapture={e => { e.target.style.borderColor = '#DEC4AD'; e.target.style.background = '#FAF5F0' }}
+                  onBlur={e => { e.target.style.borderColor = '#DEC4AD'; e.target.style.background = '#FAF5F0' }}
                 />
                 <button
                   onClick={() => addSkill(kwInput)}
