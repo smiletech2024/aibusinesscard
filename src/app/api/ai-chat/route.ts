@@ -3,6 +3,10 @@ import { deepseek, anthropic, MODEL, FALLBACK_MODEL, getAvatarSystemPrompt } fro
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { calcTokensConsumed } from '@/lib/credits'
+import { logger } from '@/lib/logger'
+
+// コンテキストウィンドウ爆発防止：直近20メッセージ（10往復）のみAIへ送信
+const MAX_CONTEXT_MESSAGES = 20
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,7 +33,6 @@ export async function POST(req: NextRequest) {
     if (sessionId) {
       const oneMinuteAgo = new Date(Date.now() - 60_000).toISOString()
 
-      // 直近1分のメッセージ数
       const { count: recentCount } = await admin
         .from('ai_conversations')
         .select('id', { count: 'exact', head: true })
@@ -44,7 +47,6 @@ export async function POST(req: NextRequest) {
         )
       }
 
-      // セッション累計メッセージ上限（トークン枯渇防止）
       const { count: totalCount } = await admin
         .from('ai_conversations')
         .select('id', { count: 'exact', head: true })
@@ -59,17 +61,14 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── トークン残高チェック（サブスク残高 + 購入残高）────────────
+    // ── トークン残高チェック ──────────────────────────────────────
     const { data: credits } = await admin
       .from('user_credits')
       .select('balance, sub_balance')
       .eq('user_id', ownerId)
       .maybeSingle()
 
-    const subBalance      = credits?.sub_balance ?? 0
-    const purchasedBalance = credits?.balance    ?? 0
-    const totalBalance     = subBalance + purchasedBalance
-
+    const totalBalance = (credits?.sub_balance ?? 0) + (credits?.balance ?? 0)
     if (totalBalance <= 0) {
       return NextResponse.json(
         {
@@ -89,7 +88,6 @@ export async function POST(req: NextRequest) {
     const ownerName  = card?.full_name || (persona.profiles as { full_name?: string } | null)?.full_name || 'オーナー'
     const ownerTitle = card?.title || ''
 
-    // 最新情報（quick_updates）を取得
     const { data: quickUpdates } = await admin
       .from('quick_updates')
       .select('content, created_at')
@@ -115,9 +113,15 @@ export async function POST(req: NextRequest) {
       })
     }
 
+    // コンテキスト爆発防止：直近 MAX_CONTEXT_MESSAGES 件のみ送信
+    const contextMessages = Array.isArray(messages)
+      ? messages.slice(-MAX_CONTEXT_MESSAGES)
+      : messages
+
     let fullText         = ''
     let promptTokens     = 0
     let completionTokens = 0
+    let usedFallback     = false
 
     // DeepSeek を試みて失敗したら Anthropic Claude にフォールバック
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -133,17 +137,18 @@ export async function POST(req: NextRequest) {
         stream_options: { include_usage: true },
         messages: [
           { role: 'system', content: systemPrompt },
-          ...messages,
+          ...contextMessages,
         ],
       })
     } catch (deepseekErr) {
-      console.error('[ai-chat] DeepSeek unavailable, falling back to Anthropic:', deepseekErr)
+      usedFallback = true
+      logger.warn('ai-chat:deepseek_fallback', { persona_id: personaId, reason: String(deepseekErr) })
       anthropicStream = await anthropic.messages.create({
         model:      FALLBACK_MODEL,
         max_tokens: 1024,
         stream:     true,
         system:     systemPrompt,
-        messages,
+        messages:   contextMessages,
       })
     }
 
@@ -181,7 +186,7 @@ export async function POST(req: NextRequest) {
             }
           }
         } catch (streamErr) {
-          console.error('[ai-chat] Stream iteration error:', streamErr)
+          logger.error('ai-chat:stream_error', streamErr, { session_id: sessionId })
         }
 
         // AIレスポンスを保存
@@ -193,37 +198,49 @@ export async function POST(req: NextRequest) {
           })
         }
 
-        // ── トークン消費：サブスク残高を先に使い、不足分は購入残高から ──
+        // ── トークン消費（原子的 RPC で競合状態を解消）────────────
         const consumed = calcTokensConsumed(promptTokens, completionTokens)
         if (consumed > 0) {
+          // RPC で FOR UPDATE ロック付き原子的デクリメント
+          const { error: rpcErr } = await admin.rpc('deduct_tokens', {
+            p_user_id:  ownerId,
+            p_consumed: consumed,
+          })
+
+          if (rpcErr) {
+            // RPC 未作成の環境では旧来のロジックにフォールバック
+            logger.warn('ai-chat:rpc_deduct_fallback', { error: rpcErr.message })
+            const { data: latest } = await admin
+              .from('user_credits')
+              .select('balance, sub_balance, total_used')
+              .eq('user_id', ownerId)
+              .maybeSingle()
+            if (latest) {
+              const fromSub  = Math.min(latest.sub_balance, consumed)
+              const fromPaid = Math.max(0, consumed - fromSub)
+              await admin.from('user_credits').update({
+                sub_balance: Math.max(0, latest.sub_balance - fromSub),
+                balance:     Math.max(0, latest.balance     - fromPaid),
+                total_used:  latest.total_used + consumed,
+              }).eq('user_id', ownerId)
+            }
+          }
+
           await admin.from('credit_transactions').insert({
             user_id:           ownerId,
             amount:            -consumed,
             type:              'usage',
-            description:       `分身AI会話 (入力${promptTokens}+出力${completionTokens}トークン)`,
+            description:       `分身AI会話${usedFallback ? '[fallback]' : ''} (入力${promptTokens}+出力${completionTokens}トークン)`,
             prompt_tokens:     promptTokens,
             completion_tokens: completionTokens,
             persona_id:        personaId,
           })
 
-          // 最新残高を再取得して更新
-          const { data: latest } = await admin
-            .from('user_credits')
-            .select('balance, sub_balance, total_used')
-            .eq('user_id', ownerId)
-            .maybeSingle()
-
-          if (latest) {
-            // サブスク残高から先に消費
-            const fromSub  = Math.min(latest.sub_balance, consumed)
-            const fromPaid = Math.max(0, consumed - fromSub)
-
-            await admin.from('user_credits').update({
-              sub_balance: Math.max(0, latest.sub_balance - fromSub),
-              balance:     Math.max(0, latest.balance     - fromPaid),
-              total_used:  latest.total_used + consumed,
-            }).eq('user_id', ownerId)
-          }
+          logger.info('ai-chat:tokens_consumed', {
+            owner_id: ownerId,
+            consumed,
+            model: usedFallback ? FALLBACK_MODEL : MODEL,
+          })
         }
 
         controller.close()
@@ -234,7 +251,7 @@ export async function POST(req: NextRequest) {
       headers: { 'Content-Type': 'text/plain; charset=utf-8' }
     })
   } catch (error) {
-    console.error('AI chat error:', error)
+    logger.error('ai-chat:unhandled', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { PLANS, canStartSession, type PlanId } from '@/lib/plans'
+import { logger } from '@/lib/logger'
 import webpush from 'web-push'
 
 export async function POST(req: NextRequest) {
@@ -46,15 +47,23 @@ export async function POST(req: NextRequest) {
       const plan   = PLANS[planId]
 
       if (plan.maxSessionsPerMonth !== -1) {
-        // 今月のセッション数を取得
+        // 今月のセッション数をユーザー全ペルソナ横断で集計
+        // （ペルソナ単位の集計だと複数ペルソナで上限を回避できてしまう）
         const startOfMonth = new Date()
         startOfMonth.setDate(1)
         startOfMonth.setHours(0, 0, 0, 0)
 
+        const { data: userPersonas } = await admin
+          .from('personas')
+          .select('id')
+          .eq('user_id', persona.user_id)
+
+        const allPersonaIds = userPersonas?.map(p => p.id) ?? [personaId]
+
         const { count } = await admin
           .from('customer_sessions')
           .select('*', { count: 'exact', head: true })
-          .eq('persona_id', personaId)
+          .in('persona_id', allPersonaIds)
           .gte('created_at', startOfMonth.toISOString())
 
         if (!canStartSession(planId, count ?? 0)) {
@@ -115,7 +124,7 @@ export async function POST(req: NextRequest) {
         }
       } catch (pushErr) {
         // 通知失敗はセッション作成に影響させない
-        console.error('Owner push notification failed:', pushErr)
+        logger.error('session:push_notify_failed', pushErr, { persona_id: personaId })
       }
     }
 
