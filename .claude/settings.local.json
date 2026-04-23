@@ -69,7 +69,8 @@
       "Bash(pkill -f \"next build\")",
       "Bash(grep -n 'card.website && \\( *)",
       "Read(//Users/tsuyoshigoto/.config/**)",
-      "Bash(curl -s \"https://aimeishi.biz/api/admin/stats\" -H \"Cookie: $\\(cat ~/.config/aimeishi-admin-cookie \\)\")"
+      "Bash(curl -s \"https://aimeishi.biz/api/admin/stats\" -H \"Cookie: $\\(cat ~/.config/aimeishi-admin-cookie \\)\")",
+      "Bash(grep -v \"^$\")"
     ]
   }
 }

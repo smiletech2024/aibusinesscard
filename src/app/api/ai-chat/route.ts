@@ -25,6 +25,40 @@ export async function POST(req: NextRequest) {
 
     const ownerId = persona.user_id as string
 
+    // ── レートリミット：セッション単位で過剰メッセージを防ぐ ──────
+    if (sessionId) {
+      const oneMinuteAgo = new Date(Date.now() - 60_000).toISOString()
+
+      // 直近1分のメッセージ数
+      const { count: recentCount } = await admin
+        .from('ai_conversations')
+        .select('id', { count: 'exact', head: true })
+        .eq('session_id', sessionId)
+        .eq('role', 'user')
+        .gte('created_at', oneMinuteAgo)
+
+      if ((recentCount ?? 0) >= 10) {
+        return NextResponse.json(
+          { error: 'RATE_LIMIT', message: '送信が速すぎます。少し待ってからもう一度お試しください。' },
+          { status: 429 }
+        )
+      }
+
+      // セッション累計メッセージ上限（トークン枯渇防止）
+      const { count: totalCount } = await admin
+        .from('ai_conversations')
+        .select('id', { count: 'exact', head: true })
+        .eq('session_id', sessionId)
+        .eq('role', 'user')
+
+      if ((totalCount ?? 0) >= 80) {
+        return NextResponse.json(
+          { error: 'SESSION_LIMIT', message: 'この会話は上限に達しました。まとめへ進んでください。' },
+          { status: 429 }
+        )
+      }
+    }
+
     // ── トークン残高チェック（サブスク残高 + 購入残高）────────────
     const { data: credits } = await admin
       .from('user_credits')

@@ -1,7 +1,9 @@
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { Logo } from '@/components/Logo'
 import SiteFooter from '@/components/SiteFooter'
 import VirtualOfficeTeaser from '@/components/VirtualOfficeTeaser'
+import { RefCapture } from '@/components/RefCapture'
 
 /* ─────────────────────────────────────────────
    Hermès Orange × Leather — カラーパレット
@@ -27,6 +29,7 @@ export default function HomePage() {
         `,
       }}
     >
+      <Suspense fallback={null}><RefCapture /></Suspense>
       {/* ─── Nav ─── */}
       <nav
         className="flex items-center justify-between px-6 py-5 max-w-5xl mx-auto w-full"

@@ -98,6 +98,7 @@ export default function SummaryPage() {
   const [session, setSession] = useState<CustomerSession | null>(null)
   const [summary, setSummary] = useState<ConversationSummary | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isOwner, setIsOwner] = useState(false)
   const supabase = createClient()
 
   useEffect(() => { loadData() }, [sessionId])
@@ -111,6 +112,14 @@ export default function SummaryPage() {
       .from('conversation_summaries').select('*').eq('session_id', sessionId)
       .order('created_at', { ascending: false }).limit(1).single()
     if (summaryData) setSummary(summaryData)
+
+    // オーナー判定
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user && sessionData) {
+      const ownerUserId = (sessionData as { personas?: { user_id?: string } }).personas?.user_id
+      setIsOwner(user.id === ownerUserId)
+    }
+
     setLoading(false)
   }
 
@@ -232,8 +241,8 @@ export default function SummaryPage() {
                 const score = parseInt(String(summary.compatibility_score ?? '0'), 10)
                 return (
                   <>
-                    {/* 相性スコア可視化 */}
-                    {!isNaN(score) && score > 0 && (
+                    {/* 相性スコア可視化 — オーナーのみ */}
+                    {isOwner && !isNaN(score) && score > 0 && (
                       <div
                         className="p-4 rounded-xl"
                         style={{
@@ -286,8 +295,8 @@ export default function SummaryPage() {
                       </div>
                     )}
 
-                    {/* BANT分析 */}
-                    {bant && (
+                    {/* BANT分析 — オーナーのみ */}
+                    {isOwner && bant && (
                       <div
                         className="p-4 rounded-xl"
                         style={{
@@ -326,8 +335,8 @@ export default function SummaryPage() {
                       </div>
                     )}
 
-                    {/* フォローアップメッセージ */}
-                    {followUp && (
+                    {/* フォローアップメッセージ — オーナーのみ */}
+                    {isOwner && followUp && (
                       <FollowUpCard message={followUp} ownerName={ownerName} />
                     )}
                   </>

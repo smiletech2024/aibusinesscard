@@ -58,10 +58,11 @@ export default function LoginPage() {
     setMessage('')
     try {
       if (isSignUp) {
+        const referredBy = typeof window !== 'undefined' ? localStorage.getItem('aimeishi_ref') : null
         const res  = await fetch('/api/auth/signup', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ email, password }),
+          body:    JSON.stringify({ email, password, referredBy }),
         })
         const data = await res.json()
         if (res.status === 409) {

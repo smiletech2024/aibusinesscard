@@ -14,7 +14,7 @@ function getAdmin() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json()
+    const { email, password, referredBy } = await req.json()
     if (!email || !password) {
       return NextResponse.json({ error: 'Bad Request' }, { status: 400 })
     }
@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
       type: 'signup',
       email,
       password,
+      options: referredBy ? { data: { referred_by: referredBy } } : undefined,
     })
 
     if (error) {

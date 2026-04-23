@@ -627,6 +627,22 @@ export default function DashboardPage() {
               </span>
             </Link>
 
+            {/* AIエージェント */}
+            <Link
+              href="/agent"
+              title="AIエージェント — ニーズ×スキルマッチング"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                padding: '3px 10px', borderRadius: 99, whiteSpace: 'nowrap', flexShrink: 0,
+                background: 'rgba(124,58,237,0.08)',
+                border: '1.5px solid rgba(124,58,237,0.25)',
+                textDecoration: 'none', fontSize: 11, fontWeight: 700,
+                color: '#7C3AED',
+              }}
+            >
+              <span style={{ fontSize: 12 }}>🤝</span> エージェント
+            </Link>
+
             {/* ログアウト（アイコンのみ） */}
             <button
               onClick={handleLogout}
