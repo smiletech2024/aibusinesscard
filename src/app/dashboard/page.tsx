@@ -1013,9 +1013,9 @@ export default function DashboardPage() {
                 <img src="/interviewer.png" alt="AI" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="mb-1">
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full inline-block mb-1" style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}>New</span>
                   <h3 className="font-black text-sm" style={{ color: 'white' }}>眠っている間に、案件が届く</h3>
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}>New</span>
                 </div>
                 <p className="text-xs leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.85)' }}>
                   スキルを登録すると、AIが他ユーザーの課題を自動スキャンして<strong style={{ color: 'white' }}>対応できる案件</strong>を届けます。
@@ -1049,9 +1049,9 @@ export default function DashboardPage() {
                 <span style={{ fontSize: 24 }}>🏢</span>
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="mb-1">
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full inline-block mb-1" style={{ background: 'rgba(232,96,28,0.3)', color: '#F5903A' }}>先着無料</span>
                   <h3 className="font-black text-sm" style={{ color: 'white' }}>バーチャルオフィスに入居する</h3>
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(232,96,28,0.3)', color: '#F5903A' }}>先着無料</span>
                 </div>
                 <p className="text-xs leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.7)' }}>
                   関東・関西の仮想ビルに窓口を構える。名刺を渡さなくても、<strong style={{ color: 'white' }}>相手がその場でAIと話せます。</strong>
@@ -1085,12 +1085,9 @@ export default function DashboardPage() {
                 <span style={{ fontSize: 22 }}>🧠</span>
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="mb-1">
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full inline-block mb-1" style={{ background: 'rgba(242,103,34,0.12)', color: '#F26722' }}>New</span>
                   <h3 className="font-black text-sm" style={{ color: '#1C0F05' }}>AIの回答を、あなたの言葉に直す</h3>
-                  <span
-                    className="text-xs font-bold px-2 py-0.5 rounded-full"
-                    style={{ background: 'rgba(242,103,34,0.12)', color: '#F26722' }}
-                  >New</span>
                 </div>
                 <p className="text-xs leading-relaxed mb-3" style={{ color: '#6B7280' }}>
                   AIの回答に「惜しい」と感じたとき、正解を一言添えるだけ。<br />
