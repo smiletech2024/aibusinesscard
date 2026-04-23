@@ -327,10 +327,8 @@ export default function VirtualOfficePage() {
                                 className="font-black leading-tight mb-0.5"
                                 style={{
                                   fontSize: 10, color: '#1C0F05', lineHeight: 1.3,
-                                  overflow: 'hidden', display: '-webkit-box',
-                                  WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-                                  wordBreak: 'break-all',
-                                } as React.CSSProperties}
+                                  overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
+                                }}
                               >
                                 {slot.company_name || '（社名）'}
                               </p>
