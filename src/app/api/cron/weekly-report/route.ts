@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
+import { escapeHtml } from '@/lib/html-escape'
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY
 const FROM      = 'AI名刺 <noreply@aimeishi.biz>'
-const SITE_URL  = 'https://www.aimeishi.biz'
+const SITE_URL  = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aimeishi.biz'
 
 function getAdmin() {
   return createServiceClient(
@@ -104,13 +105,15 @@ export async function GET(req: NextRequest) {
           freq[key] = (freq[key] ?? 0) + 1
         }
         const top = Object.entries(freq).sort(([,a],[,b]) => b - a).slice(0, 3)
-        topQText = top.map(([q, c], i) =>
-          `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #F5E8DC">
+        topQText = top.map(([q, c], i) => {
+          // 顧客の発言は HTML エスケープして XSS を防止
+          const safeQ = escapeHtml(q)
+          return `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #F5E8DC">
             <span style="width:20px;height:20px;border-radius:50%;background:#F26722;color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</span>
-            <span style="font-size:13px;color:#1C0F05;flex:1">${q}${q.length >= 40 ? '…' : ''}</span>
+            <span style="font-size:13px;color:#1C0F05;flex:1">${safeQ}${q.length >= 40 ? '…' : ''}</span>
             ${c > 1 ? `<span style="font-size:11px;color:#F26722;font-weight:700;flex-shrink:0">${c}回</span>` : ''}
           </div>`
-        ).join('')
+        }).join('')
       }
 
       // 先週比表示
@@ -128,7 +131,8 @@ export async function GET(req: NextRequest) {
         advice = `🎉 <strong>今週${apptCount}件のアポ依頼</strong>が来ています！早めに連絡して成約につなげましょう。`
       }
 
-      const ownerName = profile.full_name || cardName
+      const ownerName    = escapeHtml(profile.full_name || cardName)
+      const safeCardName = escapeHtml(cardName)
 
       await fetch('https://api.resend.com/emails', {
         method: 'POST',

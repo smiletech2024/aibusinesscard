@@ -26,24 +26,19 @@ export async function POST(req: NextRequest) {
       options: { redirectTo: `${SITE_URL}/auth/confirm` },
     })
 
-    console.log('[send-reset-email] generateLink result:', JSON.stringify({ linkData, linkError }))
-
     if (linkError) {
-      console.error('[send-reset-email] generateLink error:', linkError.message, linkError.status)
-      // デバッグ用：エラーを返す（本番では { ok: true } に戻す）
-      return NextResponse.json({ error: `generateLink failed: ${linkError.message}` }, { status: 500 })
+      console.error('[send-reset-email] generateLink error:', linkError.status)
+      // 内部エラーを漏洩させず一律で成功を返す（メールアドレス存在確認攻撃を防ぐ）
+      return NextResponse.json({ ok: true })
     }
 
     // action_link を使用（supabase.co のverifyエンドポイント経由で認証後 redirectTo へ）
     const actionLink = linkData?.properties?.action_link
     const hashedToken = linkData?.properties?.hashed_token
 
-    console.log('[send-reset-email] action_link:', actionLink?.slice(0, 60))
-    console.log('[send-reset-email] hashed_token:', hashedToken?.slice(0, 20))
-
     if (!hashedToken && !actionLink) {
       console.error('[send-reset-email] no token in response')
-      return NextResponse.json({ error: 'Failed to generate token' }, { status: 500 })
+      return NextResponse.json({ ok: true })
     }
 
     // hashed_token があれば自ドメインのconfirmページへ、なければaction_linkを直接使用
@@ -122,7 +117,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to send' }, { status: 500 })
     }
 
-    console.log(`[send-reset-email] sent to ${email}`)
     return NextResponse.json({ ok: true })
   } catch (err) {
     console.error('[send-reset-email]', err)

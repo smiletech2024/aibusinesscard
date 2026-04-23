@@ -229,24 +229,25 @@ export async function POST(req: NextRequest) {
               consumed,
               hint: 'deduct_tokens RPC が見つかりません。supabase-migration.sql を実行してください',
             })
-            // 課金記録は残しておく（後で手動調整可能）
+            // RPC 失敗時は credit_transactions も挿入しない（台帳ドリフト防止）
+          } else {
+            // RPC 成功時のみ台帳記録（残高と台帳の整合性を保証）
+            await admin.from('credit_transactions').insert({
+              user_id:           ownerId,
+              amount:            -consumed,
+              type:              'usage',
+              description:       `分身AI会話${usedFallback ? '[fallback]' : ''} (入力${promptTokens}+出力${completionTokens}トークン)`,
+              prompt_tokens:     promptTokens,
+              completion_tokens: completionTokens,
+              persona_id:        personaId,
+            })
+
+            logger.info('ai-chat:tokens_consumed', {
+              owner_id: ownerId,
+              consumed,
+              model: usedFallback ? FALLBACK_MODEL : MODEL,
+            })
           }
-
-          await admin.from('credit_transactions').insert({
-            user_id:           ownerId,
-            amount:            -consumed,
-            type:              'usage',
-            description:       `分身AI会話${usedFallback ? '[fallback]' : ''} (入力${promptTokens}+出力${completionTokens}トークン)`,
-            prompt_tokens:     promptTokens,
-            completion_tokens: completionTokens,
-            persona_id:        personaId,
-          })
-
-          logger.info('ai-chat:tokens_consumed', {
-            owner_id: ownerId,
-            consumed,
-            model: usedFallback ? FALLBACK_MODEL : MODEL,
-          })
         }
 
         controller.close()

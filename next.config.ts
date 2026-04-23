@@ -14,6 +14,29 @@ const securityHeaders = [
     key:   'Permissions-Policy',
     value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
   },
+  // HSTS（HTTPS強制 — 1年間 + サブドメイン含む）
+  {
+    key:   'Strict-Transport-Security',
+    value: 'max-age=31536000; includeSubDomains; preload',
+  },
+  // Content Security Policy
+  // 'unsafe-inline' は Next.js の inline script のため必要。nonce ベースに移行する場合は削除可能。
+  {
+    key:   'Content-Security-Policy',
+    value: [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",       // Next.js hydration に必要
+      "style-src 'self' 'unsafe-inline'",                       // CSS-in-JS に必要
+      "img-src 'self' data: blob: https:",                      // QR data URI + 外部画像
+      "font-src 'self' data:",
+      "connect-src 'self' https://*.supabase.co https://api.resend.com https://api.openai.com https://api.deepseek.com https://api.anthropic.com https://api.stripe.com",
+      "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
+      "worker-src 'self' blob:",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "upgrade-insecure-requests",
+    ].join('; '),
+  },
 ]
 
 const nextConfig: NextConfig = {

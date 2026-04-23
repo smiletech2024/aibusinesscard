@@ -9,8 +9,11 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const { personaId, content } = await req.json()
-    if (!personaId || !content?.trim()) {
-      return NextResponse.json({ error: 'Bad Request' }, { status: 400 })
+    if (!personaId || !UUID_RE.test(personaId)) {
+      return NextResponse.json({ error: 'Invalid personaId' }, { status: 400 })
+    }
+    if (!content?.trim() || typeof content !== 'string' || content.length > 1000) {
+      return NextResponse.json({ error: 'content は必須・1000文字以内です' }, { status: 400 })
     }
 
     // ペルソナがこのユーザーのものか確認

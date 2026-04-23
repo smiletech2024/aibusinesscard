@@ -59,7 +59,17 @@ export async function PATCH(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const { id, ...updates } = await req.json()
+    const body = await req.json()
+    const { id } = body
+    if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
+
+    // マスアサインメント防止：許可フィールドのみ更新
+    const ALLOWED = ['category', 'title', 'description', 'ideal_outcome', 'budget_range', 'urgency', 'is_public', 'interview_log'] as const
+    const updates: Record<string, unknown> = {}
+    for (const field of ALLOWED) {
+      if (field in body) updates[field] = body[field]
+    }
+
     const { data, error } = await supabase
       .from('user_needs')
       .update({ ...updates, updated_at: new Date().toISOString() })

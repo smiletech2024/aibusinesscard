@@ -15,6 +15,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid userId' }, { status: 400 })
     }
 
+    // ── ユーザー本人の認証を確認（IDOR防止） ────────────────────────
+    // GETパラメータ経由でuserIdが漏洩しうるため、必ずauthで検証
+    const { createClient: createAuthClient } = await import('@/lib/supabase/server')
+    const supabase = await createAuthClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user || user.id !== userId) {
+      // 未認証または他ユーザーの配信停止は静かに成功を返す（enumeration防止）
+      return NextResponse.json({ ok: true })
+    }
+
     const admin = getAdmin()
 
     // Supabase auth user_metadata に配信停止フラグを保存

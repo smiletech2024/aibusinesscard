@@ -82,13 +82,14 @@ export async function GET() {
   ])
 
   // MRR計算
-  const planCounts: Record<string, number> = { free: 0, solo: 0, growth: 0, scale: 0 }
+  const planCounts: Record<string, number> = { free: 0, solo: 0, pro: 0, growth: 0, scale: 0 }
   for (const row of planDistResult.data ?? []) {
     planCounts[row.plan] = (planCounts[row.plan] ?? 0) + 1
   }
-  const mrr = (planCounts.solo ?? 0) * PLANS.solo.priceJpy
+  const mrr = (planCounts.solo   ?? 0) * PLANS.solo.priceJpy
+             + (planCounts.pro    ?? 0) * PLANS.pro.priceJpy
              + (planCounts.growth ?? 0) * PLANS.growth.priceJpy
-             + (planCounts.scale ?? 0) * PLANS.scale.priceJpy
+             + (planCounts.scale  ?? 0) * PLANS.scale.priceJpy
 
   // 日別セッション集計
   const dailyMap: Record<string, number> = {}
@@ -129,7 +130,7 @@ export async function GET() {
     },
     subscriptions: {
       byPlan:       planCounts,
-      totalPaying:  (planCounts.solo ?? 0) + (planCounts.growth ?? 0) + (planCounts.scale ?? 0),
+      totalPaying:  (planCounts.solo ?? 0) + (planCounts.pro ?? 0) + (planCounts.growth ?? 0) + (planCounts.scale ?? 0),
       mrr,
     },
     sessions: {
