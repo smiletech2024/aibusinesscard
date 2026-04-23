@@ -13,6 +13,7 @@ function CreditsContent() {
   const supabase = createClient()
 
   const [balance, setBalance]           = useState<number | null>(null)
+  const [subBalance, setSubBalance]     = useState(0)
   const [totalUsed, setTotalUsed]       = useState(0)
   const [loading, setLoading]           = useState(true)
   const [purchasing, setPurchasing]     = useState<string | null>(null)
@@ -27,7 +28,8 @@ function CreditsContent() {
       const res = await fetch('/api/credits/balance')
       if (res.ok) {
         const json = await res.json()
-        setBalance(json.balance)
+        setBalance(json.total_balance ?? json.balance)
+        setSubBalance(json.sub_balance ?? 0)
         setTotalUsed(json.total_used)
       }
     } finally {
@@ -130,6 +132,21 @@ function CreditsContent() {
               {balanceLow && !balanceEmpty && (
                 <div style={{ marginTop: 8, fontSize: 13, color: '#F59E0B', fontWeight: 600 }}>
                   ⚠️ 残高が少なくなっています。
+                </div>
+              )}
+              {/* 内訳 */}
+              {(subBalance > 0 || (balance !== null && balance - subBalance > 0)) && (
+                <div style={{ marginTop: 12, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {subBalance > 0 && (
+                    <span style={{ background: '#FFF0E8', color: '#F26722', fontSize: 12, fontWeight: 700, padding: '3px 10px', borderRadius: 99 }}>
+                      月額プラン: {formatTokens(subBalance)}
+                    </span>
+                  )}
+                  {balance !== null && balance - subBalance > 0 && (
+                    <span style={{ background: '#F0F9FF', color: '#0369A1', fontSize: 12, fontWeight: 700, padding: '3px 10px', borderRadius: 99 }}>
+                      購入済み: {formatTokens(balance - subBalance)}
+                    </span>
+                  )}
                 </div>
               )}
               <div style={{ marginTop: 16, display: 'flex', gap: 24, fontSize: 13, color: '#A08068' }}>
