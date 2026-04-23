@@ -58,6 +58,7 @@ export default function SetupPage() {
   const [qIndustry, setQIndustry] = useState('')
   const [keywords, setKeywords] = useState<string[]>([])
   const [kwInput, setKwInput] = useState('')
+  const [qFaq, setQFaq] = useState('')
 
   // Draft & selections
   const [draft, setDraft] = useState<DraftData | null>(null)
@@ -103,7 +104,7 @@ export default function SetupPage() {
     try {
       const res = await fetch('/api/generate-persona-draft', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: qName, title: qTitle, industry: qIndustry, keywords }),
+        body: JSON.stringify({ name: qName, title: qTitle, industry: qIndustry, keywords, faq: qFaq }),
       })
       const data = await res.json()
       if (data.draft) {
@@ -323,6 +324,27 @@ export default function SetupPage() {
               )}
             </div>
 
+            {/* よく聞かれること */}
+            <div>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: '#4A2C1A' }}>
+                よく聞かれること・得意な相談 <span style={{ color: '#A08068', fontSize: 11, fontWeight: 400 }}>（任意）</span>
+              </label>
+              <textarea
+                value={qFaq}
+                onChange={e => setQFaq(e.target.value)}
+                placeholder={"例：\n・補助金の探し方を相談したい\n・新規事業のアドバイスが欲しい\n・料金の見積もりを知りたい"}
+                rows={4}
+                style={{
+                  width: '100%', padding: '10px 12px', fontSize: 13, borderRadius: 10,
+                  border: '1.5px solid #DEC4AD', background: '#FAF5F0', color: '#1C0F05',
+                  outline: 'none', resize: 'vertical', lineHeight: 1.6, boxSizing: 'border-box' as const,
+                }}
+                onFocus={e => { e.target.style.borderColor = '#F26722'; e.target.style.background = 'white' }}
+                onBlur={e => { e.target.style.borderColor = '#DEC4AD'; e.target.style.background = '#FAF5F0' }}
+              />
+              <p style={{ fontSize: 11, color: '#A08068', marginTop: 4 }}>AIがこの内容をもとに回答を生成します</p>
+            </div>
+
             <button
               type="button"
               onClick={generateDraft}
@@ -488,6 +510,24 @@ export default function SetupPage() {
         </div>
 
         <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+
+          {/* スキップボタン */}
+          <div style={{ marginBottom: 16, padding: '12px 14px', background: '#FFF0E8', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#1C0F05' }}>AIが最適な設定を選びました</div>
+              <div style={{ fontSize: 11, color: '#A08068', marginTop: 2 }}>あとで変更できます</div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setStep('card')}
+              style={{
+                padding: '10px 18px', borderRadius: 10, fontSize: 14, fontWeight: 800,
+                background: 'linear-gradient(135deg, #F26722, #F59340)',
+                color: 'white', border: 'none', cursor: 'pointer',
+                whiteSpace: 'nowrap', boxShadow: '0 3px 10px rgba(242,103,34,0.35)',
+              }}
+            >そのまま使う →</button>
+          </div>
 
           {/* ── 話し方スタイル ── */}
           <section>
@@ -677,7 +717,7 @@ export default function SetupPage() {
               boxShadow: '0 4px 16px rgba(242,103,34,0.35)', marginTop: 8,
             }}
           >
-            この内容で名刺情報を入力する →
+            カスタマイズして次へ →
           </button>
         </div>
       </div>

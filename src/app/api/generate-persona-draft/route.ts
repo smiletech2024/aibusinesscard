@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { deepseek, MODEL } from '@/lib/anthropic'
 
-function getPersonaDraftPrompt(name: string, title: string, industry: string, keywords: string[]): string {
+function getPersonaDraftPrompt(name: string, title: string, industry: string, keywords: string[], faq?: string): string {
   return `以下のプロフィールを持つ人物の「分身AI用ペルソナ候補」を生成してください。
 
 【プロフィール】
 名前: ${name}
 肩書き: ${title}
 業種・分野: ${industry}
-得意分野・キーワード: ${keywords.join('、')}
+得意分野・キーワード: ${keywords.join('、')}${faq ? `\n\n【よく聞かれること・得意な相談】\n${faq}\n\nこの内容を参考にFAQを生成してください。` : ''}
 
 【出力形式（JSON）】
 {
@@ -46,12 +46,12 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const { name, title, industry, keywords } = await req.json()
+    const { name, title, industry, keywords, faq } = await req.json()
 
     const response = await deepseek.chat.completions.create({
       model: MODEL,
       max_tokens: 3000,
-      messages: [{ role: 'user', content: getPersonaDraftPrompt(name, title, industry, keywords) }],
+      messages: [{ role: 'user', content: getPersonaDraftPrompt(name, title, industry, keywords, faq) }],
     })
 
     const rawText = response.choices[0]?.message?.content || ''

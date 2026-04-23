@@ -315,6 +315,7 @@ export default function CardPage() {
   const [showAppt, setShowAppt] = useState(false)
   const [existingSession, setExistingSession] = useState<{ id: string; status: string } | null>(null)
   const [proceeding, setProceeding] = useState(false)
+  const [faqPreview, setFaqPreview] = useState<string[]>([])
   const supabase = createClient()
 
   useEffect(() => { loadCard() }, [cardId])
@@ -328,6 +329,18 @@ export default function CardPage() {
       setCardDeleted(true)
     } else {
       setCard(data ?? null)
+    }
+
+    if (data?.persona_id) {
+      const { data: persona } = await supabase
+        .from('personas')
+        .select('faq_json')
+        .eq('id', data.persona_id)
+        .maybeSingle()
+      if (persona?.faq_json) {
+        const faqs = persona.faq_json as Array<{question: string}>
+        setFaqPreview(faqs.map(f => f.question).filter(Boolean))
+      }
     }
 
     const savedId = typeof window !== 'undefined' ? localStorage.getItem(SESSION_KEY(cardId)) : null
@@ -669,6 +682,25 @@ export default function CardPage() {
               </div>
             ) : !showNameInput ? (
               <div className="space-y-3">
+                {/* こんなことを聞けます */}
+                {faqPreview.length > 0 && !existingSession && (
+                  <div style={{ marginBottom: 12 }}>
+                    <p style={{ fontSize: 11, color: '#A08068', fontWeight: 700, marginBottom: 6, textAlign: 'center' }}>
+                      💬 こんなことを聞けます
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {faqPreview.slice(0, 3).map((q, i) => (
+                        <div key={i} style={{
+                          background: 'rgba(242,103,34,0.08)', border: '1px solid rgba(242,103,34,0.2)',
+                          borderRadius: 10, padding: '8px 12px', fontSize: 12, color: '#FFF0E8',
+                          cursor: 'pointer',
+                        }} onClick={() => { setShowNameInput(true) }}>
+                          ❓ {q}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {/* メインCTA：分身AIに相談 */}
                 <button
                   onClick={() => setShowNameInput(true)}
