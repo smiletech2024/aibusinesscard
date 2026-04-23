@@ -59,8 +59,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error:   'PLAN_LIMIT_EXCEEDED',
-          message: `${plan.name}プランのペルソナ上限（${plan.maxPersonas}個）に達しています。プランをアップグレードしてください。`,
+          message: `${plan.name}プランのペルソナ上限（${plan.maxPersonas}個）に達しています。現在${personaCount}個作成済み。プランをアップグレードしてください。`,
           upgradeRequired: true,
+          debug: { planId, personaCount, maxPersonas: plan.maxPersonas },
         },
         { status: 403 }
       )

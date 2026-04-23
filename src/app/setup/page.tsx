@@ -145,7 +145,7 @@ export default function SetupPage() {
         setStep('done')
       } else if (data.upgradeRequired) {
         setStep('card')
-        setSaveError('すでに分身AIを作成済みです。ダッシュボードから編集してください。')
+        setSaveError(data.message ?? 'プラン上限です。ダッシュボードから編集してください。')
       } else {
         setStep('card')
         setSaveError(data.message ?? '保存に失敗しました。もう一度お試しください。')
