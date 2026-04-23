@@ -458,6 +458,7 @@ export default function EditPersonaPage() {
               style={{
                 fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 10,
                 background: '#FFF0E8', color: '#C4511A', border: '1.5px solid #FDD5B5', cursor: 'pointer',
+                whiteSpace: 'nowrap', flexShrink: 0,
               }}
             >＋ 追加</button>
           </div>
