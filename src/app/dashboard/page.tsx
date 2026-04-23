@@ -707,6 +707,19 @@ export default function DashboardPage() {
           🔕 通知がブロックされています — ブラウザの設定から許可してください
         </div>
       )}
+      {notifPermission === 'unsupported' && (
+        <div style={{ background: '#F0F9FF', borderBottom: '1px solid #BAE6FD', padding: '8px 20px', fontSize: 11, color: '#0369A1', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+          <span>📱 iPhoneで通知を受け取るには、ホーム画面に追加（PWAインストール）が必要です</span>
+          <a
+            href="https://support.apple.com/ja-jp/guide/iphone/iph42ab2f3a7/ios"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: '#0284C7', fontWeight: 700, whiteSpace: 'nowrap', textDecoration: 'none' }}
+          >
+            追加方法 →
+          </a>
+        </div>
+      )}
       {notifPermission === 'granted' && (
         <div style={{ background: '#F0FDF4', borderBottom: '1px solid #BBF7D0', padding: '8px 20px', fontSize: 11, color: '#166534', display: 'flex', alignItems: 'center', gap: 6 }}>
           ✅ 通知設定済み — お客様が話しかけると通知が届きます
