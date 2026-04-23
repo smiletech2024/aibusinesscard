@@ -218,8 +218,7 @@ export default function DashboardPage() {
 
   // マウント時に即座に通知権限を確認（userIdを待たない）
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+    if (!('Notification' in window)) {
       setNotifPermission('unsupported'); return
     }
     setNotifPermission(Notification.permission)
@@ -688,14 +687,14 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* フリープランの対話上限バナー */}
       {/* 通知許可バナー */}
-      {(notifPermission === 'default' || notifPermission === null) && !loading && (
+      {(notifPermission === 'default' || notifPermission === null) && (
         <div style={{ background: '#FFF7ED', borderBottom: '1px solid #FED7AA', padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ fontSize: 12, color: '#92400E' }}>
             🔔 お客様が話しかけたとき、スマホに通知を受け取れます
           </div>
           <button
+            type="button"
             onClick={enableNotifications}
             style={{ fontSize: 12, fontWeight: 700, color: 'white', background: '#F26722', border: 'none', borderRadius: 8, padding: '6px 14px', cursor: 'pointer', whiteSpace: 'nowrap' }}
           >
@@ -703,11 +702,17 @@ export default function DashboardPage() {
           </button>
         </div>
       )}
+      {notifPermission === 'denied' && (
+        <div style={{ background: '#FFF7ED', borderBottom: '1px solid #FED7AA', padding: '8px 20px', fontSize: 11, color: '#92400E', display: 'flex', alignItems: 'center', gap: 6 }}>
+          🔕 通知がブロックされています — ブラウザの設定から許可してください
+        </div>
+      )}
       {notifPermission === 'granted' && (
         <div style={{ background: '#F0FDF4', borderBottom: '1px solid #BBF7D0', padding: '8px 20px', fontSize: 11, color: '#166534', display: 'flex', alignItems: 'center', gap: 6 }}>
           ✅ 通知設定済み — お客様が話しかけると通知が届きます
         </div>
       )}
+      {/* フリープランの対話上限バナー */}
 
       {maxSessions !== -1 && monthlySessionCount >= maxSessions && (
         <div style={{ background: '#FEF2F2', borderBottom: '1px solid #FECACA', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
