@@ -871,10 +871,12 @@ export default function DashboardPage() {
                       const updates = quickUpdates[pid] ?? []
                       return (
                         <div className="mx-5 mb-4 rounded-xl overflow-hidden" style={{ border: '1px solid rgba(242,103,34,0.2)', background: 'rgba(255,248,244,0.8)' }}>
-                          <div className="px-4 pt-3 pb-2 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(242,103,34,0.12)' }}>
-                            <span style={{ fontSize: 14 }}>⚡</span>
-                            <span className="text-xs font-bold" style={{ color: '#1C0F05' }}>⚡ AIに最新情報を追加</span>
-                            <span className="text-xs ml-auto" style={{ color: '#A08068' }}>送信するとすぐ会話に反映されます</span>
+                          <div className="px-4 pt-3 pb-2" style={{ borderBottom: '1px solid rgba(242,103,34,0.12)' }}>
+                            <div className="flex items-center gap-1.5">
+                              <span style={{ fontSize: 13 }}>⚡</span>
+                              <span className="text-xs font-bold" style={{ color: '#1C0F05' }}>AIに最新情報を追加</span>
+                            </div>
+                            <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>送信するとすぐ会話に反映されます</p>
                           </div>
                           <div className="px-3 pt-2 pb-3">
                             <div className="flex gap-2">
