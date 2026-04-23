@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/client'
 interface CardData {
   full_name: string; title: string; company: string
   short_intro: string; email: string; phone: string; website: string
+  address: string
   cta_label: string; cta_url: string
 }
 
@@ -20,6 +21,7 @@ const cardFields = [
   { key: 'email',       label: 'メール',   placeholder: 'you@example.com',             required: false, multiline: false },
   { key: 'phone',       label: '電話番号', placeholder: '090-xxxx-xxxx',               required: false, multiline: false },
   { key: 'website',     label: 'Web',      placeholder: 'https://yoursite.com',        required: false, multiline: false },
+  { key: 'address',     label: '住所',     placeholder: '東京都渋谷区〇〇 1-2-3',      required: false, multiline: false },
 ]
 
 export default function EditCardPage() {
@@ -28,7 +30,7 @@ export default function EditCardPage() {
   const supabase = createClient()
 
   const [cardData, setCardData] = useState<CardData>({
-    full_name: '', title: '', company: '', short_intro: '', email: '', phone: '', website: '',
+    full_name: '', title: '', company: '', short_intro: '', email: '', phone: '', website: '', address: '',
     cta_label: '', cta_url: '',
   })
   const [loading, setLoading] = useState(true)
@@ -57,6 +59,7 @@ export default function EditCardPage() {
         email:       card.email       ?? '',
         phone:       card.phone       ?? '',
         website:     card.website     ?? '',
+        address:     (card as { address?: string }).address ?? '',
         cta_label:   (card as { cta_label?: string }).cta_label ?? '',
         cta_url:     (card as { cta_url?: string }).cta_url     ?? '',
       })

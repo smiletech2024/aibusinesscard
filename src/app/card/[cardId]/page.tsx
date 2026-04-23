@@ -381,6 +381,7 @@ export default function CardPage() {
     if (card.phone)       lines.push(`TEL;TYPE=CELL:${card.phone}`)
     if (card.email)       lines.push(`EMAIL;TYPE=INTERNET:${card.email}`)
     if (card.website)     lines.push(`URL:${card.website}`)
+    if ((card as { address?: string }).address) lines.push(`ADR;TYPE=WORK:;;${(card as { address?: string }).address};;;;`)
     if (card.short_intro) lines.push(`NOTE:${card.short_intro.replace(/\n/g, '\\n')}`)
     lines.push(`X-AI-MEISHI:https://www.aimeishi.biz/card/${card.id}`)
     lines.push('END:VCARD')
@@ -568,6 +569,17 @@ export default function CardPage() {
                     {card.website.replace(/https?:\/\//, '')}
                   </span>
                 </a>
+              )}
+              {(card as { address?: string }).address && (
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'rgba(242,103,34,0.12)' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F5843A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z" /><circle cx="12" cy="10" r="3" />
+                    </svg>
+                  </div>
+                  <span className="text-sm" style={{ color: '#A08068' }}>{(card as { address?: string }).address}</span>
+                </div>
               )}
             </div>
 

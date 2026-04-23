@@ -29,7 +29,7 @@ export async function PATCH(
     }
 
     const body = await req.json()
-    const { full_name, title, company, short_intro, email, phone, website, style_config, cta_label, cta_url } = body
+    const { full_name, title, company, short_intro, email, phone, website, address, style_config, cta_label, cta_url } = body
 
     const payload: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
@@ -44,6 +44,7 @@ export async function PATCH(
       payload.email       = email       || null
       payload.phone       = phone       || null
       payload.website     = website     || null
+      payload.address     = address     || null
     }
 
     // CTAフィールド
