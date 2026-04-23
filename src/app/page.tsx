@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Logo } from '@/components/Logo'
 import SiteFooter from '@/components/SiteFooter'
+import VirtualOfficeTeaser from '@/components/VirtualOfficeTeaser'
 
 /* ─────────────────────────────────────────────
    Hermès Orange × Leather — カラーパレット
@@ -152,6 +153,9 @@ export default function HomePage() {
             </div>
           ))}
         </div>
+
+        {/* バーチャルオフィス */}
+        <VirtualOfficeTeaser />
 
         {/* 料金プラン */}
         <div className="w-full max-w-3xl mb-24">

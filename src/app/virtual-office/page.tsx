@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Logo } from '@/components/Logo'
 import { createClient } from '@/lib/supabase/client'
 
 interface Slot {
@@ -154,28 +155,43 @@ export default function VirtualOfficePage() {
       {/* ── Header ── */}
       <div style={{ background: 'white', borderBottom: '1px solid #EDD9C8', position: 'sticky', top: 0, zIndex: 10 }}>
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">
-          <button
-            onClick={() => router.push('/dashboard')}
-            style={{ width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FAF5F0', border: 'none', cursor: 'pointer' }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
+          {/* ロゴ or 戻るボタン */}
+          {userId ? (
+            <button
+              onClick={() => router.push('/dashboard')}
+              style={{ width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FAF5F0', border: 'none', cursor: 'pointer', flexShrink: 0 }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+          ) : (
+            <Link href="/" style={{ flexShrink: 0 }}>
+              <Logo size={28} variant="dark" />
+            </Link>
+          )}
           <div className="flex-1">
             <h1 className="font-black text-base" style={{ color: '#1C0F05' }}>バーチャルオフィス</h1>
             <p className="text-xs" style={{ color: '#A08068' }}>
               入居中 {occupiedTotal} / 42 社 · 今なら先着無料
             </p>
           </div>
-          {mySlot && (
+          {mySlot ? (
             <div
               className="text-xs font-bold px-3 py-1 rounded-full"
               style={{ background: 'rgba(232,96,28,0.1)', color: '#E8601C', border: '1px solid rgba(232,96,28,0.25)' }}
             >
               入居中
             </div>
-          )}
+          ) : !userId ? (
+            <Link
+              href="/auth/login"
+              className="text-xs font-bold px-4 py-2 rounded-full"
+              style={{ background: '#E8601C', color: 'white', textDecoration: 'none', whiteSpace: 'nowrap' }}
+            >
+              入居する
+            </Link>
+          ) : null}
         </div>
       </div>
 
