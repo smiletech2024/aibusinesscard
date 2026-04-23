@@ -864,7 +864,8 @@ export default function AgentPage() {
               <textarea
                 value={inputText}
                 onChange={e => setInputText(e.target.value)}
-                placeholder="メッセージを入力..."
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleUserSend() } }}
+                placeholder="メッセージを入力（Shift+Enterで改行）"
                 disabled={aiTyping}
                 rows={2}
                 style={{
