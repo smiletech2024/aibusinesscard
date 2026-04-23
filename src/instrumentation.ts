@@ -24,22 +24,24 @@ export async function register() {
 
   const missing = required.filter(k => !process.env[k])
   if (missing.length > 0) {
-    console.error(
+    // 本番環境（NODE_ENV=production）では警告をエラーとして扱う
+    const logLevel = process.env.NODE_ENV === 'production' ? 'error' : 'warn'
+    console[logLevel === 'error' ? 'error' : 'warn'](
       JSON.stringify({
-        level: 'error',
+        level: logLevel,
         event: 'startup:env_missing',
         missing,
-        ts: new Date().toISOString(),
+        ts:    new Date().toISOString(),
+        hint:  '本番環境ではすべての環境変数を設定してください',
       })
     )
-    // クラッシュはさせない（開発環境でも起動できるよう）
-    // 本番環境では監視ツールのアラートを設定すること
   } else {
     console.log(
       JSON.stringify({
         level: 'info',
         event: 'startup:env_ok',
-        ts: new Date().toISOString(),
+        count: required.length,
+        ts:    new Date().toISOString(),
       })
     )
   }

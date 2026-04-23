@@ -50,12 +50,35 @@ async function upsertCredits(
   }
 }
 
-// ─── Stripe イベント単位の冪等性チェック ──────────────────────
+// ─── 冪等性チェック（イベント単位）──────────────────────────────
 async function isEventProcessed(admin: ReturnType<typeof getAdmin>, eventId: string): Promise<boolean> {
   const { data } = await admin
     .from('credit_transactions')
     .select('id')
     .eq('stripe_event_id', eventId)
+    .maybeSingle()
+  return !!data
+}
+
+// ─── 冪等性チェック（サブスク＋月単位）────────────────────────
+// checkout.session.completed と customer.subscription.created は
+// 同じサブスクに対して別 event_id で発火するため、
+// event_id だけでは二重付与を防げない。
+// stripe_subscription_id + 月（YYYY-MM）の複合キーで防ぐ。
+async function isSubGrantedThisMonth(
+  admin: ReturnType<typeof getAdmin>,
+  stripeSubId: string
+): Promise<boolean> {
+  const startOfMonth = new Date()
+  startOfMonth.setDate(1)
+  startOfMonth.setHours(0, 0, 0, 0)
+
+  const { data } = await admin
+    .from('credit_transactions')
+    .select('id')
+    .eq('stripe_subscription_id', stripeSubId)
+    .eq('type', 'bonus')
+    .gte('created_at', startOfMonth.toISOString())
     .maybeSingle()
   return !!data
 }
@@ -112,16 +135,18 @@ export async function POST(req: NextRequest) {
         const planId = plan_id as PlanId
         const plan   = PLANS[planId]
         if (plan && plan.monthlyTokens > 0) {
-          // イベント ID で冪等性を保証（checkout と subscription.created の二重発火を確実に防ぐ）
-          if (await isEventProcessed(admin, event.id)) {
-            return NextResponse.json({ received: true, skipped: true })
-          }
-
           const stripeSubId = typeof session.subscription === 'string'
             ? session.subscription
             : (session.subscription as { id?: string } | null)?.id
 
           if (stripeSubId) {
+            // サブスク+月 ベースの冪等性チェック
+            // （checkout と subscription.created は別 event_id のため event_id だけでは不十分）
+            if (await isSubGrantedThisMonth(admin, stripeSubId)) {
+              logger.info('webhook:sub_grant_skipped_dup', { user_id, stripe_sub_id: stripeSubId })
+              return NextResponse.json({ received: true, skipped: true })
+            }
+
             await admin.from('user_subscriptions').upsert({
               user_id,
               plan:                   planId,
@@ -131,20 +156,21 @@ export async function POST(req: NextRequest) {
               status:                 'active',
               current_period_start:   new Date().toISOString(),
             }, { onConflict: 'user_id' })
-          }
 
-          await upsertCredits(admin, user_id, {
-            setSubBalance: plan.monthlyTokens,
-            subResetAt:    new Date().toISOString(),
-          })
-          await admin.from('credit_transactions').insert({
-            user_id,
-            amount:          plan.monthlyTokens,
-            type:            'bonus',
-            description:     `${plan.name}プラン 月次トークン付与（初回checkout）`,
-            stripe_event_id: event.id,
-          })
-          logger.info('webhook:sub_checkout_grant', { user_id, plan: planId, tokens: plan.monthlyTokens })
+            await upsertCredits(admin, user_id, {
+              setSubBalance: plan.monthlyTokens,
+              subResetAt:    new Date().toISOString(),
+            })
+            await admin.from('credit_transactions').insert({
+              user_id,
+              amount:                  plan.monthlyTokens,
+              type:                    'bonus',
+              description:             `${plan.name}プラン 月次トークン付与（初回checkout）`,
+              stripe_event_id:         event.id,
+              stripe_subscription_id:  stripeSubId,
+            })
+            logger.info('webhook:sub_checkout_grant', { user_id, plan: planId, tokens: plan.monthlyTokens })
+          }
         }
       }
     }
@@ -164,11 +190,6 @@ export async function POST(req: NextRequest) {
     const priceId = sub.items.data[0]?.price?.id
     if (!userId || !priceId) return NextResponse.json({ received: true })
 
-    // イベント ID ベースの冪等性（checkout と二重発火対策）
-    if (await isEventProcessed(admin, event.id)) {
-      return NextResponse.json({ received: true, skipped: true })
-    }
-
     const planId      = getPlanByPriceId(priceId) ?? (sub.metadata?.plan_id as PlanId | undefined) ?? 'free'
     const plan        = PLANS[planId]
     const periodStart = new Date((sub as unknown as { current_period_start: number }).current_period_start * 1000).toISOString()
@@ -186,14 +207,20 @@ export async function POST(req: NextRequest) {
       cancel_at_period_end:   sub.cancel_at_period_end,
     }, { onConflict: 'user_id' })
 
+    // サブスク+月 ベースの冪等性（checkout.session.completed との二重発火を防ぐ）
     if (plan.monthlyTokens > 0) {
+      if (await isSubGrantedThisMonth(admin, sub.id)) {
+        logger.info('webhook:sub_grant_skipped_dup', { user_id: userId, event: event.type })
+        return NextResponse.json({ received: true, skipped: true })
+      }
       await upsertCredits(admin, userId, { setSubBalance: plan.monthlyTokens, subResetAt: periodStart })
       await admin.from('credit_transactions').insert({
-        user_id:         userId,
-        amount:          plan.monthlyTokens,
-        type:            'bonus',
-        description:     `${plan.name}プラン 月次トークン付与 (${Math.floor(plan.monthlyTokens / 10_000)}万トークン)`,
-        stripe_event_id: event.id,
+        user_id:                userId,
+        amount:                 plan.monthlyTokens,
+        type:                   'bonus',
+        description:            `${plan.name}プラン 月次トークン付与 (${Math.floor(plan.monthlyTokens / 10_000)}万トークン)`,
+        stripe_event_id:        event.id,
+        stripe_subscription_id: sub.id,
       })
     }
 

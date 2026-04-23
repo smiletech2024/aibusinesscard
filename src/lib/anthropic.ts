@@ -1,17 +1,27 @@
 import OpenAI from 'openai'
 import Anthropic from '@anthropic-ai/sdk'
 
+// APIキーが未設定のときは空文字ではなく undefined を渡して SDK に検出させる
+// （空文字は認証エラーが曖昧になるため）
 export const deepseek = new OpenAI({
-  apiKey: process.env.DEEPSEEK_API_KEY || '',
+  apiKey:  process.env.DEEPSEEK_API_KEY || 'missing-deepseek-key',
   baseURL: 'https://api.deepseek.com',
 })
 
 export const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
+  apiKey: process.env.ANTHROPIC_API_KEY || 'missing-anthropic-key',
 })
 
 export const MODEL          = 'deepseek-chat'
 export const FALLBACK_MODEL = 'claude-haiku-4-5'
+
+/** APIキー設定状況を確認して警告を返す（起動時チェック用） */
+export function checkApiKeys(): string[] {
+  const warnings: string[] = []
+  if (!process.env.DEEPSEEK_API_KEY)   warnings.push('DEEPSEEK_API_KEY が未設定です')
+  if (!process.env.ANTHROPIC_API_KEY)  warnings.push('ANTHROPIC_API_KEY が未設定です（フォールバック不可）')
+  return warnings
+}
 
 // ヒアリングAIのシステムプロンプト
 export function getHearingSystemPrompt(): string {

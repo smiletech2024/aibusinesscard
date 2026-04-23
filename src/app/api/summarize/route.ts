@@ -6,7 +6,7 @@ import { logger } from '@/lib/logger'
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY
 const FROM           = 'AI名刺 <noreply@aimeishi.biz>'
-const SITE_URL       = 'https://www.aimeishi.biz'
+const SITE_URL       = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aimeishi.biz'
 
 /** メール送信 — fire-and-forget（レスポンスをブロックしない） */
 function sendEmailAsync(to: string, subject: string, html: string) {

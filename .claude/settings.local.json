@@ -70,7 +70,9 @@
       "Bash(grep -n 'card.website && \\( *)",
       "Read(//Users/tsuyoshigoto/.config/**)",
       "Bash(curl -s \"https://aimeishi.biz/api/admin/stats\" -H \"Cookie: $\\(cat ~/.config/aimeishi-admin-cookie \\)\")",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(git -C /Users/tsuyoshigoto/Desktop/aibusinesscard log --oneline -20)",
+      "Bash(find /Users/tsuyoshigoto/Desktop/aibusinesscard -name \"*.ts\" -path \"*/api/*\" -exec grep -l \"select.*count\" {} \\\\;)"
     ]
   }
 }

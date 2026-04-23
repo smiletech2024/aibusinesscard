@@ -1,5 +1,5 @@
 -- ================================================================
--- AI名刺 セキュリティ&品質改善マイグレーション v2
+-- AI名刺 セキュリティ&品質改善マイグレーション v3
 -- Supabase Dashboard > SQL Editor で実行してください
 -- ================================================================
 
@@ -53,7 +53,7 @@ CREATE POLICY "Owners can update own conversations" ON ai_conversations
 CREATE POLICY "Anyone can insert conversations" ON ai_conversations
   FOR INSERT WITH CHECK (true);
 
--- conversation_summaries
+-- conversation_summaries（DROP 抜け修正）
 DROP POLICY IF EXISTS "Anyone can manage summaries" ON conversation_summaries;
 
 CREATE POLICY "Owners can read own summaries" ON conversation_summaries
@@ -94,18 +94,35 @@ ALTER TABLE conversation_summaries
   END;
 
 -- ----------------------------------------------------------------
--- 3. credit_transactions に stripe_event_id を追加
---    Stripe イベント単位の冪等性を保証する
+-- 3. credit_transactions に stripe_event_id / stripe_subscription_id 追加
+--    イベント単位・サブスク単位の二重付与を構造的に防ぐ
 -- ----------------------------------------------------------------
 ALTER TABLE credit_transactions
-  ADD COLUMN IF NOT EXISTS stripe_event_id TEXT;
+  ADD COLUMN IF NOT EXISTS stripe_event_id        TEXT,
+  ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT;
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_credit_tx_stripe_event
   ON credit_transactions(stripe_event_id)
   WHERE stripe_event_id IS NOT NULL;
 
+-- サブスク+期間ベースの冪等性インデックス（checkout と subscription.created の二重発火防止）
+CREATE UNIQUE INDEX IF NOT EXISTS idx_credit_tx_sub_period
+  ON credit_transactions(stripe_subscription_id, DATE_TRUNC('month', created_at))
+  WHERE stripe_subscription_id IS NOT NULL AND type = 'bonus';
+
 -- ----------------------------------------------------------------
--- 4. 原子的トークン消費 RPC 関数
+-- 4. customer_sessions に expires_at 追加（セッション有効期限）
+-- ----------------------------------------------------------------
+ALTER TABLE customer_sessions
+  ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP WITH TIME ZONE;
+
+-- 既存セッションの有効期限を作成日 +24h に設定
+UPDATE customer_sessions
+  SET expires_at = created_at + INTERVAL '24 hours'
+  WHERE expires_at IS NULL;
+
+-- ----------------------------------------------------------------
+-- 5. 原子的トークン消費 RPC 関数
 --    FOR UPDATE ロックで競合状態（race condition）を解消
 -- ----------------------------------------------------------------
 CREATE OR REPLACE FUNCTION deduct_tokens(
@@ -135,10 +152,14 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ----------------------------------------------------------------
--- 5. パフォーマンス改善インデックス
+-- 6. パフォーマンス改善インデックス
 -- ----------------------------------------------------------------
 CREATE INDEX IF NOT EXISTS idx_customer_sessions_persona_created
   ON customer_sessions(persona_id, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_customer_sessions_expires
+  ON customer_sessions(expires_at)
+  WHERE expires_at IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS idx_ai_conversations_session_created
   ON ai_conversations(session_id, created_at ASC);
