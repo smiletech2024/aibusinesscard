@@ -1032,6 +1032,42 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {/* バーチャルオフィス バナー */}
+        {cards.length > 0 && (
+          <div
+            className="rounded-2xl p-5"
+            style={{
+              background: 'linear-gradient(135deg, #1C0F05 0%, #2C1A08 100%)',
+              boxShadow: '0 6px 24px rgba(28,15,5,0.35)',
+            }}
+          >
+            <div className="flex items-start gap-4">
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'rgba(232,96,28,0.2)', border: '1px solid rgba(232,96,28,0.3)' }}
+              >
+                <span style={{ fontSize: 24 }}>🏢</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-black text-sm" style={{ color: 'white' }}>バーチャルオフィスに入居する</h3>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(232,96,28,0.3)', color: '#F5903A' }}>先着無料</span>
+                </div>
+                <p className="text-xs leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                  関東・関西の仮想ビルに窓口を構える。名刺を渡さなくても、<strong style={{ color: 'white' }}>相手がその場でAIと話せます。</strong>
+                </p>
+                <Link
+                  href="/virtual-office"
+                  className="inline-block text-xs font-bold px-4 py-2 rounded-xl transition hover:opacity-90"
+                  style={{ background: '#E8601C', color: 'white', textDecoration: 'none' }}
+                >
+                  空き状況を見る →
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* AIを育てる 機能アピールバナー */}
         {cards.length > 0 && (
           <div
