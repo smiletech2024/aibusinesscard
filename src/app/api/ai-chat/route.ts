@@ -59,6 +59,20 @@ export async function POST(req: NextRequest) {
           { status: 429 }
         )
       }
+
+      // ── セッション有効期限チェック ──────────────────────────────
+      const { data: sessionRow } = await admin
+        .from('customer_sessions')
+        .select('expires_at')
+        .eq('id', sessionId)
+        .maybeSingle()
+
+      if (sessionRow?.expires_at && new Date(sessionRow.expires_at) < new Date()) {
+        return NextResponse.json(
+          { error: 'SESSION_EXPIRED', message: 'このセッションは有効期限（24時間）を過ぎています。' },
+          { status: 410 }
+        )
+      }
     }
 
     // ── トークン残高チェック ──────────────────────────────────────
@@ -208,22 +222,14 @@ export async function POST(req: NextRequest) {
           })
 
           if (rpcErr) {
-            // RPC 未作成の環境では旧来のロジックにフォールバック
-            logger.warn('ai-chat:rpc_deduct_fallback', { error: rpcErr.message })
-            const { data: latest } = await admin
-              .from('user_credits')
-              .select('balance, sub_balance, total_used')
-              .eq('user_id', ownerId)
-              .maybeSingle()
-            if (latest) {
-              const fromSub  = Math.min(latest.sub_balance, consumed)
-              const fromPaid = Math.max(0, consumed - fromSub)
-              await admin.from('user_credits').update({
-                sub_balance: Math.max(0, latest.sub_balance - fromSub),
-                balance:     Math.max(0, latest.balance     - fromPaid),
-                total_used:  latest.total_used + consumed,
-              }).eq('user_id', ownerId)
-            }
+            // RPC 失敗時はトークン消費をスキップ（競合状態を避けるため read-then-write しない）
+            // migration が未適用の場合のみ発生。本番では RPC が常に存在するはずなのでエラーログのみ。
+            logger.error('ai-chat:rpc_deduct_failed', rpcErr, {
+              owner_id: ownerId,
+              consumed,
+              hint: 'deduct_tokens RPC が見つかりません。supabase-migration.sql を実行してください',
+            })
+            // 課金記録は残しておく（後で手動調整可能）
           }
 
           await admin.from('credit_transactions').insert({

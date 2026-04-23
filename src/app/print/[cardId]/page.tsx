@@ -164,11 +164,11 @@ const IconLocation = () => (
 )
 
 /* ─── QRコード SVG レンダラー (全デバイス対応) ─── */
-// canvas は iOS Safari で描画失敗するケースがあるため、
-// SVG 文字列をインライン展開する方式を採用。
-// html-to-image はインライン SVG を確実にキャプチャできる。
+// canvas は iOS Safari で描画失敗するケースがあるため SVG 方式を採用。
+// XSS 防止のため dangerouslySetInnerHTML を使わず <img> + data URI に変換。
+// html-to-image はインライン img も確実にキャプチャできる。
 function QRCodeSVG({ url, size, style }: { url: string; size: number; style?: React.CSSProperties }) {
-  const [svg, setSvg] = useState('')
+  const [dataUri, setDataUri] = useState('')
   useEffect(() => {
     if (!url) return
     QRCode.toString(url, {
@@ -178,7 +178,9 @@ function QRCodeSVG({ url, size, style }: { url: string; size: number; style?: Re
       errorCorrectionLevel: 'H',   // 30%訂正 — ロゴ重ねてもスキャン可能
       color: { dark: '#1C0F05', light: '#FFFFFF' },
     }).then(svgStr => {
-      setSvg(svgStr.replace(/(<svg[^>]*)\swidth="[^"]*"\sheight="[^"]*"/, '$1 width="100%" height="100%"'))
+      // SVG を Base64 data URI に変換（XSS 防止）
+      const encoded = btoa(unescape(encodeURIComponent(svgStr)))
+      setDataUri(`data:image/svg+xml;base64,${encoded}`)
     }).catch(() => {})
   }, [url, size])
 
@@ -187,10 +189,10 @@ function QRCodeSVG({ url, size, style }: { url: string; size: number; style?: Re
 
   return (
     <div style={{ width: size, height: size, display: 'block', flexShrink: 0, position: 'relative', ...style }}>
-      {/* QR本体 */}
-      <div style={{ width: size, height: size }} dangerouslySetInnerHTML={{ __html: svg }} />
+      {/* QR本体 — data URI img でレンダリング（XSS-safe） */}
+      {dataUri && <img src={dataUri} width={size} height={size} alt="QR Code" style={{ display: 'block' }} />}
       {/* 中央ロゴ */}
-      {svg && (
+      {dataUri && (
         <div style={{
           position: 'absolute', top: '50%', left: '50%',
           transform: 'translate(-50%, -50%)',

@@ -28,7 +28,25 @@ export async function PATCH(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { skills, projects, rawVoice, faqs, toneProfile } = await req.json()
+    const body = await req.json()
+    const { skills, projects, rawVoice, faqs, toneProfile } = body
+
+    // ── 入力バリデーション（DOS防止）────────────────────────────
+    if (rawVoice && (typeof rawVoice !== 'string' || rawVoice.length > 10_000)) {
+      return NextResponse.json({ error: 'rawVoice too long (max 10,000 chars)' }, { status: 400 })
+    }
+    if (skills && (!Array.isArray(skills) || skills.length > 50 || skills.some((s: unknown) => typeof s !== 'string' || s.length > 500))) {
+      return NextResponse.json({ error: 'Invalid skills (max 50 items, 500 chars each)' }, { status: 400 })
+    }
+    if (projects && (!Array.isArray(projects) || projects.length > 20)) {
+      return NextResponse.json({ error: 'Invalid projects (max 20 items)' }, { status: 400 })
+    }
+    if (faqs && (!Array.isArray(faqs) || faqs.length > 30)) {
+      return NextResponse.json({ error: 'Invalid faqs (max 30 items)' }, { status: 400 })
+    }
+    if (toneProfile && typeof toneProfile === 'string' && toneProfile.length > 2000) {
+      return NextResponse.json({ error: 'toneProfile too long (max 2,000 chars)' }, { status: 400 })
+    }
 
     // values_summary の各セクションを構築（順序：ベース → スキル → 生の声）
     const stripped = (persona.values_summary || '')
