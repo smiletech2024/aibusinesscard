@@ -48,20 +48,36 @@ export async function POST(req: NextRequest) {
     const planId = (sub?.plan ?? 'free') as PlanId
     const plan   = PLANS[planId]
 
-    // ペルソナ数チェック
-    const { count: personaCount } = await admin
-      .from('personas')
-      .select('*', { count: 'exact', head: true })
+    // ペルソナ数チェック（名刺が紐づいているものだけカウント）
+    const { data: cardRows } = await admin
+      .from('business_cards')
+      .select('persona_id')
       .eq('user_id', user.id)
       .eq('is_active', true)
+    const personaCount = (cardRows ?? []).length
 
-    if (!canAddPersona(planId, personaCount ?? 0)) {
+    // 名刺のないゴーストペルソナを非アクティブ化
+    const activeCardPersonaIds = (cardRows ?? []).map(r => r.persona_id).filter(Boolean)
+    if (activeCardPersonaIds.length > 0) {
+      await admin.from('personas')
+        .update({ is_active: false })
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .not('id', 'in', `(${activeCardPersonaIds.join(',')})`)
+    } else {
+      // 名刺が0枚なら全ゴーストペルソナをクリア
+      await admin.from('personas')
+        .update({ is_active: false })
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+    }
+
+    if (!canAddPersona(planId, personaCount)) {
       return NextResponse.json(
         {
           error:   'PLAN_LIMIT_EXCEEDED',
-          message: `${plan.name}プランのペルソナ上限（${plan.maxPersonas}個）に達しています。現在${personaCount}個作成済み。プランをアップグレードしてください。`,
+          message: `${plan.name}プランのペルソナ上限（${plan.maxPersonas}個）に達しています。`,
           upgradeRequired: true,
-          debug: { planId, personaCount, maxPersonas: plan.maxPersonas },
         },
         { status: 403 }
       )
