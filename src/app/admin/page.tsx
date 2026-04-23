@@ -366,6 +366,7 @@ export default function AdminPage() {
   const [feedback, setFeedback] = useState<Feedback[]>([])
   const [loading, setLoading]   = useState(true)
   const [tab, setTab]           = useState<'kpi' | 'users' | 'feedback' | 'support'>('kpi')
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -375,10 +376,15 @@ export default function AdminPage() {
     ])
     if (sRes.ok) setStats(await sRes.json())
     if (fRes.ok) setFeedback((await fRes.json()).data ?? [])
+    setLastUpdated(new Date())
     setLoading(false)
   }, [])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => {
+    load()
+    const interval = setInterval(load, 60_000)
+    return () => clearInterval(interval)
+  }, [load])
 
   const markRead = async (id: string) => {
     await fetch('/api/admin/feedback', {
@@ -417,10 +423,17 @@ export default function AdminPage() {
               {isMobile ? stats.unreadFeedback : `未読 ${stats.unreadFeedback}件`}
             </span>
           ) : null}
-          <button onClick={load}
-            style={{ padding: isMobile ? '6px 10px' : '6px 14px', borderRadius: 8, background: '#334155', color: '#94A3B8', fontSize: 12, border: 'none', cursor: 'pointer' }}>
-            {isMobile ? '↻' : '更新'}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {lastUpdated && !isMobile && (
+              <span style={{ fontSize: 10, color: '#475569' }}>
+                {lastUpdated.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} 更新
+              </span>
+            )}
+            <button onClick={load}
+              style={{ padding: isMobile ? '6px 10px' : '6px 14px', borderRadius: 8, background: loading ? '#1E293B' : '#334155', color: '#94A3B8', fontSize: 12, border: 'none', cursor: 'pointer' }}>
+              {loading ? '⟳' : (isMobile ? '↻' : '↻ 更新')}
+            </button>
+          </div>
           <Link href="/dashboard"
             style={{ padding: isMobile ? '6px 10px' : '6px 14px', borderRadius: 8, background: '#334155', color: '#94A3B8', fontSize: 12, textDecoration: 'none' }}>
             {isMobile ? '⌂' : '← サービスへ'}
