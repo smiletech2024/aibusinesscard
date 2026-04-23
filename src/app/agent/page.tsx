@@ -44,9 +44,11 @@ type AgentMatch = {
   approach_message: string | null; status: string; is_read: boolean
   skill_title: string; skill_category: string
   skill_user_name: string; skill_user_company: string; skill_user_title_label: string
+  skill_user_card_id: string | null
   need_title: string; need_category: string; need_description: string
   need_budget: string; need_urgency: string
   need_user_name: string; need_user_company: string; need_user_title_label: string
+  need_user_card_id: string | null
   created_at: string
 }
 type ParsedSummary = {
@@ -485,6 +487,21 @@ export default function AgentPage() {
                                     提案する →
                                   </button>
                                 )}
+                                {isSent && m.need_user_card_id && (
+                                  <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                                    <Link
+                                      href={`/card/${m.need_user_card_id}`}
+                                      style={{
+                                        flex: 1, display: 'block', textAlign: 'center',
+                                        padding: '9px', borderRadius: 10, textDecoration: 'none',
+                                        background: 'linear-gradient(135deg,#059669,#047857)',
+                                        color: 'white', fontSize: 12, fontWeight: 700,
+                                        boxShadow: '0 3px 10px rgba(5,150,105,0.25)',
+                                      }}>
+                                      🤝 相手のAI名刺を見る →
+                                    </Link>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -524,9 +541,23 @@ export default function AgentPage() {
                               <div style={{
                                 background: '#F8FAFF', border: '1px solid rgba(37,99,235,0.15)', borderRadius: 10,
                                 padding: '10px 12px', fontSize: 12, color: '#1E3A8A', lineHeight: 1.7,
+                                marginBottom: m.skill_user_card_id ? 10 : 0,
                               }}>
                                 {m.approach_message}
                               </div>
+                            )}
+                            {m.skill_user_card_id && (
+                              <Link
+                                href={`/card/${m.skill_user_card_id}`}
+                                style={{
+                                  display: 'block', textAlign: 'center',
+                                  padding: '9px', borderRadius: 10, textDecoration: 'none',
+                                  background: 'linear-gradient(135deg,#2563EB,#1D4ED8)',
+                                  color: 'white', fontSize: 12, fontWeight: 700,
+                                  boxShadow: '0 3px 10px rgba(37,99,235,0.25)',
+                                }}>
+                                🤝 {m.skill_user_name}さんのAI名刺を見る →
+                              </Link>
                             )}
                           </div>
                         )

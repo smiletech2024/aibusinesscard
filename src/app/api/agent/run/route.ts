@@ -38,16 +38,17 @@ export async function POST() {
 
     const { data: myCard } = await admin
       .from('business_cards')
-      .select('company, title')
+      .select('id, company, title')
       .eq('user_id', user.id)
       .eq('is_active', true)
       .order('created_at', { ascending: true })
       .limit(1)
       .single()
 
-    const myName    = myProfile?.full_name ?? 'ユーザー'
-    const myCompany = myCard?.company ?? ''
-    const myTitle   = myCard?.title ?? ''
+    const myName      = myProfile?.full_name ?? 'ユーザー'
+    const myCompany   = myCard?.company ?? ''
+    const myTitle     = myCard?.title ?? ''
+    const myCardId    = myCard?.id ?? null
 
     // ── 他ユーザーの公開課題を取得（最大40件） ─────────
     const { data: allNeeds } = await admin
@@ -73,11 +74,11 @@ export async function POST() {
 
     const { data: needCards } = await admin
       .from('business_cards')
-      .select('user_id, company, title')
+      .select('id, user_id, company, title')
       .in('user_id', needUserIds)
       .eq('is_active', true)
 
-    const profileMap: Record<string, { name: string; company: string; title: string }> = {}
+    const profileMap: Record<string, { name: string; company: string; title: string; cardId: string | null }> = {}
     for (const uid of needUserIds) {
       const profile = needProfiles?.find(p => p.id === uid)
       const card    = needCards?.find(c => c.user_id === uid)
@@ -85,6 +86,7 @@ export async function POST() {
         name:    profile?.full_name ?? '匿名ユーザー',
         company: card?.company ?? '',
         title:   card?.title ?? '',
+        cardId:  card?.id ?? null,
       }
     }
 
@@ -168,6 +170,9 @@ ${needsText}
               need_user_name:       needOwner.name,
               need_user_company:    needOwner.company,
               need_user_title_label: needOwner.title,
+              // カードID（相手のカードページへ直リンク用）
+              skill_user_card_id:   myCardId,
+              need_user_card_id:    needOwner.cardId,
             })
           }
         } catch (e) {
