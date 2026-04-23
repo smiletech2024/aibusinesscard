@@ -664,7 +664,7 @@ export default function DashboardPage() {
                   {n.customerName}が本会話を希望しています
                 </p>
                 <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>
-                  AIが整理済み · すぐに本題から話せます
+                  AIが会話を整理済み · すぐに本題から入れます
                 </p>
               </div>
               <div className="flex gap-2 flex-shrink-0">
@@ -676,7 +676,7 @@ export default function DashboardPage() {
                     textDecoration: 'none', display: 'block', whiteSpace: 'nowrap',
                   }}
                 >
-                  話しかける →
+                  今すぐ話す →
                 </Link>
                 <button
                   onClick={() => setNotifications(prev => prev.filter(x => x.id !== n.id))}
@@ -701,21 +701,21 @@ export default function DashboardPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 18 }}>🚨</span>
             <div>
-              <div style={{ fontWeight: 800, fontSize: 13, color: '#991B1B' }}>今月のAI対話（{maxSessions}件）に達しました</div>
-              <div style={{ fontSize: 12, color: '#B91C1C' }}>新しい顧客がQRを読んでもAIが応答できない状態です</div>
+              <div style={{ fontWeight: 800, fontSize: 13, color: '#991B1B' }}>今月の対話枠が上限に達しました（{maxSessions}件）</div>
+              <div style={{ fontSize: 12, color: '#B91C1C' }}>QRを読んだお客様にAIが応答できません。プランを上げてください。</div>
             </div>
           </div>
           <Link href="/pricing" style={{ background: '#EF4444', color: '#fff', fontSize: 12, fontWeight: 700, padding: '8px 16px', borderRadius: 99, textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
-            今すぐアップグレード →
+            対話枠を増やす →
           </Link>
         </div>
       )}
       {maxSessions !== -1 && monthlySessionCount === maxSessions - 1 && (
         <div style={{ background: '#FFFBEB', borderBottom: '1px solid #FDE68A', padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ fontSize: 12, color: '#92400E' }}>
-            ⚠️ 今月の対話残り<strong>1件</strong>です（{monthlySessionCount}/{maxSessions}件使用）
+            ⚠️ 今月の対話残り<strong>1件</strong>です（{monthlySessionCount}/{maxSessions}件使用中）
           </div>
-          <Link href="/pricing" style={{ fontSize: 12, color: '#F59E0B', fontWeight: 700, textDecoration: 'none' }}>アップグレードする →</Link>
+          <Link href="/pricing" style={{ fontSize: 12, color: '#F59E0B', fontWeight: 700, textDecoration: 'none' }}>上限を増やす →</Link>
         </div>
       )}
 
@@ -724,9 +724,9 @@ export default function DashboardPage() {
         {sessions.length > 0 && (
           <div className="grid grid-cols-3 gap-4">
             {[
-              { label: 'AI名刺', value: cards.length, unit: '枚', color: '#F26722', borderColor: '#F26722' },
-              { label: 'AI対話中', value: aiChatCount, unit: '件', color: '#F59340', borderColor: '#F59340' },
-              { label: '返事を待っています', value: summaryCount, unit: '件', color: '#059669', borderColor: '#059669' },
+              { label: '名刺', value: cards.length, unit: '枚', color: '#F26722', borderColor: '#F26722' },
+              { label: '商談中', value: aiChatCount, unit: '件', color: '#F59340', borderColor: '#F59340' },
+              { label: '返事待ち', value: summaryCount, unit: '件', color: '#059669', borderColor: '#059669' },
             ].map(({ label, value, unit, color, borderColor }) => (
               <div
                 key={label}
@@ -852,13 +852,13 @@ export default function DashboardPage() {
                   <circle cx="12" cy="14" r="2" />
                 </svg>
               </div>
-              <h3 className="font-black text-lg mb-2" style={{ color: '#1C0F05' }}>分身AIを作りましょう</h3>
+              <h3 className="font-black text-lg mb-2" style={{ color: '#1C0F05' }}>最初の分身AIを、作りましょう</h3>
               <p className="text-sm mb-6" style={{ color: '#A08068' }}>
-                約3分のヒアリングで、あなたらしく話すAIが完成。<br />
-                QRコードを渡すだけで、24時間対応が始まります
+                3分のヒアリングで完成します。<br />
+                名刺のQRを渡した瞬間から、AIが24時間対応を始めます。
               </p>
               <Link href="/setup" className="btn-primary text-sm px-7 py-3" style={{ borderRadius: 14 }}>
-                分身AIを作り始める →
+                はじめての分身AIを作る →
               </Link>
             </div>
           ) : (
@@ -923,8 +923,8 @@ export default function DashboardPage() {
                         <div className="mx-5 mb-4 rounded-xl overflow-hidden" style={{ border: '1px solid rgba(242,103,34,0.2)', background: 'rgba(255,248,244,0.8)' }}>
                           <div className="px-4 pt-3 pb-2 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(242,103,34,0.12)' }}>
                             <span style={{ fontSize: 14 }}>⚡</span>
-                            <span className="text-xs font-bold" style={{ color: '#1C0F05' }}>AIにクイック情報を追加</span>
-                            <span className="text-xs ml-auto" style={{ color: '#A08068' }}>入力するとAIがすぐに使います</span>
+                            <span className="text-xs font-bold" style={{ color: '#1C0F05' }}>⚡ AIに最新情報を追加</span>
+                            <span className="text-xs ml-auto" style={{ color: '#A08068' }}>送信するとすぐ会話に反映されます</span>
                           </div>
                           <div className="px-3 pt-2 pb-3">
                             <div className="flex gap-2">
@@ -933,7 +933,7 @@ export default function DashboardPage() {
                                 value={quickInput[pid] ?? ''}
                                 onChange={e => setQuickInput(prev => ({ ...prev, [pid]: e.target.value }))}
                                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleQuickUpdate(pid) } }}
-                                placeholder="例：先月、○○社のDXを支援し売上30%改善"
+                                placeholder="例：今日、○○社に提案して新しい課題を聞いた"
                                 style={{
                                   flex: 1, padding: '8px 12px', fontSize: 13, borderRadius: 10,
                                   border: '1.5px solid #DEC4AD', background: '#fff', color: '#1C0F05',
@@ -1062,18 +1062,18 @@ export default function DashboardPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-black text-sm" style={{ color: 'white' }}>AIエージェントが仕事を探す</h3>
+                  <h3 className="font-black text-sm" style={{ color: 'white' }}>眠っている間に、案件が届く</h3>
                   <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}>New</span>
                 </div>
                 <p className="text-xs leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.85)' }}>
-                  あなたのスキルを登録するだけ。AIが他のユーザーの課題を自動検索して、<strong style={{ color: 'white' }}>マッチングした案件</strong>を届けます。
+                  スキルを登録すると、AIが他ユーザーの課題を自動スキャンして<strong style={{ color: 'white' }}>対応できる案件</strong>を届けます。
                 </p>
                 <Link
                   href="/agent"
                   className="inline-block text-xs font-bold px-4 py-2 rounded-xl transition hover:opacity-90"
                   style={{ background: 'white', color: '#E8601C', textDecoration: 'none' }}
                 >
-                  エージェントを起動する →
+                  案件を探させる →
                 </Link>
               </div>
             </div>
@@ -1098,15 +1098,15 @@ export default function DashboardPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-black text-sm" style={{ color: '#1C0F05' }}>AIをあなた本人に近づける</h3>
+                  <h3 className="font-black text-sm" style={{ color: '#1C0F05' }}>AIの回答を、あなたの言葉に直す</h3>
                   <span
                     className="text-xs font-bold px-2 py-0.5 rounded-full"
                     style={{ background: 'rgba(242,103,34,0.12)', color: '#F26722' }}
                   >New</span>
                 </div>
                 <p className="text-xs leading-relaxed mb-3" style={{ color: '#6B7280' }}>
-                  AIが受けた質問に<strong style={{ color: '#1C0F05' }}>本人の正解を登録</strong>すると、次から同じ質問にあなたらしく答えられます。<br />
-                  お客様との会話履歴を見ながら「惜しい回答」を本人の言葉に直しましょう。
+                  AIの回答に「惜しい」と感じたとき、正解を一言添えるだけ。<br />
+                  次回から、あなたらしい答え方に変わります。
                 </p>
                 <a
                   href="#sessions"
@@ -1118,17 +1118,17 @@ export default function DashboardPage() {
                     textDecoration: 'none',
                   }}
                 >
-                  会話履歴を確認する →
+                  回答を磨きに行く →
                 </a>
               </div>
             </div>
             <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(242,103,34,0.15)' }}>
-              <p className="text-xs font-bold mb-2" style={{ color: '#A08068' }}>AIを育てる3つの方法</p>
+              <p className="text-xs font-bold mb-2" style={{ color: '#A08068' }}>AIを鍛える3つの方法</p>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { icon: '📚', title: 'スキル登録', desc: '専門領域・ツールを登録' },
-                  { icon: '💼', title: '案件事例', desc: '課題・結果を構造化して学習' },
-                  { icon: '✏️', title: '回答修正', desc: '会話履歴から直接フィードバック' },
+                  { icon: '📚', title: 'スキル登録', desc: '専門領域をAIに伝える' },
+                  { icon: '💼', title: '案件事例', desc: '実績をストーリーで学習' },
+                  { icon: '✏️', title: '回答修正', desc: '惜しい回答を直接直す' },
                 ].map(({ icon, title, desc }) => (
                   <div key={title} className="rounded-xl p-2.5 text-center"
                     style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(242,103,34,0.1)' }}>

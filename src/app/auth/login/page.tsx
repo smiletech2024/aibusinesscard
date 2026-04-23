@@ -65,11 +65,11 @@ export default function LoginPage() {
         })
         const data = await res.json()
         if (res.status === 409) {
-          setError('このメールアドレスはすでに登録されています。ログインしてください。')
+          setError('このアドレスはすでに登録済みです。ログインしてください。')
           return
         }
         if (!res.ok) throw new Error(data.error || 'signup_failed')
-        setMessage('📩 確認メールをお送りしました。\nメール内の「メールアドレスを確認する」をタップすると、あなたの分身AI作成が始まります。\n（届かない場合は迷惑メールフォルダもご確認ください）')
+        setMessage('📩 確認メールをお送りしました。\nメール内のボタンを押すと、分身AI作成が始まります。\n（届かない場合は迷惑メールフォルダもご確認ください）')
       } else {
         // レート制限付きログイン API を使用
         const res  = await fetch('/api/auth/login', {
@@ -91,7 +91,7 @@ export default function LoginPage() {
           const remaining = data.remaining ?? 0
           setAttempts(data.attempts ?? attempts + 1)
           if (remaining === 1) {
-            setError(`メールアドレスまたはパスワードが違います。あと${remaining}回失敗するとアカウントが一時ロックされます。`)
+            setError(`メールアドレスかパスワードが違います。あと${remaining}回でロックされます。`)
           } else if (remaining > 1) {
             setError(`メールアドレスまたはパスワードが違います。（残り${remaining}回）`)
           } else {
@@ -117,7 +117,7 @@ export default function LoginPage() {
           setError('しばらく時間をおいてから再度お試しください。')
         }
       } else if (msg.includes('already registered') || msg.includes('already been registered')) {
-        setError('このメールアドレスはすでに登録されています。ログインしてください。')
+        setError('このアドレスはすでに登録済みです。ログインしてください。')
       } else if (msg.includes('invalid email')) {
         setError('メールアドレスの形式が正しくありません。')
       } else if (msg.includes('Password should')) {
@@ -153,9 +153,9 @@ export default function LoginPage() {
           </h2>
           <div className="space-y-5">
             {[
-              '約3分で、あなたらしいAIが完成する',
+              '約3分で、あなたとして話すAIが完成する',
               'QRコード一枚で、24時間対応が始まる',
-              '要約＋相性スコアつきで、本物の商談へ',
+              '相性スコアつきで、本物の商談だけ届く',
             ].map((text) => (
               <div key={text} className="flex items-center gap-3">
                 <div
@@ -202,10 +202,10 @@ export default function LoginPage() {
 
           <div className="mb-8">
             <h1 className="font-black mb-1" style={{ color: '#1C0F05', fontSize: 26 }}>
-              {isSignUp ? '分身AIを作成する' : 'おかえりなさい'}
+              {isSignUp ? '分身AIを作る' : 'おかえりなさい'}
             </h1>
             <p className="text-sm" style={{ color: '#A08068' }}>
-              {isSignUp ? '無料・約3分で完成します' : 'あなたのAIが待っています'}
+              {isSignUp ? '無料、3分で完成します' : 'あなたのAIが待っています'}
             </p>
           </div>
 
@@ -257,16 +257,16 @@ export default function LoginPage() {
               <div style={{ background: '#FFF1F2', border: '1.5px solid #FECDD3', borderRadius: 14, padding: '16px', textAlign: 'center' }}>
                 <div style={{ fontSize: 28, marginBottom: 8 }}>🔒</div>
                 <div style={{ color: '#E11D48', fontWeight: 800, fontSize: 14, marginBottom: 4 }}>
-                  アカウントが一時ロックされました
+                  ロックされています
                 </div>
                 <div style={{ color: '#9F1239', fontSize: 13, marginBottom: 10 }}>
-                  ログイン試行が{5}回失敗したため、一時的にロックしました
+                  5回連続で失敗したため、一時停止しました
                 </div>
                 <div style={{ background: '#FECDD3', borderRadius: 8, padding: '10px', fontSize: 20, fontWeight: 900, color: '#E11D48', fontVariantNumeric: 'tabular-nums' }}>
                   {formatCountdown(countdown)}
                 </div>
                 <div style={{ color: '#9F1239', fontSize: 11, marginTop: 6 }}>
-                  経過後に自動解除されます
+                  タイマーが0になると自動で解除されます
                 </div>
               </div>
             )}
@@ -302,7 +302,7 @@ export default function LoginPage() {
                 opacity: isLocked ? 0.5 : 1,
               }}
             >
-              {loading ? '確認中...' : isLocked ? `🔒 ${formatCountdown(countdown)}後に解除` : isSignUp ? '分身AIを作り始める →' : 'ログイン'}
+              {loading ? '確認中...' : isLocked ? `🔒 ${formatCountdown(countdown)}後に解除` : isSignUp ? '分身AIを作る →' : 'ログイン'}
             </button>
           </form>
 
@@ -311,12 +311,12 @@ export default function LoginPage() {
               onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage('') }}
               style={{ fontSize: 14, fontWeight: 600, color: '#F26722', background: 'none', border: 'none', cursor: 'pointer' }}
             >
-              {isSignUp ? 'すでにアカウントをお持ちの方はこちら →' : 'アカウントをお持ちでない方 →'}
+              {isSignUp ? 'すでに登録済みの方' : 'はじめての方'}
             </button>
             {!isSignUp && (
               <Link href="/auth/reset-password"
                 style={{ fontSize: 13, color: '#A08068', textDecoration: 'none' }}>
-                パスワードを忘れた方はこちら
+                パスワードを忘れた場合
               </Link>
             )}
           </div>

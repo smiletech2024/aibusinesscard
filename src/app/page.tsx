@@ -62,7 +62,7 @@ export default function HomePage() {
             className="w-2 h-2 rounded-full inline-block"
             style={{ background: '#E8601C', boxShadow: '0 0 6px #E8601C' }}
           />
-          先行体験・無料公開中
+          β公開中 · 完全無料ではじめる
         </div>
 
         {/* Heading */}
@@ -80,7 +80,7 @@ export default function HomePage() {
               backgroundClip: 'text',
             }}
           >
-            24時間話し続ける。
+            24時間働き続ける。
           </span>
         </h1>
 
@@ -89,7 +89,7 @@ export default function HomePage() {
           className="text-base max-w-lg mb-12 leading-relaxed"
           style={{ color: '#7A4A28', whiteSpace: 'pre-line' }}
         >
-          {`QRコードを渡すだけ。あなたの分身AIが顧客の相談に応え、\n本当に会うべき人だけを、整理された状態で届けてくれる。`}
+          {`名刺のQRコードを渡した夜、商談が整理されている。\n分身AIが顧客の疑問に答え、相性スコアと要約をつけて届ける。`}
         </p>
 
         {/* CTA Buttons */}
@@ -104,7 +104,7 @@ export default function HomePage() {
               letterSpacing: '0.02em',
             }}
           >
-            自分の分身AIを作る →
+            3分で分身AIを作る →
           </Link>
           <Link
             href="/auth/login"
@@ -122,9 +122,9 @@ export default function HomePage() {
         {/* Feature Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl w-full mb-24">
           {[
-            { step: '01', title: 'あなたを深く知る', desc: '約3分のヒアリング。思考・実績・価値観をAIが学習し、あなたらしい答え方を身につける。' },
-            { step: '02', title: '代わりに、話す', desc: 'QRを渡せばあとは全自動。深夜でも、移動中でも、顧客の質問にあなたとして答え続ける。' },
-            { step: '03', title: '要約して、届ける', desc: '相性・課題・未解決点を整理した状態で通知。本当に動くべき商談だけが手元に届く。' },
+            { step: '01', title: '3分で、あなたを学ぶ', desc: '価値観・実績・話し方をAIが吸収する。3分後には、あなたとして話せるAIが完成する。' },
+            { step: '02', title: '眠っていても、商談が進む', desc: '深夜でも、移動中でも。名刺のQRを読んだ相手は、あなたのAIとすぐに会話できる。' },
+            { step: '03', title: '熱い商談だけ、手元に届く', desc: '相性スコア・課題・未解決点を整理して通知する。あなたが動くべき商談だけが届く。' },
           ].map(({ step, title, desc }) => (
             <div
               key={step}
@@ -159,17 +159,17 @@ export default function HomePage() {
             className="font-black text-center mb-2 text-xl"
             style={{ color: '#2C1806' }}
           >
-            料金プラン
+            シンプルな料金体系
           </h2>
           <p className="text-center text-sm mb-8" style={{ color: '#B88860' }}>
-            まずは無料でお試しください
+            フリープランで今日からはじめる。いつでも解約できます
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { name: 'フリー',         price: '無料',     desc: '基本機能・分身AI1体' },
-              { name: 'スタンダード',   price: '¥480/月',  desc: '名刺3枚・トークン拡張' },
-              { name: 'ビジネス',       price: '¥2,980/月',desc: '名刺10枚・優先サポート' },
-              { name: 'エンタープライズ',price: '¥9,800/月',desc: '無制限・専任サポート' },
+              { name: 'フリー',           price: '無料',      desc: 'まず試す · 分身AI1体' },
+              { name: 'スタンダード',     price: '¥480/月',   desc: '本格活用 · 名刺3枚' },
+              { name: 'ビジネス',         price: '¥2,980/月', desc: 'チームで使う · 名刺10枚' },
+              { name: 'エンタープライズ', price: '¥9,800/月', desc: '全力支援 · 枚数無制限' },
             ].map(({ name, price, desc }, i) => (
               <div
                 key={name}
@@ -208,7 +208,7 @@ export default function HomePage() {
             ))}
           </div>
           <p className="text-center text-xs mt-4" style={{ color: '#B88860' }}>
-            価格はすべて税込（JPY）。クレジットカード決済（Visa・Mastercard・AMEX・JCB）
+            すべて税込・月額払い。カード決済対応（Visa · Master · AMEX · JCB）
           </p>
         </div>
       </div>

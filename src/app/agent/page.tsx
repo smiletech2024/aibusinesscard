@@ -227,11 +227,11 @@ export default function AgentPage() {
         setAgentMsg(`⚠️ ${data.error}`)
       } else {
         const n = data.newCount ?? 0
-        setAgentMsg(n > 0 ? `✅ ${n}件の新しいマッチングが見つかりました！` : '🔍 新しいマッチングはありませんでした。しばらくすると増えます。')
+        setAgentMsg(n > 0 ? `✅ ${n}件の案件が見つかりました。確認してみてください。` : '今回は新しい案件が見つかりませんでした。ユーザーが増えると見つかりやすくなります。')
         await fetchAll()
       }
     } catch {
-      setAgentMsg('⚠️ エラーが発生しました')
+      setAgentMsg('⚠️ エラーが起きました。もう一度お試しください')
     } finally {
       setAgentRunning(false)
     }
@@ -307,7 +307,7 @@ export default function AgentPage() {
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
             {/* Pulse dot */}
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#E8601C', display: 'inline-block', boxShadow: '0 0 0 2px rgba(232,96,28,0.25)', animation: 'pulse 2s infinite' }} />
-            <span style={{ fontSize: 16, fontWeight: 800, color: '#2C1806' }}>AIエージェント</span>
+            <span style={{ fontSize: 16, fontWeight: 800, color: '#2C1806' }}>営業エージェント</span>
           </div>
           {newBadge > 0 && (
             <span style={{
@@ -323,9 +323,9 @@ export default function AgentPage() {
         {/* ── タブ ── */}
         <div style={{ display: 'flex', gap: 0, marginTop: 20, marginBottom: 24, background: 'white', borderRadius: 14, padding: 4, border: '1px solid rgba(196,136,58,0.18)' }}>
           {([
-            { key: 'matches', icon: '🤝', label: 'マッチング', badge: newBadge },
-            { key: 'needs',   icon: '📌', label: '課題',       badge: needs.length },
-            { key: 'skills',  icon: '⚡', label: 'スキル',     badge: skills.length },
+            { key: 'matches', icon: '🎯', label: '案件マッチング', badge: newBadge },
+            { key: 'needs',   icon: '📌', label: '今の課題',     badge: needs.length },
+            { key: 'skills',  icon: '💡', label: '得意分野',     badge: skills.length },
           ] as const).map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
               style={{
@@ -371,9 +371,9 @@ export default function AgentPage() {
                       <img src="/interviewer.png" alt="AI" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
                     </div>
                     <div>
-                      <div style={{ fontSize: 15, fontWeight: 800, color: '#2C1806' }}>AIエージェントを実行</div>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: '#2C1806' }}>エージェントに動いてもらう</div>
                       <div style={{ fontSize: 11, color: '#B88860', marginTop: 2 }}>
-                        あなたのスキルで対応できる課題を自動検索します
+                        あなたのスキルで解決できる案件を、他ユーザーの中から自動で見つけます
                       </div>
                     </div>
                   </div>
@@ -406,9 +406,9 @@ export default function AgentPage() {
                     {agentRunning ? (
                       <>
                         <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite' }}>⚙️</span>
-                        エージェントが案件を探しています...
+                        ほかのユーザーの課題をスキャンしています...
                       </>
-                    ) : '🚀 エージェントを実行して案件を探す'}
+                    ) : '🔍 案件を探してもらう'}
                   </button>
 
                   {agentMsg && (
@@ -424,13 +424,13 @@ export default function AgentPage() {
                 {/* 見つけた案件（outgoing） */}
                 <div style={{ marginBottom: 32 }}>
                   <div style={{ fontSize: 11, fontWeight: 800, color: '#B88860', letterSpacing: '0.1em', marginBottom: 12 }}>
-                    あなたのスキルで対応できそうな案件 ({outgoing.length})
+                    対応できそうな案件 ({outgoing.length}件)
                   </div>
                   {outgoing.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '32px 20px', background: 'white', borderRadius: 16, border: '1px dashed rgba(196,136,58,0.3)' }}>
                       <div style={{ fontSize: 28, marginBottom: 8 }}>🔍</div>
                       <p style={{ fontSize: 13, color: '#B88860', margin: 0 }}>
-                        エージェントを実行すると案件が表示されます
+                        ボタンを押して、エージェントに案件を探させましょう
                       </p>
                     </div>
                   ) : (
@@ -482,7 +482,7 @@ export default function AgentPage() {
                                       color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer',
                                       boxShadow: '0 3px 10px rgba(232,96,28,0.25)',
                                     }}>
-                                    詳細を見て提案する →
+                                    提案する →
                                   </button>
                                 )}
                               </div>
@@ -498,7 +498,7 @@ export default function AgentPage() {
                 {incoming.length > 0 && (
                   <div>
                     <div style={{ fontSize: 11, fontWeight: 800, color: '#B88860', letterSpacing: '0.1em', marginBottom: 12 }}>
-                      あなたの課題に対する提案 ({incoming.length})
+                      あなたの課題への提案 ({incoming.length}件)
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                       {incoming.map(m => {
@@ -513,7 +513,7 @@ export default function AgentPage() {
                               <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#2563EB,#1D4ED8)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>📬</div>
                               <div>
                                 <div style={{ fontSize: 13, fontWeight: 700, color: '#2C1806' }}>
-                                  {m.skill_user_name} さんから提案が届きました
+                                  {m.skill_user_name} さんが提案しています
                                 </div>
                                 <div style={{ fontSize: 11, color: '#B88860' }}>
                                   {m.skill_user_company} · {m.skill_title} · 適合度 {m.match_score}点
@@ -543,7 +543,7 @@ export default function AgentPage() {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                   <div>
                     <div style={{ fontSize: 15, fontWeight: 800, color: '#2C1806' }}>今の課題</div>
-                    <div style={{ fontSize: 11, color: '#B88860' }}>AIが他ユーザーのスキルとマッチングします</div>
+                    <div style={{ fontSize: 11, color: '#B88860' }}>課題を登録すると、解決できる人がアプローチしてきます</div>
                   </div>
                   <button
                     onClick={() => startInterview('needs')}
@@ -553,7 +553,7 @@ export default function AgentPage() {
                       color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer',
                       boxShadow: '0 3px 10px rgba(232,96,28,0.25)',
                     }}>
-                    + 課題を追加
+                    ＋ 課題を登録する
                   </button>
                 </div>
 
@@ -563,9 +563,9 @@ export default function AgentPage() {
                     borderRadius: 20, border: '2px dashed rgba(196,136,58,0.3)',
                   }}>
                     <div style={{ fontSize: 40, marginBottom: 12 }}>📌</div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: '#2C1806', marginBottom: 6 }}>今抱えている課題を登録しましょう</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: '#2C1806', marginBottom: 6 }}>解決したい課題はありますか？</div>
                     <div style={{ fontSize: 12, color: '#B88860', marginBottom: 20, lineHeight: 1.7 }}>
-                      AIが丁寧にヒアリングして整理します。<br />登録した課題をもとに、解決できる人をマッチングします。
+                      AIが3〜5問で内容を整理します。<br />登録すると、解決できるスキルを持つ人が自動でアプローチしてきます。
                     </div>
                     <button
                       onClick={() => startInterview('needs')}
@@ -575,7 +575,7 @@ export default function AgentPage() {
                         color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer',
                         boxShadow: '0 4px 16px rgba(232,96,28,0.3)',
                       }}>
-                      AIと話して課題を登録する →
+                      課題をAIに話す →
                     </button>
                   </div>
                 ) : (
@@ -632,7 +632,7 @@ export default function AgentPage() {
                         background: 'transparent', color: '#E8601C', fontSize: 13, fontWeight: 700,
                         cursor: 'pointer', width: '100%',
                       }}>
-                      + もう1つ課題を追加
+                      ＋ 別の課題も登録する
                     </button>
                   </div>
                 )}
@@ -645,7 +645,7 @@ export default function AgentPage() {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                   <div>
                     <div style={{ fontSize: 15, fontWeight: 800, color: '#2C1806' }}>得意分野・スキル</div>
-                    <div style={{ fontSize: 11, color: '#B88860' }}>エージェントが他ユーザーの課題とマッチングします</div>
+                    <div style={{ fontSize: 11, color: '#B88860' }}>登録したスキルをもとに、エージェントが自動で案件を探します</div>
                   </div>
                   <button
                     onClick={() => startInterview('skills')}
@@ -655,7 +655,7 @@ export default function AgentPage() {
                       color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer',
                       boxShadow: '0 3px 10px rgba(29,78,216,0.25)',
                     }}>
-                    + スキルを追加
+                    ＋ スキルを登録する
                   </button>
                 </div>
 
@@ -665,9 +665,9 @@ export default function AgentPage() {
                     borderRadius: 20, border: '2px dashed rgba(29,78,216,0.2)',
                   }}>
                     <div style={{ fontSize: 40, marginBottom: 12 }}>⚡</div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: '#2C1806', marginBottom: 6 }}>得意なことを登録しましょう</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: '#2C1806', marginBottom: 6 }}>あなたのスキルを教えてください</div>
                     <div style={{ fontSize: 12, color: '#B88860', marginBottom: 20, lineHeight: 1.7 }}>
-                      AIがあなたの強みを引き出してくれます。<br />登録後、エージェントが自動で仕事を見つけます。
+                      AIが3〜5問であなたの強みを整理します。<br />登録後すぐ、エージェントが案件を探し始めます。
                     </div>
                     <button
                       onClick={() => startInterview('skills')}
@@ -677,7 +677,7 @@ export default function AgentPage() {
                         color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer',
                         boxShadow: '0 4px 16px rgba(29,78,216,0.25)',
                       }}>
-                      AIと話してスキルを登録する →
+                      強みをAIに話す →
                     </button>
                   </div>
                 ) : (
@@ -724,7 +724,7 @@ export default function AgentPage() {
                         background: 'transparent', color: '#1D4ED8', fontSize: 13, fontWeight: 700,
                         cursor: 'pointer', width: '100%',
                       }}>
-                      + もう1つスキルを追加
+                      ＋ 別のスキルも登録する
                     </button>
                   </div>
                 )}
@@ -755,7 +755,7 @@ export default function AgentPage() {
             </button>
             <div style={{ flex: 1, textAlign: 'center' }}>
               <span style={{ fontSize: 14, fontWeight: 800, color: '#2C1806' }}>
-                {interviewType === 'needs' ? '📌 課題ヒアリング' : '⚡ スキルヒアリング'}
+                {interviewType === 'needs' ? '📌 課題をヒアリング' : '💡 スキルをヒアリング'}
               </span>
             </div>
             <div style={{ width: 48 }} />
@@ -813,7 +813,7 @@ export default function AgentPage() {
                 border: '2px solid #E8601C', boxShadow: '0 4px 20px rgba(232,96,28,0.15)',
               }}>
                 <div style={{ fontSize: 13, fontWeight: 800, color: '#E8601C', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  ✅ ヒアリング完了！内容を確認してください
+                  ✅ 整理できました。内容を確認してください
                 </div>
                 {[
                   { label: '分野', value: CATEGORY_META[summary.category]?.label ?? summary.category },
@@ -834,7 +834,7 @@ export default function AgentPage() {
                   <button
                     onClick={() => { setSummary(null); setMessages([]); sendToAI([]) }}
                     style={{ flex: 1, padding: 10, borderRadius: 10, border: '1.5px solid rgba(196,136,58,0.3)', background: 'white', color: '#7A4A28', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-                    やり直す
+                    もう一度話す
                   </button>
                   <button
                     onClick={handleSave}
@@ -845,7 +845,7 @@ export default function AgentPage() {
                       color: saving ? '#B88860' : 'white', fontSize: 13, fontWeight: 800, cursor: saving ? 'wait' : 'pointer',
                       boxShadow: '0 3px 12px rgba(232,96,28,0.3)',
                     }}>
-                    {saving ? '保存中...' : 'この内容で登録する ✓'}
+                    {saving ? '保存中...' : 'これで登録する'}
                   </button>
                 </div>
               </div>
@@ -905,13 +905,13 @@ export default function AgentPage() {
             maxWidth: 680, margin: '0 auto',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: '#2C1806' }}>提案内容の確認・送信</div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#2C1806' }}>提案を送る</div>
               <button onClick={() => setApproachMatch(null)} style={{ background: 'none', border: 'none', color: '#B88860', fontSize: 18, cursor: 'pointer' }}>✕</button>
             </div>
 
             {/* 課題詳細 */}
             <div style={{ background: '#FBF4EC', borderRadius: 12, padding: '14px 16px', marginBottom: 20 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: '#B88860', letterSpacing: '0.08em', marginBottom: 6 }}>対象の課題</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: '#B88860', letterSpacing: '0.08em', marginBottom: 6 }}>相手の課題</div>
               <div style={{ fontSize: 14, fontWeight: 800, color: '#2C1806', marginBottom: 4 }}>{approachMatch.need_title}</div>
               <div style={{ fontSize: 12, color: '#7A4A28', lineHeight: 1.6, marginBottom: 8 }}>{approachMatch.need_description}</div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -924,11 +924,11 @@ export default function AgentPage() {
             {/* メッセージ編集 */}
             <div style={{ marginBottom: 20 }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: '#B88860', letterSpacing: '0.05em', marginBottom: 8 }}>
-                AIが生成したアプローチメッセージ（編集可）
+                AIが作ったメッセージ（自由に編集できます）
               </div>
               {genLoading ? (
                 <div style={{ padding: 20, textAlign: 'center', color: '#B88860', fontSize: 13 }}>
-                  ✨ メッセージを生成中...
+                  ✨ メッセージを考えています...
                 </div>
               ) : (
                 <textarea
@@ -955,7 +955,7 @@ export default function AgentPage() {
                 fontSize: 14, fontWeight: 800, cursor: sendLoading || genLoading ? 'wait' : 'pointer',
                 boxShadow: '0 4px 16px rgba(232,96,28,0.3)',
               }}>
-              {sendLoading ? '送信中...' : '📨 このメッセージを相手に送る'}
+              {sendLoading ? '送信中...' : '送る'}
             </button>
           </div>
         </div>

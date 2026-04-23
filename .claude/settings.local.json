@@ -50,7 +50,23 @@
       "Bash(python3)",
       "Bash(awk -F': ' '{n=$2+0; if\\(n<13 && n>0\\) print}')",
       "Bash(xargs cat *)",
-      "Bash(grep -E \"^.*\\(error|Error\\).*$\")"
+      "Bash(grep -E \"^.*\\(error|Error\\).*$\")",
+      "Bash(sed -i '' 's/✅ ${n}件の新しいマッチングが見つかりました！/✅ ${n}件の案件が見つかりました。確認してみてください。/g' /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/agent/page.tsx)",
+      "Bash(sed -i '' 's/🔍 新しいマッチングはありませんでした。しばらくすると増えます。/今回は新しい案件が見つかりませんでした。ユーザーが増えると見つかりやすくなります。/g' /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/agent/page.tsx)",
+      "Bash(sed -i '' 's/⚠️ エラーが発生しました/⚠️ エラーが起きました。もう一度お試しください/g' /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/agent/page.tsx)",
+      "Bash(sed -i '' s/エージェントが案件を探しています.../ほかのユーザーの課題をスキャンしています.../g /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/agent/page.tsx)",
+      "Bash(sed -i '' 's/🚀 エージェントを実行して案件を探す/🔍 案件を探してもらう/g' /Users/tsuyoshigoto/Desktop/aibusinesscard/src/app/agent/page.tsx)",
+      "Bash(sed -i '' s/AIが他ユーザーのスキルとマッチングします/課題を登録すると、解決できる人がアプローチしてきます/g src/app/agent/page.tsx)",
+      "Bash(sed -i '' 's/+ 課題を追加/＋ 課題を登録する/g' src/app/agent/page.tsx)",
+      "Bash(sed -i '' s/今抱えている課題を登録しましょう/解決したい課題はありますか？/g src/app/agent/page.tsx)",
+      "Bash(sed -i '' s/AIが丁寧にヒアリングして整理します。/AIが3〜5問で内容を整理します。/g src/app/agent/page.tsx)",
+      "Bash(sed -i '' s/登録した課題をもとに、解決できる人をマッチングします。/登録すると、解決できるスキルを持つ人が自動でアプローチしてきます。/g src/app/agent/page.tsx)",
+      "Bash(sed -i '' s/約3分で、あなたらしいAIが完成する/約3分で、あなたとして話すAIが完成する/g src/app/auth/login/page.tsx)",
+      "Bash(sed -i '' s/要約＋相性スコアつきで、本物の商談へ/相性スコアつきで、本物の商談だけ届く/g src/app/auth/login/page.tsx)",
+      "Bash(sed -i '' s/分身AIを作成する/分身AIを作る/g src/app/auth/login/page.tsx)",
+      "Bash(sed -i '' s/無料・約3分で完成します/無料、3分で完成します/g src/app/auth/login/page.tsx)",
+      "Bash(sed -i '' s/このメールアドレスはすでに登録されています。ログインしてください。/このアドレスはすでに登録済みです。ログインしてください。/g src/app/auth/login/page.tsx)",
+      "Bash(pkill -f \"next build\")"
     ]
   }
 }
