@@ -15,7 +15,7 @@
  *    - AI が止まらない安心感
  */
 
-export type PlanId = 'free' | 'solo' | 'growth' | 'scale'
+export type PlanId = 'free' | 'solo' | 'pro' | 'growth' | 'scale'
 
 export type Plan = {
   id: PlanId
@@ -53,6 +53,24 @@ export const PLANS: Record<PlanId, Plan> = {
       monthlyReport:     false,
       prioritySupport:   false,
     },
+  },
+  pro: {
+    id:                   'pro',
+    name:                 'プロ',
+    priceJpy:             1_480,
+    maxCards:             3,
+    maxPersonas:          3,
+    maxSessionsPerMonth:  -1,
+    monthlyTokens:        1_200_000,   // 120万/月
+    showBranding:         false,
+    analysisHistoryLimit: -1,
+    features: {
+      sessionAnalysis:   true,
+      pushNotifications: true,
+      monthlyReport:     true,         // 週次レポートあり
+      prioritySupport:   false,
+    },
+    badge: 'おすすめ',
   },
   solo: {
     id:                   'solo',
@@ -123,6 +141,7 @@ export const TOKEN_RATE_TABLE = [
 /** Stripe Price ID ↔ PlanId */
 export function getPlanByPriceId(priceId: string): PlanId | null {
   if (priceId === process.env.STRIPE_PRICE_SOLO)   return 'solo'
+  if (priceId === process.env.STRIPE_PRICE_PRO)    return 'pro'
   if (priceId === process.env.STRIPE_PRICE_GROWTH)  return 'growth'
   if (priceId === process.env.STRIPE_PRICE_SCALE)   return 'scale'
   return null
@@ -130,6 +149,7 @@ export function getPlanByPriceId(priceId: string): PlanId | null {
 
 export function getPriceIdByPlan(planId: PlanId): string | null {
   if (planId === 'solo')   return process.env.STRIPE_PRICE_SOLO   ?? null
+  if (planId === 'pro')    return process.env.STRIPE_PRICE_PRO    ?? null
   if (planId === 'growth') return process.env.STRIPE_PRICE_GROWTH ?? null
   if (planId === 'scale')  return process.env.STRIPE_PRICE_SCALE  ?? null
   return null
@@ -153,6 +173,7 @@ export function canStartSession(plan: PlanId, monthlyCount: number): boolean {
 export const PLAN_COLORS: Record<PlanId, { bg: string; text: string; border: string }> = {
   free:   { bg: '#F3F4F6', text: '#6B7280', border: '#D1D5DB' },
   solo:   { bg: '#FFF0E8', text: '#F26722', border: '#F26722' },
+  pro:    { bg: '#FFF0E8', text: '#E05A18', border: '#E05A18' },
   growth: { bg: '#EDE9FE', text: '#7C3AED', border: '#7C3AED' },
   scale:  { bg: '#FEF9C3', text: '#92400E', border: '#F59E0B' },
 }

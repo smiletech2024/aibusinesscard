@@ -66,7 +66,7 @@ function PricingContent() {
   }
 
   const currentPlan = planInfo?.plan ?? 'free'
-  const planOrder: PlanId[] = ['free', 'solo', 'growth', 'scale']
+  const planOrder: PlanId[] = ['free', 'solo', 'pro', 'growth', 'scale']
 
   return (
     <div style={{ minHeight: '100vh', background: '#FAF5F0', paddingBottom: 80 }}>

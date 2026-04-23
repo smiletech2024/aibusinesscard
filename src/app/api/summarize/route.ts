@@ -82,6 +82,10 @@ export async function POST(req: NextRequest) {
       .update({ status: 'summarized', summary_id: summary.id })
       .eq('id', sessionId)
 
+    // ── 熱い客スコア判定 ─────────────────────────────────────────────
+    const score = parseInt(String(summaryData.compatibility_score ?? '0'), 10)
+    const isHotLead = !isNaN(score) && score >= 75
+
     // ── オーナーへメール通知 ──────────────────────────────────────────
     if (ownerUserId && RESEND_API_KEY) {
       try {
@@ -92,25 +96,53 @@ export async function POST(req: NextRequest) {
           .maybeSingle()
         const ownerEmail = profile?.email
         if (ownerEmail) {
-          const scoreText = summaryData.compatibility_score ? `相性スコア: ${summaryData.compatibility_score}点` : ''
-          const purposeText = summaryData.purpose ? `目的: ${summaryData.purpose}` : ''
+          const purposeText = summaryData.purpose || ''
+          const nextAction  = summaryData.next_action || ''
+
+          const hotBanner = isHotLead ? `
+            <div style="background:#FEF3C7;border:2px solid #F59E0B;border-radius:12px;padding:16px;margin-bottom:20px">
+              <div style="font-size:20px;margin-bottom:6px">🔥 熱い見込み客です！</div>
+              <div style="font-size:14px;color:#92400E;font-weight:700">相性スコア ${score}点 — 今すぐ連絡することをおすすめします</div>
+              ${nextAction ? `<div style="font-size:13px;color:#78350F;margin-top:8px">💡 ${nextAction}</div>` : ''}
+            </div>` : ''
+
           await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND_API_KEY}` },
             body: JSON.stringify({
               from: FROM,
               to: ownerEmail,
-              subject: `💬 ${customerName}さんとのAI会話まとめが届きました`,
+              subject: isHotLead
+                ? `🔥 熱い見込み客！${customerName}さんとの会話まとめ（スコア${score}点）`
+                : `💬 ${customerName}さんとのAI会話まとめが届きました`,
               html: `
-                <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px">
-                  <h2 style="color:#F26722">新しい相談まとめ</h2>
-                  <p><strong>${customerName}</strong>さんがあなたのAI分身と会話しました。</p>
-                  ${purposeText ? `<p style="background:#FFF7ED;padding:10px;border-radius:8px;border-left:3px solid #F26722">${purposeText}</p>` : ''}
-                  ${scoreText ? `<p style="color:#059669;font-weight:bold">${scoreText}</p>` : ''}
-                  <a href="${SITE_URL}/summary/${sessionId}" style="display:inline-block;background:#F26722;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:12px">
+                <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
+                  <div style="margin-bottom:20px">
+                    <img src="${SITE_URL}/logo.png" alt="AI名刺" height="28" style="opacity:0.8" />
+                  </div>
+                  ${hotBanner}
+                  <h2 style="color:#1C0F05;font-size:18px;margin:0 0 8px">新しい相談まとめ</h2>
+                  <p style="color:#6B7280;font-size:14px;margin:0 0 20px">
+                    <strong style="color:#1C0F05">${customerName}</strong>さんがあなたのAI分身と会話しました。
+                  </p>
+                  ${purposeText ? `
+                    <div style="background:#FFF7ED;border-left:4px solid #F26722;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:16px">
+                      <div style="font-size:11px;color:#A08068;font-weight:700;margin-bottom:4px">相談の目的</div>
+                      <div style="font-size:14px;color:#1C0F05">${purposeText}</div>
+                    </div>` : ''}
+                  ${score > 0 ? `
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px">
+                      <div style="font-size:13px;color:#6B7280">相性スコア</div>
+                      <div style="font-size:20px;font-weight:900;color:${score >= 75 ? '#F59E0B' : score >= 50 ? '#F26722' : '#9CA3AF'}">${score}点</div>
+                      <div style="font-size:12px;color:${score >= 75 ? '#D97706' : '#9CA3AF'}">${score >= 75 ? '🔥 高い' : score >= 50 ? '普通' : '低め'}</div>
+                    </div>` : ''}
+                  <a href="${SITE_URL}/summary/${sessionId}"
+                    style="display:inline-block;background:linear-gradient(135deg,#F26722,#F59340);color:white;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px;margin-bottom:24px">
                     まとめを確認する →
                   </a>
-                  <p style="color:#9CA3AF;font-size:12px;margin-top:20px">AI名刺 · aimeishi.biz</p>
+                  <p style="color:#D1D5DB;font-size:11px;border-top:1px solid #F3F4F6;padding-top:16px">
+                    AI名刺 · <a href="${SITE_URL}" style="color:#D1D5DB">aimeishi.biz</a>
+                  </p>
                 </div>
               `,
             }),
@@ -118,6 +150,37 @@ export async function POST(req: NextRequest) {
         }
       } catch (emailErr) {
         console.error('Summary email failed:', emailErr)
+      }
+    }
+
+    // ── 熱い客プッシュ通知 ────────────────────────────────────────────
+    if (isHotLead && ownerUserId && RESEND_API_KEY) {
+      try {
+        const { data: ownerSubs } = await admin
+          .from('push_subscriptions')
+          .select('subscription')
+          .eq('user_id', ownerUserId)
+          .eq('role', 'owner')
+        if (ownerSubs?.length) {
+          const webpush = (await import('web-push')).default
+          webpush.setVapidDetails(
+            process.env.VAPID_SUBJECT!,
+            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+            process.env.VAPID_PRIVATE_KEY!
+          )
+          const payload = JSON.stringify({
+            title: `🔥 熱い見込み客！スコア${score}点`,
+            body: `${customerName}さん — 今すぐ連絡するチャンスです`,
+            url: `/summary/${sessionId}`,
+          })
+          await Promise.allSettled(
+            ownerSubs.map(({ subscription }) =>
+              webpush.sendNotification(subscription as import('web-push').PushSubscription, payload)
+            )
+          )
+        }
+      } catch (pushErr) {
+        console.error('Hot lead push failed:', pushErr)
       }
     }
 
