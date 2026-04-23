@@ -193,8 +193,8 @@ export default function EditPersonaPage() {
             </svg>
           </button>
           <div>
-            <h1 className="font-black text-base" style={{ color: '#1C0F05' }}>AIの知識を強化する</h1>
-            <p className="text-xs" style={{ color: '#A08068' }}>スキル・案件事例を学習させると回答精度が上がります</p>
+            <h1 className="font-black text-base" style={{ color: '#1C0F05' }}>分身AIを育てる</h1>
+            <p className="text-xs" style={{ color: '#A08068' }}>ここに入れた情報だけが、あなたのAIの記憶になる</p>
           </div>
         </div>
       </div>
@@ -205,10 +205,10 @@ export default function EditPersonaPage() {
         <div className="card p-5">
           <div className="flex items-center gap-2 mb-1">
             <span style={{ fontSize: 20 }}>🎭</span>
-            <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>AIの口調・トーン</h2>
+            <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>話し方のクセを決める</h2>
           </div>
           <p className="text-xs mb-4" style={{ color: '#A08068' }}>
-            お客様に対してどんな話し方をするか選んでください。業種・ブランドイメージに合わせてください
+            名刺を渡した相手への第一印象です。あなたのブランドに合った話し方を選んでください
           </p>
 
           {/* プリセット選択 */}
@@ -248,7 +248,7 @@ export default function EditPersonaPage() {
               <div style={{ fontSize: 13, fontWeight: 800, color: tonePreset === 'custom' ? '#C4511A' : '#1C0F05', marginBottom: 2 }}>
                 カスタム
               </div>
-              <div style={{ fontSize: 11, color: '#A08068', lineHeight: 1.4 }}>自分で細かく指定</div>
+              <div style={{ fontSize: 11, color: '#A08068', lineHeight: 1.4 }}>ゼロから自分で指定</div>
             </button>
           </div>
 
@@ -257,7 +257,7 @@ export default function EditPersonaPage() {
             const p = TONE_PRESETS.find(p => p.id === tonePreset)
             return p ? (
               <div style={{ background: '#FAF5F0', border: '1px solid #EDD9C8', borderRadius: 10, padding: '10px 12px', marginBottom: 12 }}>
-                <p className="text-xs font-bold mb-1" style={{ color: '#A08068' }}>AIへの指示（プリセット内容）</p>
+                <p className="text-xs font-bold mb-1" style={{ color: '#A08068' }}>AIに渡している指示文</p>
                 <p className="text-xs" style={{ color: '#4A2C1A', lineHeight: 1.6 }}>{p.value}</p>
               </div>
             ) : null
@@ -266,7 +266,7 @@ export default function EditPersonaPage() {
           {/* 追加指示 or カスタム全文 */}
           <div>
             <label className="block text-xs font-semibold mb-1.5" style={{ color: '#4A2C1A' }}>
-              {tonePreset === 'custom' ? '口調の指示（自由記述）' : '追加の口調指示（任意）'}
+              {tonePreset === 'custom' ? 'ゼロから指定（自由記述）' : 'さらに調整したい場合（任意）'}
             </label>
             <textarea
               value={toneCustom}
@@ -296,13 +296,13 @@ export default function EditPersonaPage() {
             <span style={{ fontSize: 24, flexShrink: 0 }}>🎤</span>
             <div>
               <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>
-                あなたの生の言葉を貼り付ける
+                あなたが書いた文を、そのまま貼る
                 <span className="ml-2 text-xs font-bold px-2 py-0.5 rounded-full"
-                  style={{ background: 'rgba(242,103,34,0.12)', color: '#F26722' }}>最も効果大</span>
+                  style={{ background: 'rgba(242,103,34,0.12)', color: '#F26722' }}>いちばん効果が出ます</span>
               </h2>
               <p className="text-xs mt-1 leading-relaxed" style={{ color: '#6B7280' }}>
-                SNS投稿・メール・ブログ・仕事への想いなど、<strong style={{ color: '#1C0F05' }}>あなたが実際に書いた文章</strong>をそのまま貼り付けてください。<br />
-                整えなくていいです。文体・語彙・熱量をAIが直接学習します。
+                SNSの投稿、送ったメール、ブログの一節。なんでもいい。<br />
+                <strong style={{ color: '#1C0F05' }}>整えなくていいです。</strong>あなたらしい言葉・間・熱量を、AIがそのまま受け取ります。
               </p>
             </div>
           </div>
@@ -324,17 +324,17 @@ export default function EditPersonaPage() {
             {rawVoice.length > 0 ? (
               <div className="flex items-center gap-2">
                 <div className="text-xs font-bold" style={{ color: rawVoice.length >= 300 ? '#059669' : rawVoice.length >= 100 ? '#F59E0B' : '#EF4444' }}>
-                  {rawVoice.length >= 300 ? '✓ 精度：高' : rawVoice.length >= 100 ? '△ 精度：中（もう少し書くと上がります）' : '✗ 精度：低（100文字以上を目安に）'}
+                  {rawVoice.length >= 300 ? '✓ 十分です。AIがあなたらしく話せます' : rawVoice.length >= 100 ? `△ あと${300 - rawVoice.length}文字で精度が上がります` : '✗ まだ短いです（100文字を目安に）'}
                 </div>
                 <span className="text-xs" style={{ color: '#A08068' }}>{rawVoice.length}文字</span>
               </div>
             ) : (
-              <p className="text-xs" style={{ color: '#A08068' }}>100文字以上書くと効果が出ます（300文字以上で最高精度）</p>
+              <p className="text-xs" style={{ color: '#A08068' }}>100文字〜でAIの個性が出始めます。300文字以上で最高精度</p>
             )}
           </div>
           {rawVoice.length > 0 && rawVoice.length < 100 && (
             <div className="mt-2 p-3 rounded-xl text-xs" style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)', color: '#B91C1C' }}>
-              💡 ヒント：SNSの投稿、お客様へのメール、自己紹介文など、すでに書いたものをそのまま貼り付けるだけでOKです
+              💡 すでに書いたものをそのまま貼るだけでOKです。SNSの投稿、過去のメール、自己紹介文、なんでも
             </div>
           )}
         </div>
@@ -342,13 +342,13 @@ export default function EditPersonaPage() {
         {/* スキルセット */}
         <div className="card p-5">
           <div className="flex items-center justify-between mb-1">
-            <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>スキルセット・専門領域</h2>
+            <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>得意領域を登録する</h2>
             <span className="text-xs font-bold" style={{ color: skills.length >= 20 ? '#EF4444' : '#A08068' }}>
               {skills.length}/20
             </span>
           </div>
           <p className="text-xs mb-4" style={{ color: '#A08068' }}>
-            タップで追加・解除。一覧にないものは下の入力欄から追加できます
+            タップで選ぶだけ。「何の専門家か」をAIに覚えさせます
           </p>
 
           {/* プリセット選択肢 */}
@@ -450,8 +450,8 @@ export default function EditPersonaPage() {
         <div>
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>お問い合わせ対応設定</h2>
-              <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>よくある質問と回答を登録しておくとAIが代わりに答えます</p>
+              <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>よく来る質問を先読みする</h2>
+              <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>ここに仕込んでおくと、AIが24時間代わりに答えます</p>
             </div>
             <button
               onClick={addFaq}
@@ -465,7 +465,8 @@ export default function EditPersonaPage() {
           <div className="space-y-3">
             {faqs.length === 0 && (
               <div className="rounded-xl p-4 text-center" style={{ background: 'rgba(255,255,255,0.5)', border: '1.5px dashed #DEC4AD' }}>
-                <p className="text-sm" style={{ color: '#A08068' }}>＋ 追加ボタンでFAQを登録できます</p>
+                <p className="text-sm font-semibold mb-1" style={{ color: '#4A2C1A' }}>まだ登録されていません</p>
+                <p className="text-xs" style={{ color: '#A08068' }}>「料金は？」「どんな人に向いてる？」など、初回に必ず来る質問を先に仕込んでおきましょう</p>
               </div>
             )}
             {faqs.map((faq, idx) => (
@@ -522,18 +523,18 @@ export default function EditPersonaPage() {
         <div>
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>過去案件・プロジェクト事例</h2>
-              <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>具体的な数字・結果まで書くほど精度が上がります</p>
+              <h2 className="font-black text-sm" style={{ color: '#1C0F05' }}>実績・プロジェクト事例</h2>
+              <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>「何を変えたか」を数字で書くと、相手の信頼が変わります</p>
             </div>
             <button
               onClick={addProject}
               style={{
                 fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 10,
                 background: '#FFF0E8', color: '#C4511A', border: '1.5px solid #FDD5B5',
-                cursor: 'pointer',
+                cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
               }}
             >
-              + 追加
+              ＋ 追加
             </button>
           </div>
 
@@ -611,7 +612,7 @@ export default function EditPersonaPage() {
               boxShadow: saving ? 'none' : '0 4px 14px rgba(242,103,34,0.3)',
             }}
           >
-            {saving ? '保存中...' : 'AIに学習させる →'}
+            {saving ? '更新中...' : 'この内容でAIを育てる →'}
           </button>
         </div>
       </div>
