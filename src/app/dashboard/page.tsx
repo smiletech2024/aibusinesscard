@@ -1168,6 +1168,9 @@ export default function DashboardPage() {
         </div>
 
 
+        {/* ── 友達紹介 ── */}
+        {userId && <ReferralPanel userId={userId} />}
+
         {/* ── アポイント一覧 ── */}
         {appointments.length > 0 && (
           <div>
@@ -1427,8 +1430,6 @@ export default function DashboardPage() {
             )}
           </div>
         )}
-        {/* ── 友達紹介 ── */}
-        {userId && <ReferralPanel userId={userId} />}
 
       </div>
       <SiteFooter />
