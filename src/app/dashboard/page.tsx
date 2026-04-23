@@ -54,9 +54,6 @@ export default function DashboardPage() {
   const [monthlySessionCount, setMonthlySessionCount] = useState(0)
   const [maxSessions, setMaxSessions]             = useState(-1)
   const [appointments, setAppointments]           = useState<Appointment[]>([])
-  const [needsCount, setNeedsCount]               = useState(0)
-  const [skillsCount, setSkillsCount]             = useState(0)
-  const [matchesCount, setMatchesCount]           = useState(0)
   const personaIdsRef  = useRef<string[]>([])
   const avatarInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
@@ -96,18 +93,6 @@ export default function DashboardPage() {
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d?.appointments) setAppointments(d.appointments) })
       .catch(() => {})
-  }, [])
-  useEffect(() => {
-    Promise.all([
-      fetch('/api/needs').then(r => r.ok ? r.json() : []),
-      fetch('/api/skills').then(r => r.ok ? r.json() : []),
-      fetch('/api/agent/matches').then(r => r.ok ? r.json() : { outgoing: [], incoming: [] }),
-    ]).then(([needs, skills, matches]) => {
-      setNeedsCount(Array.isArray(needs) ? needs.length : 0)
-      setSkillsCount(Array.isArray(skills) ? skills.length : 0)
-      const m = matches as { outgoing?: unknown[]; incoming?: unknown[] }
-      setMatchesCount((m.outgoing?.length ?? 0) + (m.incoming?.length ?? 0))
-    }).catch(() => {})
   }, [])
   useEffect(() => {
     fetch('/api/plan')
@@ -686,47 +671,25 @@ export default function DashboardPage() {
 
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
         {/* Stats */}
-        <div className="space-y-3">
-          {sessions.length > 0 && (
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { label: '名刺', value: cards.length, unit: '枚', color: '#F26722', borderColor: '#F26722' },
-                { label: '商談中', value: aiChatCount, unit: '件', color: '#F59340', borderColor: '#F59340' },
-                { label: '返事待ち', value: summaryCount, unit: '件', color: '#059669', borderColor: '#059669' },
-              ].map(({ label, value, unit, color, borderColor }) => (
-                <div
-                  key={label}
-                  className="p-4 text-center rounded-2xl"
-                  style={{ background: 'white', border: '1px solid #EDD9C8', borderLeft: `3px solid ${borderColor}`, boxShadow: '0 1px 3px rgba(242,103,34,0.06)' }}
-                >
-                  <div className="text-3xl font-black mb-1" style={{ color }}>{value}</div>
-                  <div className="text-xs font-medium" style={{ color: '#A08068' }}>{label}</div>
-                  <div className="text-xs" style={{ color }}>{unit}</div>
-                </div>
-              ))}
-            </div>
-          )}
-          <Link href="/agent" style={{ textDecoration: 'none' }}>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { label: '課題', value: needsCount, unit: '件', color: '#7C3AED', borderColor: '#7C3AED', icon: '🎯' },
-                { label: 'スキル', value: skillsCount, unit: '件', color: '#0EA5E9', borderColor: '#0EA5E9', icon: '⚡' },
-                { label: 'マッチング', value: matchesCount, unit: '件', color: '#E8601C', borderColor: '#E8601C', icon: '🤝' },
-              ].map(({ label, value, unit, color, borderColor, icon }) => (
-                <div
-                  key={label}
-                  className="p-4 text-center rounded-2xl"
-                  style={{ background: 'white', border: '1px solid #EDD9C8', borderLeft: `3px solid ${borderColor}`, boxShadow: '0 1px 3px rgba(242,103,34,0.06)' }}
-                >
-                  <div style={{ fontSize: 14, marginBottom: 2 }}>{icon}</div>
-                  <div className="text-2xl font-black mb-0.5" style={{ color }}>{value}</div>
-                  <div className="text-xs font-medium" style={{ color: '#A08068' }}>{label}</div>
-                  <div className="text-xs" style={{ color }}>{unit}</div>
-                </div>
-              ))}
-            </div>
-          </Link>
-        </div>
+        {sessions.length > 0 && (
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { label: '名刺', value: cards.length, unit: '枚', color: '#F26722', borderColor: '#F26722' },
+              { label: '商談中', value: aiChatCount, unit: '件', color: '#F59340', borderColor: '#F59340' },
+              { label: '返事待ち', value: summaryCount, unit: '件', color: '#059669', borderColor: '#059669' },
+            ].map(({ label, value, unit, color, borderColor }) => (
+              <div
+                key={label}
+                className="p-4 text-center rounded-2xl"
+                style={{ background: 'white', border: '1px solid #EDD9C8', borderLeft: `3px solid ${borderColor}`, boxShadow: '0 1px 3px rgba(242,103,34,0.06)' }}
+              >
+                <div className="text-3xl font-black mb-1" style={{ color }}>{value}</div>
+                <div className="text-xs font-medium" style={{ color: '#A08068' }}>{label}</div>
+                <div className="text-xs" style={{ color }}>{unit}</div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* ── 顧客関心の可視化（アナリティクス） ── */}
         {analytics && analytics.summarizedSessions > 0 && (
