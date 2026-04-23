@@ -216,15 +216,20 @@ export default function DashboardPage() {
   const [notifPermission, setNotifPermission] = useState<NotificationPermission | 'unsupported' | null>(null)
   const [pushRegistered, setPushRegistered] = useState(false)
 
-  // userId確定後に許可状態チェック＆既許可なら自動登録
+  // マウント時に即座に通知権限を確認（userIdを待たない）
   useEffect(() => {
-    if (typeof window === 'undefined' || !userId) return
+    if (typeof window === 'undefined') return
     if (!('Notification' in window) || !('serviceWorker' in navigator)) {
       setNotifPermission('unsupported'); return
     }
-    const perm = Notification.permission
-    setNotifPermission(perm)
-    if (perm === 'granted') {
+    setNotifPermission(Notification.permission)
+  }, [])
+
+  // userId確定後に既許可なら自動登録
+  useEffect(() => {
+    if (!userId || typeof window === 'undefined') return
+    if (!('Notification' in window)) return
+    if (Notification.permission === 'granted') {
       import('@/lib/push').then(({ subscribePushUser }) =>
         subscribePushUser(userId).then(() => setPushRegistered(true)).catch(() => {})
       )
