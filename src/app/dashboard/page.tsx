@@ -73,6 +73,13 @@ export default function DashboardPage() {
   }
   const [analytics, setAnalytics] = useState<Analytics | null>(null)
 
+  type Insights = {
+    totalSessions: number; thisMonthSessions: number
+    topQuestions: { question: string; count: number }[]
+    appointmentCount: number; appointmentsThisMonth: number; conversionRate: number
+  }
+  const [insights, setInsights] = useState<Insights | null>(null)
+
   type Appointment = {
     id: string; card_id: string; card_name: string
     customer_name: string; customer_email: string | null; customer_phone: string | null
@@ -86,6 +93,13 @@ export default function DashboardPage() {
     fetch('/api/analytics')
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) setAnalytics(d) })
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    fetch('/api/dashboard/insights')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setInsights(d) })
       .catch(() => {})
   }, [])
   useEffect(() => {
@@ -700,6 +714,46 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {/* ── 成果サマリー ── */}
+        {insights && (insights.totalSessions > 0 || insights.appointmentCount > 0) && (
+          <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #EDD9C8', boxShadow: '0 1px 3px rgba(242,103,34,0.06)' }}>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="section-label mb-0.5">あなたの名刺の成果</p>
+                <h2 className="text-base font-black" style={{ color: '#1C0F05' }}>成果サマリー</h2>
+              </div>
+              <span className="text-xs" style={{ color: '#A08068' }}>累計 / 今月</span>
+            </div>
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              {[
+                { label: '累計相談数', value: insights.totalSessions, sub: `今月 ${insights.thisMonthSessions}件`, color: '#F26722' },
+                { label: 'アポ獲得数', value: insights.appointmentCount, sub: `今月 ${insights.appointmentsThisMonth}件`, color: '#059669' },
+                { label: 'アポ転換率', value: `${insights.conversionRate}%`, sub: '相談→アポ', color: insights.conversionRate >= 10 ? '#059669' : '#F59340' },
+              ].map(({ label, value, sub, color }) => (
+                <div key={label} className="text-center p-3 rounded-xl" style={{ background: '#FAF5F0' }}>
+                  <div className="text-2xl font-black" style={{ color }}>{value}</div>
+                  <div className="text-xs font-semibold mt-0.5" style={{ color: '#4A2C1A' }}>{label}</div>
+                  <div className="text-xs mt-0.5" style={{ color: '#A08068' }}>{sub}</div>
+                </div>
+              ))}
+            </div>
+            {insights.topQuestions.length > 0 && (
+              <div>
+                <p className="text-xs font-bold mb-2" style={{ color: '#A08068' }}>💬 よく聞かれた質問 TOP{insights.topQuestions.length}（過去30日）</p>
+                <div className="space-y-2">
+                  {insights.topQuestions.map((q, i) => (
+                    <div key={i} className="flex items-start gap-2 p-2 rounded-lg" style={{ background: '#FFF7F2' }}>
+                      <span className="text-xs font-black flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: '#F26722', color: 'white', fontSize: 10 }}>{i + 1}</span>
+                      <span className="text-xs flex-1" style={{ color: '#1C0F05', lineHeight: 1.5 }}>{q.question}{q.question.length >= 40 ? '…' : ''}</span>
+                      {q.count > 1 && <span className="text-xs font-bold flex-shrink-0" style={{ color: '#F26722' }}>{q.count}回</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* ── 顧客関心の可視化（アナリティクス） ── */}
         {analytics && analytics.summarizedSessions > 0 && (
           <div
@@ -960,7 +1014,7 @@ export default function DashboardPage() {
                             className="btn-primary text-xs px-4 py-2"
                             style={{ borderRadius: 10 }}
                           >
-                            お客様が見る画面を確認
+                            🤖 AIをテスト
                           </a>
                           <Link
                             href={`/edit/${card.id}`}

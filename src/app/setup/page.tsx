@@ -73,6 +73,7 @@ export default function SetupPage() {
 
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const [saveError, setSaveError] = useState('')
+  const [faqWarning, setFaqWarning] = useState(false)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -98,8 +99,10 @@ export default function SetupPage() {
   }
 
   /* ── ドラフト生成 ── */
-  const generateDraft = async () => {
+  const generateDraft = async (skipFaqCheck = false) => {
     if (!qName || !qTitle || !qIndustry || keywords.length === 0) return
+    if (!qFaq.trim() && !skipFaqCheck) { setFaqWarning(true); return }
+    setFaqWarning(false)
     setStep('generating')
     try {
       const res = await fetch('/api/generate-persona-draft', {
@@ -348,9 +351,30 @@ export default function SetupPage() {
               </p>
             </div>
 
+            {faqWarning && (
+              <div style={{ background: '#FEF3C7', border: '1.5px solid #F59E0B', borderRadius: 12, padding: '14px' }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#92400E', marginBottom: 8 }}>
+                  ⚠️ よく聞かれることが空です
+                </p>
+                <p style={{ fontSize: 12, color: '#92400E', marginBottom: 12, lineHeight: 1.6 }}>
+                  ここを埋めないと、AIがお客様の質問に的外れな回答をする可能性があります。<br />
+                  後から編集もできますが、最初から入力することを強くおすすめします。
+                </p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button type="button" onClick={() => setFaqWarning(false)}
+                    style={{ flex: 1, padding: '9px', borderRadius: 9, fontSize: 13, fontWeight: 700, background: '#F26722', color: 'white', border: 'none', cursor: 'pointer' }}>
+                    戻って入力する
+                  </button>
+                  <button type="button" onClick={() => generateDraft(true)}
+                    style={{ flex: 1, padding: '9px', borderRadius: 9, fontSize: 12, fontWeight: 600, background: 'white', color: '#92400E', border: '1px solid #F59E0B', cursor: 'pointer' }}>
+                    このまま続ける
+                  </button>
+                </div>
+              </div>
+            )}
             <button
               type="button"
-              onClick={generateDraft}
+              onClick={() => generateDraft()}
               disabled={!canGenerate}
               style={{
                 width: '100%', padding: '14px', fontSize: 16, fontWeight: 700,
