@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { deepseek, MODEL, getAvatarSystemPrompt } from '@/lib/anthropic'
+import { deepseek, anthropic, MODEL, FALLBACK_MODEL, getAvatarSystemPrompt } from '@/lib/anthropic'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { calcTokensConsumed } from '@/lib/credits'
@@ -115,34 +115,73 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    const stream = await deepseek.chat.completions.create({
-      model:          MODEL,
-      max_tokens:     1024,
-      stream:         true,
-      stream_options: { include_usage: true },
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...messages,
-      ],
-    })
-
     let fullText         = ''
     let promptTokens     = 0
     let completionTokens = 0
 
+    // DeepSeek を試みて失敗したら Anthropic Claude にフォールバック
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let deepseekStream: AsyncIterable<any> | null = null
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let anthropicStream: AsyncIterable<any> | null = null
+
+    try {
+      deepseekStream = await deepseek.chat.completions.create({
+        model:          MODEL,
+        max_tokens:     1024,
+        stream:         true,
+        stream_options: { include_usage: true },
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...messages,
+        ],
+      })
+    } catch (deepseekErr) {
+      console.error('[ai-chat] DeepSeek unavailable, falling back to Anthropic:', deepseekErr)
+      anthropicStream = await anthropic.messages.create({
+        model:      FALLBACK_MODEL,
+        max_tokens: 1024,
+        stream:     true,
+        system:     systemPrompt,
+        messages,
+      })
+    }
+
     const encoder  = new TextEncoder()
     const readable = new ReadableStream({
       async start(controller) {
-        for await (const chunk of stream) {
-          const text = chunk.choices[0]?.delta?.content || ''
-          if (text) {
-            fullText += text
-            controller.enqueue(encoder.encode(text))
+        try {
+          if (deepseekStream) {
+            for await (const chunk of deepseekStream) {
+              const text = chunk.choices[0]?.delta?.content || ''
+              if (text) {
+                fullText += text
+                controller.enqueue(encoder.encode(text))
+              }
+              if (chunk.usage) {
+                promptTokens     = chunk.usage.prompt_tokens     ?? 0
+                completionTokens = chunk.usage.completion_tokens ?? 0
+              }
+            }
+          } else if (anthropicStream) {
+            for await (const event of anthropicStream) {
+              if (event.type === 'content_block_delta' && event.delta?.type === 'text_delta') {
+                const text = (event.delta.text as string) || ''
+                if (text) {
+                  fullText += text
+                  controller.enqueue(encoder.encode(text))
+                }
+              }
+              if (event.type === 'message_start') {
+                promptTokens = event.message?.usage?.input_tokens ?? 0
+              }
+              if (event.type === 'message_delta') {
+                completionTokens = event.usage?.output_tokens ?? 0
+              }
+            }
           }
-          if (chunk.usage) {
-            promptTokens     = chunk.usage.prompt_tokens     ?? 0
-            completionTokens = chunk.usage.completion_tokens ?? 0
-          }
+        } catch (streamErr) {
+          console.error('[ai-chat] Stream iteration error:', streamErr)
         }
 
         // AIレスポンスを保存

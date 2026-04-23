@@ -56,6 +56,10 @@ export async function GET(req: NextRequest) {
 
       if (!profile?.email) continue
 
+      // 配信停止チェック
+      const { data: authUser } = await admin.auth.admin.getUserById(userId)
+      if (authUser?.user?.user_metadata?.email_unsubscribed) continue
+
       // 今週・先週のセッション数
       const [thisWeek, lastWeek, thisWeekAppt, lastWeekAppt] = await Promise.all([
         admin.from('customer_sessions').select('id', { count: 'exact' })

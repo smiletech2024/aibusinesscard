@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { deepseek, MODEL, getSummaryPrompt } from '@/lib/anthropic'
+import { deepseek, anthropic, MODEL, FALLBACK_MODEL, getSummaryPrompt } from '@/lib/anthropic'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 
@@ -42,13 +42,24 @@ export async function POST(req: NextRequest) {
     const customerName = s?.customer_name || 'お客様'
     const ownerUserId = s?.personas?.user_id
 
-    const response = await deepseek.chat.completions.create({
-      model: MODEL,
-      max_tokens: 2048,
-      messages: [{ role: 'user', content: getSummaryPrompt(conversations, ownerName) }],
-    })
-
-    const rawSummary = response.choices[0]?.message?.content || ''
+    // DeepSeek を試みて失敗したら Anthropic Claude にフォールバック
+    let rawSummary = ''
+    try {
+      const response = await deepseek.chat.completions.create({
+        model: MODEL,
+        max_tokens: 2048,
+        messages: [{ role: 'user', content: getSummaryPrompt(conversations, ownerName) }],
+      })
+      rawSummary = response.choices[0]?.message?.content || ''
+    } catch (deepseekErr) {
+      console.error('[summarize] DeepSeek unavailable, falling back to Anthropic:', deepseekErr)
+      const response = await anthropic.messages.create({
+        model: FALLBACK_MODEL,
+        max_tokens: 2048,
+        messages: [{ role: 'user', content: getSummaryPrompt(conversations, ownerName) }],
+      })
+      rawSummary = response.content[0]?.type === 'text' ? response.content[0].text : ''
+    }
 
     let summaryData
     try {

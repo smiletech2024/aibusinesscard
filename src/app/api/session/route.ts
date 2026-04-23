@@ -11,6 +11,23 @@ export async function POST(req: NextRequest) {
     )
     const { personaId, cardId, customerName, customerEmail } = await req.json()
 
+    // ── IP ベースのレートリミット（同一personaへの乱用防止）──────
+    if (personaId) {
+      const oneMinuteAgo = new Date(Date.now() - 60_000).toISOString()
+      const { count: recentSessions } = await admin
+        .from('customer_sessions')
+        .select('id', { count: 'exact', head: true })
+        .eq('persona_id', personaId)
+        .gte('created_at', oneMinuteAgo)
+
+      if ((recentSessions ?? 0) >= 5) {
+        return NextResponse.json(
+          { error: 'RATE_LIMIT', message: 'アクセスが集中しています。しばらくしてから再度お試しください。' },
+          { status: 429 }
+        )
+      }
+    }
+
     // ── オーナーのプランを取得してセッション上限チェック ─────────
     const { data: persona } = await admin
       .from('personas')

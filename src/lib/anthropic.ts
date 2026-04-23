@@ -1,11 +1,17 @@
 import OpenAI from 'openai'
+import Anthropic from '@anthropic-ai/sdk'
 
 export const deepseek = new OpenAI({
   apiKey: process.env.DEEPSEEK_API_KEY || '',
   baseURL: 'https://api.deepseek.com',
 })
 
-export const MODEL = 'deepseek-chat'
+export const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY || '',
+})
+
+export const MODEL          = 'deepseek-chat'
+export const FALLBACK_MODEL = 'claude-haiku-4-5'
 
 // ヒアリングAIのシステムプロンプト
 export function getHearingSystemPrompt(): string {
