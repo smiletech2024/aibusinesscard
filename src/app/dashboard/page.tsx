@@ -511,56 +511,6 @@ export default function DashboardPage() {
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-2">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Logo size={26} variant="dark" />
-            {/* プロフィール写真アップロード */}
-            <div style={{ position: 'relative', flexShrink: 0 }}>
-              <button
-                onClick={() => avatarInputRef.current?.click()}
-                disabled={avatarUploading}
-                title="プロフィール写真をアップロード"
-                style={{
-                  position: 'relative', width: 32, height: 32, borderRadius: '50%',
-                  overflow: 'hidden', cursor: 'pointer', border: '2px solid #EDD9C8',
-                  background: avatarUrl ? 'transparent' : 'rgba(242,103,34,0.12)',
-                  padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F26722" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                    <circle cx="12" cy="13" r="4"/>
-                  </svg>
-                )}
-                {/* カメラオーバーレイ */}
-                <div style={{
-                  position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  opacity: avatarUploading ? 1 : 0, transition: 'opacity 0.15s',
-                }}
-                  className="avatar-hover-overlay"
-                  onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
-                  onMouseLeave={e => !avatarUploading && (e.currentTarget.style.opacity = '0')}
-                >
-                  {avatarUploading ? (
-                    <div style={{ width: 12, height: 12, border: '2px solid rgba(255,255,255,0.4)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-                  ) : (
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                      <circle cx="12" cy="13" r="4"/>
-                    </svg>
-                  )}
-                </div>
-              </button>
-              <input
-                ref={avatarInputRef}
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                onChange={handleAvatarUpload}
-              />
-            </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
             {/* プランバッジ */}
