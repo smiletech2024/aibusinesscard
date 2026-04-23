@@ -393,6 +393,66 @@ export default function VirtualOfficePage() {
           </div>
         </div>
 
+        {/* ── 入居者ディレクトリ ── */}
+        {(() => {
+          const tenants = slots
+            .filter(s => s.area === activeArea && s.user_id)
+            .sort((a, b) => b.floor_num - a.floor_num || a.slot_num - b.slot_num)
+          if (tenants.length === 0) return null
+          return (
+            <div>
+              <h2 className="font-black text-sm mb-3" style={{ color: '#1C0F05' }}>
+                {area.label} 入居者一覧
+                <span className="ml-2 font-normal text-xs" style={{ color: '#A08068' }}>{tenants.length} 社</span>
+              </h2>
+              <div className="space-y-2">
+                {tenants.map(slot => (
+                  <div
+                    key={slot.id}
+                    className="flex items-center gap-3 rounded-2xl px-4 py-3"
+                    style={{ background: 'white', border: '1px solid #EDD9C8' }}
+                  >
+                    {/* フロアバッジ */}
+                    <div
+                      className="flex-shrink-0 flex flex-col items-center justify-center rounded-xl"
+                      style={{ width: 40, height: 40, background: '#FAF5F0', border: '1px solid #EDD9C8' }}
+                    >
+                      <span style={{ fontSize: 9, fontWeight: 900, color: '#C4883A', letterSpacing: '0.05em' }}>{slot.floor_num}F</span>
+                      <span style={{ fontSize: 8, color: '#DEC4AD' }}>{slot.slot_num}番</span>
+                    </div>
+
+                    {/* 会社情報 */}
+                    <div className="flex-1 min-w-0">
+                      {slot.card_title && (
+                        <p style={{ fontSize: 10, fontWeight: 700, color: '#E8601C', marginBottom: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {slot.card_title}
+                        </p>
+                      )}
+                      <p className="font-black text-sm leading-tight" style={{ color: '#1C0F05', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {slot.company_name || '（社名未設定）'}
+                      </p>
+                      {slot.display_name && (
+                        <p style={{ fontSize: 11, color: '#A08068', marginTop: 1 }}>{slot.display_name}</p>
+                      )}
+                    </div>
+
+                    {/* 窓口ボタン */}
+                    {slot.card_id && (
+                      <Link
+                        href={`/card/${slot.card_id}`}
+                        className="flex-shrink-0 font-bold rounded-xl text-xs"
+                        style={{ padding: '8px 14px', background: '#E8601C', color: 'white', textDecoration: 'none', whiteSpace: 'nowrap' }}
+                      >
+                        窓口を開く
+                      </Link>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        })()}
+
         {/* ── 案内 ── */}
         {!mySlot && userId && (
           <div className="rounded-2xl p-4" style={{ background: 'white', border: '1px solid #EDD9C8' }}>
