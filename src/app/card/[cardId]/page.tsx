@@ -759,8 +759,11 @@ export default function CardPage() {
                 >
                   {proceeding ? '接続中...' : '話しかける →'}
                 </button>
+                <p style={{ textAlign: 'center', fontSize: 11, color: '#6B4030', marginTop: 8 }}>
+                  🔓 登録不要・無料でご利用いただけます
+                </p>
                 <button onClick={() => setShowNameInput(false)}
-                  className="w-full text-center text-sm py-2 mt-2"
+                  className="w-full text-center text-sm py-2 mt-1"
                   style={{ color: '#6B4030', background: 'transparent', border: 'none', cursor: 'pointer' }}
                 >キャンセル</button>
               </div>
@@ -952,17 +955,22 @@ function CustomLayoutCard({ card, layout, showAppt, setShowAppt, showNameInput, 
                     続きから話す →
                   </button>
                 ) : showNameInput ? (
-                  <div style={{ width: '100%', height: '100%', display: 'flex', gap: 6 }}>
-                    <input
-                      type="text" value={customerName} onChange={e => setCustomerName(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && proceedToChat()}
-                      placeholder="お名前（任意）"
-                      style={{ flex: 1, background: 'rgba(28,15,5,0.8)', border: '1.5px solid rgba(242,103,34,0.3)', borderRadius: 10, padding: '0 12px', color: '#FFF0E8', fontSize: 13, outline: 'none' }}
-                    />
-                    <button onClick={proceedToChat} disabled={proceeding}
-                      style={{ padding: '0 14px', background: 'linear-gradient(135deg,#F5843A,#F59340)', border: 'none', borderRadius: 10, color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                      {proceeding ? '...' : '話す →'}
-                    </button>
+                  <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ display: 'flex', gap: 6, flex: 1 }}>
+                      <input
+                        type="text" value={customerName} onChange={e => setCustomerName(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && proceedToChat()}
+                        placeholder="お名前（任意）"
+                        style={{ flex: 1, background: 'rgba(28,15,5,0.8)', border: '1.5px solid rgba(242,103,34,0.3)', borderRadius: 10, padding: '0 12px', color: '#FFF0E8', fontSize: 13, outline: 'none' }}
+                      />
+                      <button onClick={proceedToChat} disabled={proceeding}
+                        style={{ padding: '0 14px', background: 'linear-gradient(135deg,#F5843A,#F59340)', border: 'none', borderRadius: 10, color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                        {proceeding ? '...' : '話す →'}
+                      </button>
+                    </div>
+                    <p style={{ textAlign: 'center', fontSize: 10, color: 'rgba(255,240,232,0.5)', margin: 0 }}>
+                      🔓 登録不要・無料でご利用いただけます
+                    </p>
                   </div>
                 ) : (
                   <button onClick={() => setShowNameInput(true)} style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg,#F5843A,#F59340)', border: 'none', borderRadius: 14, color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer', boxShadow: '0 4px 20px rgba(242,103,34,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
