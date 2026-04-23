@@ -38,9 +38,14 @@ export async function POST(req: NextRequest) {
     }
 
     // 確認URLを自ドメインに変換
-    const actionLink   = data.properties?.action_link ?? ''
-    const token_hash   = new URL(actionLink).searchParams.get('token_hash') ?? ''
-    const confirmUrl   = `${SITE_URL}/auth/confirm?token_hash=${token_hash}&type=signup`
+    // hashed_token が正しい値（action_link の ?token= ではなく hashed_token を使う）
+    const actionLink = data.properties?.action_link ?? ''
+    const token_hash =
+      data.properties?.hashed_token ||
+      new URL(actionLink).searchParams.get('token_hash') ||
+      new URL(actionLink).searchParams.get('token') ||
+      ''
+    const confirmUrl = `${SITE_URL}/auth/confirm?token_hash=${encodeURIComponent(token_hash)}&type=signup`
 
     // Resend でメール送信（Supabaseのメール送信レート制限を完全バイパス）
     const html = buildSignupEmail(confirmUrl)

@@ -1427,8 +1427,94 @@ export default function DashboardPage() {
             )}
           </div>
         )}
+        {/* ── 友達紹介 ── */}
+        {userId && <ReferralPanel userId={userId} />}
+
       </div>
       <SiteFooter />
+    </div>
+  )
+}
+
+function ReferralPanel({ userId }: { userId: string }) {
+  const [copied, setCopied] = useState(false)
+  const referralUrl = `https://www.aimeishi.biz/?ref=${userId}`
+
+  const copy = async () => {
+    await navigator.clipboard.writeText(referralUrl)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2500)
+  }
+
+  return (
+    <div
+      className="rounded-2xl p-5"
+      style={{
+        background: 'linear-gradient(135deg, #FFF7ED, #FFF0E0)',
+        border: '1px solid rgba(242,103,34,0.2)',
+        boxShadow: '0 1px 3px rgba(242,103,34,0.06)',
+      }}
+    >
+      <div className="flex items-start gap-3 mb-4">
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{ background: 'rgba(242,103,34,0.12)', fontSize: 20 }}
+        >
+          🎁
+        </div>
+        <div>
+          <h3 className="font-black text-sm" style={{ color: '#1C0F05' }}>友達に紹介する</h3>
+          <p className="text-xs mt-0.5" style={{ color: '#A08068' }}>
+            紹介リンクを送るだけ。あなたの名刺URLでもOKです。
+          </p>
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <div
+          className="flex-1 px-3 py-2.5 rounded-xl text-xs truncate"
+          style={{ background: 'white', border: '1.5px solid #EDD9C8', color: '#A08068', fontFamily: 'monospace' }}
+        >
+          {referralUrl}
+        </div>
+        <button
+          onClick={copy}
+          style={{
+            padding: '0 16px', borderRadius: 12, fontSize: 12, fontWeight: 700,
+            background: copied ? '#059669' : 'linear-gradient(135deg, #F26722, #F59340)',
+            color: 'white', border: 'none', cursor: 'pointer',
+            flexShrink: 0, transition: 'background 0.3s',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {copied ? '✓ コピー済' : 'コピー'}
+        </button>
+      </div>
+      <div className="flex gap-3 mt-3">
+        <a
+          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('AIが24時間、顧客の質問に答えてくれる「AI名刺」試してみて！無料で始められるよ 👇')}&url=${encodeURIComponent(referralUrl)}`}
+          target="_blank" rel="noopener noreferrer"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            padding: '8px 14px', borderRadius: 10, fontSize: 12, fontWeight: 700,
+            background: 'rgba(29,161,242,0.1)', color: '#1DA1F2',
+            border: '1px solid rgba(29,161,242,0.25)', textDecoration: 'none',
+          }}
+        >
+          𝕏 でシェア
+        </a>
+        <a
+          href={`https://line.me/R/msg/text/?${encodeURIComponent('AIが24時間、顧客の質問に答えてくれる「AI名刺」！無料で試せます👇\n' + referralUrl)}`}
+          target="_blank" rel="noopener noreferrer"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            padding: '8px 14px', borderRadius: 10, fontSize: 12, fontWeight: 700,
+            background: 'rgba(6,199,85,0.1)', color: '#06C755',
+            border: '1px solid rgba(6,199,85,0.25)', textDecoration: 'none',
+          }}
+        >
+          LINE
+        </a>
+      </div>
     </div>
   )
 }

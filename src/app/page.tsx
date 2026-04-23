@@ -168,43 +168,51 @@ export default function HomePage() {
           <p className="text-center text-sm mb-8" style={{ color: '#B88860' }}>
             フリープランで今日からはじめる。いつでも解約できます
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
             {[
-              { name: 'フリー',           price: '無料',      desc: 'まず試す · 分身AI1体' },
-              { name: 'スタンダード',     price: '¥480/月',   desc: '本格活用 · 名刺3枚' },
-              { name: 'ビジネス',         price: '¥2,980/月', desc: 'チームで使う · 名刺10枚' },
-              { name: 'エンタープライズ', price: '¥9,800/月', desc: '全力支援 · 枚数無制限' },
-            ].map(({ name, price, desc }, i) => (
+              { name: 'フリー',           price: '無料',      desc: '名刺1枚',   badge: '' },
+              { name: 'スタンダード',     price: '¥480/月',   desc: '名刺2枚',   badge: '' },
+              { name: 'プロ',             price: '¥1,480/月', desc: '名刺3枚',   badge: 'おすすめ' },
+              { name: 'ビジネス',         price: '¥2,980/月', desc: '名刺5枚',   badge: '' },
+              { name: 'エンタープライズ', price: '¥9,800/月', desc: '枚数無制限', badge: '' },
+            ].map(({ name, price, desc, badge }, i) => (
               <div
                 key={name}
-                className="p-4 rounded-2xl text-center"
+                className="p-3 rounded-2xl text-center relative"
                 style={{
-                  background: i === 1
+                  background: i === 2
                     ? 'linear-gradient(145deg,#E8601C,#C4511A)'
                     : 'rgba(255,255,255,0.75)',
-                  border: i === 1
+                  border: i === 2
                     ? 'none'
                     : '1px solid rgba(196,136,58,0.25)',
-                  boxShadow: i === 1
+                  boxShadow: i === 2
                     ? '0 6px 24px rgba(232,96,28,0.3)'
                     : '0 2px 8px rgba(196,136,58,0.08)',
                 }}
               >
+                {badge && (
+                  <div style={{
+                    position: 'absolute', top: -8, left: '50%', transform: 'translateX(-50%)',
+                    background: '#F5903A', color: 'white', fontSize: 9, fontWeight: 800,
+                    padding: '2px 8px', borderRadius: 99, whiteSpace: 'nowrap',
+                  }}>{badge}</div>
+                )}
                 <div
                   className="text-xs font-bold mb-1"
-                  style={{ color: i === 1 ? 'rgba(255,255,255,0.85)' : '#E8601C' }}
+                  style={{ color: i === 2 ? 'rgba(255,255,255,0.85)' : '#E8601C' }}
                 >
                   {name}
                 </div>
                 <div
-                  className="font-black text-lg mb-1"
-                  style={{ color: i === 1 ? 'white' : '#2C1806' }}
+                  className="font-black text-base mb-0.5"
+                  style={{ color: i === 2 ? 'white' : '#2C1806' }}
                 >
                   {price}
                 </div>
                 <div
                   className="text-xs leading-snug"
-                  style={{ color: i === 1 ? 'rgba(255,255,255,0.75)' : '#B88860' }}
+                  style={{ color: i === 2 ? 'rgba(255,255,255,0.75)' : '#B88860' }}
                 >
                   {desc}
                 </div>

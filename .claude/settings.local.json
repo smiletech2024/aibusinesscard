@@ -66,7 +66,10 @@
       "Bash(sed -i '' s/分身AIを作成する/分身AIを作る/g src/app/auth/login/page.tsx)",
       "Bash(sed -i '' s/無料・約3分で完成します/無料、3分で完成します/g src/app/auth/login/page.tsx)",
       "Bash(sed -i '' s/このメールアドレスはすでに登録されています。ログインしてください。/このアドレスはすでに登録済みです。ログインしてください。/g src/app/auth/login/page.tsx)",
-      "Bash(pkill -f \"next build\")"
+      "Bash(pkill -f \"next build\")",
+      "Bash(grep -n 'card.website && \\( *)",
+      "Read(//Users/tsuyoshigoto/.config/**)",
+      "Bash(curl -s \"https://aimeishi.biz/api/admin/stats\" -H \"Cookie: $\\(cat ~/.config/aimeishi-admin-cookie \\)\")"
     ]
   }
 }

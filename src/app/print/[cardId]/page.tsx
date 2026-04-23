@@ -259,7 +259,7 @@ function ExecutiveFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 
       )}
 
       {/* Main content */}
-      <div style={{ position: 'absolute', left: 32, top: 0, right: 112, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
+      <div style={{ position: 'absolute', left: 32, top: 0, right: 185, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
 
         {/* Company */}
         {card.company && (
@@ -284,7 +284,7 @@ function ExecutiveFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 
         <div style={{ width: 40, height: 2, background: 'linear-gradient(90deg, #F26722, #F59340)', borderRadius: 2, marginBottom: 18 }} />
 
         {/* Contact */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7, overflow: 'hidden' }}>
           {card.email && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#4A2C1A', fontSize: 19 }}>
               <span style={{ color: '#F26722' }}><IconMail /></span>
@@ -304,9 +304,9 @@ function ExecutiveFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 
             </div>
           )}
           {card.address && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#4A2C1A', fontSize: 19 }}>
-              <span style={{ color: '#F26722' }}><IconLocation /></span>
-              {card.address}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#4A2C1A', fontSize: 19, overflow: 'hidden' }}>
+              <span style={{ color: '#F26722', flexShrink: 0 }}><IconLocation /></span>
+              <span style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-all', lineHeight: 1.35 } as React.CSSProperties}>{card.address}</span>
             </div>
           )}
         </div>
@@ -395,7 +395,7 @@ function MidnightFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 1
       </div>
 
       {/* Left content */}
-      <div style={{ position: 'absolute', left: 32, top: 36, bottom: 36, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <div style={{ position: 'absolute', left: 32, top: 36, right: 185, bottom: 52, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', overflow: 'hidden' }}>
         <div>
           {card.company && (
             <p style={{ fontSize: 18, color: '#F5A47A', fontWeight: 700, letterSpacing: '0.2em', margin: '0 0 10px' }}>
@@ -412,7 +412,7 @@ function MidnightFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 1
           )}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, overflow: 'hidden' }}>
           {card.email && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.55)', fontSize: 19 }}>
               <span style={{ color: '#F5A47A' }}><IconMail /></span> {card.email}
@@ -429,8 +429,9 @@ function MidnightFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 1
             </div>
           )}
           {card.address && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.55)', fontSize: 19 }}>
-              <span style={{ color: '#F5A47A' }}><IconLocation /></span> {card.address}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.55)', fontSize: 19, overflow: 'hidden' }}>
+              <span style={{ color: '#F5A47A', flexShrink: 0 }}><IconLocation /></span>
+              <span style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-all', lineHeight: 1.35 } as React.CSSProperties}>{card.address}</span>
             </div>
           )}
         </div>
@@ -505,7 +506,7 @@ function VividFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }
       )}
 
       {/* Left content */}
-      <div style={{ position: 'absolute', left: 32, top: 32, bottom: 44, right: 120, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <div style={{ position: 'absolute', left: 32, top: 32, bottom: 52, right: 185, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', overflow: 'hidden' }}>
         <div>
           {card.company && (
             <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.7)', fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 10px' }}>
@@ -524,7 +525,7 @@ function VividFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }
           )}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, overflow: 'hidden' }}>
           {card.email && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.75)', fontSize: 19 }}>
               <IconMail /> {card.email}
@@ -541,8 +542,9 @@ function VividFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }
             </div>
           )}
           {card.address && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.75)', fontSize: 19 }}>
-              <IconLocation /> {card.address}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.75)', fontSize: 19, overflow: 'hidden' }}>
+              <span style={{ flexShrink: 0 }}><IconLocation /></span>
+              <span style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-all', lineHeight: 1.35 } as React.CSSProperties}>{card.address}</span>
             </div>
           )}
         </div>
@@ -613,17 +615,17 @@ function OceanFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }
       {/* User logo */}
       {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', filter: 'brightness(0) invert(1)', opacity: 0.8, pointerEvents: 'none' }} />}
       {/* Content */}
-      <div style={{ position: 'absolute', left: 32, top: 30, bottom: 36, right: 120, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <div style={{ position: 'absolute', left: 32, top: 30, bottom: 52, right: 185, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', overflow: 'hidden' }}>
         <div>
           {card.company && <p style={{ fontSize: 18, color: '#7EF2E8', fontWeight: 700, letterSpacing: '0.2em', margin: '0 0 10px' }}>{card.company}</p>}
           <h2 style={{ fontSize: 28, fontWeight: 900, color: '#FFFFFF', margin: '0 0 6px', lineHeight: 1.05, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
           {card.title && <p style={{ fontSize: 18, color: '#7EF2E8', fontWeight: 600, margin: 0 }}>{card.title}</p>}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, overflow: 'hidden' }}>
           {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19 }}><span style={{ color: '#7EF2E8' }}><IconMail /></span>{card.email}</div>}
           {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19 }}><span style={{ color: '#7EF2E8' }}><IconPhone /></span>{card.phone}</div>}
           {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19 }}><span style={{ color: '#7EF2E8' }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
-          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19 }}><span style={{ color: '#7EF2E8' }}><IconLocation /></span>{card.address}</div>}
+          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19, overflow: 'hidden' }}><span style={{ color: '#7EF2E8', flexShrink: 0 }}><IconLocation /></span><span style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-all', lineHeight: 1.35 } as React.CSSProperties}>{card.address}</span></div>}
         </div>
       </div>
       {qrUrl && (
@@ -677,17 +679,17 @@ function ForestFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 
       {/* User logo */}
       {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', filter: 'brightness(0) invert(1)', opacity: 0.8, pointerEvents: 'none' }} />}
       {/* Content */}
-      <div style={{ position: 'absolute', left: 36, top: 30, bottom: 36, right: 118, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <div style={{ position: 'absolute', left: 36, top: 30, bottom: 52, right: 185, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', overflow: 'hidden' }}>
         <div>
           {card.company && <p style={{ fontSize: 18, color: '#6EE7B7', fontWeight: 700, letterSpacing: '0.2em', margin: '0 0 10px' }}>{card.company}</p>}
           <h2 style={{ fontSize: 27, fontWeight: 900, color: '#FFFFFF', margin: '0 0 6px', lineHeight: 1.05, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
           {card.title && <p style={{ fontSize: 18, color: '#6EE7B7', fontWeight: 600, margin: 0 }}>{card.title}</p>}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, overflow: 'hidden' }}>
           {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19 }}><span style={{ color: '#6EE7B7' }}><IconMail /></span>{card.email}</div>}
           {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19 }}><span style={{ color: '#6EE7B7' }}><IconPhone /></span>{card.phone}</div>}
           {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19 }}><span style={{ color: '#6EE7B7' }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
-          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19 }}><span style={{ color: '#6EE7B7' }}><IconLocation /></span>{card.address}</div>}
+          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 19, overflow: 'hidden' }}><span style={{ color: '#6EE7B7', flexShrink: 0 }}><IconLocation /></span><span style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-all', lineHeight: 1.35 } as React.CSSProperties}>{card.address}</span></div>}
         </div>
       </div>
       {qrUrl && (
@@ -741,17 +743,17 @@ function CrimsonFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14
       {/* User logo */}
       {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', filter: 'brightness(0) invert(1)', opacity: 0.8, pointerEvents: 'none' }} />}
       {/* Content */}
-      <div style={{ position: 'absolute', left: 32, top: 30, bottom: 36, right: 125, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <div style={{ position: 'absolute', left: 32, top: 30, bottom: 52, right: 185, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', overflow: 'hidden' }}>
         <div>
           {card.company && <p style={{ fontSize: 18, color: '#FECDD3', fontWeight: 700, letterSpacing: '0.2em', margin: '0 0 10px' }}>{card.company}</p>}
           <h2 style={{ fontSize: 27, fontWeight: 900, color: '#FFFFFF', margin: '0 0 6px', lineHeight: 1.05, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
           {card.title && <p style={{ fontSize: 18, color: '#FECDD3', fontWeight: 600, margin: 0 }}>{card.title}</p>}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, overflow: 'hidden' }}>
           {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.65)', fontSize: 19 }}><span style={{ color: '#FECDD3' }}><IconMail /></span>{card.email}</div>}
           {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.65)', fontSize: 19 }}><span style={{ color: '#FECDD3' }}><IconPhone /></span>{card.phone}</div>}
           {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.65)', fontSize: 19 }}><span style={{ color: '#FECDD3' }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
-          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.65)', fontSize: 19 }}><span style={{ color: '#FECDD3' }}><IconLocation /></span>{card.address}</div>}
+          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.65)', fontSize: 19, overflow: 'hidden' }}><span style={{ color: '#FECDD3', flexShrink: 0 }}><IconLocation /></span><span style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-all', lineHeight: 1.35 } as React.CSSProperties}>{card.address}</span></div>}
         </div>
       </div>
       {qrUrl && (
@@ -809,16 +811,16 @@ function GoldFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }:
       {/* User logo */}
       {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', filter: 'sepia(1) saturate(2) hue-rotate(5deg) brightness(1.2)', opacity: 0.9, pointerEvents: 'none' }} />}
       {/* Content */}
-      <div style={{ position: 'absolute', left: 32, top: 0, bottom: 0, right: 112, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      <div style={{ position: 'absolute', left: 32, top: 0, bottom: 0, right: 185, display: 'flex', flexDirection: 'column', justifyContent: 'center', overflow: 'hidden' }}>
         {card.company && <p style={{ fontSize: 18, color: '#D4AF37', fontWeight: 700, letterSpacing: '0.22em', margin: '0 0 12px' }}>{card.company}</p>}
         <h2 style={{ fontSize: 27, fontWeight: 900, color: '#F5E6A3', margin: '0 0 4px', lineHeight: 1.05, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
         {card.title && <p style={{ fontSize: 18, color: '#D4AF37', fontWeight: 600, margin: '0 0 18px' }}>{card.title}</p>}
         <div style={{ width: 36, height: 1, background: 'linear-gradient(90deg, #D4AF37, transparent)', marginBottom: 16 }} />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7, overflow: 'hidden' }}>
           {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(245,230,163,0.6)', fontSize: 19 }}><span style={{ color: '#D4AF37' }}><IconMail /></span>{card.email}</div>}
           {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(245,230,163,0.6)', fontSize: 19 }}><span style={{ color: '#D4AF37' }}><IconPhone /></span>{card.phone}</div>}
           {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(245,230,163,0.6)', fontSize: 19 }}><span style={{ color: '#D4AF37' }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
-          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(245,230,163,0.6)', fontSize: 19 }}><span style={{ color: '#D4AF37' }}><IconLocation /></span>{card.address}</div>}
+          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(245,230,163,0.6)', fontSize: 19, overflow: 'hidden' }}><span style={{ color: '#D4AF37', flexShrink: 0 }}><IconLocation /></span><span style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-all', lineHeight: 1.35 } as React.CSSProperties}>{card.address}</span></div>}
         </div>
       </div>
       {qrUrl && (
@@ -880,16 +882,16 @@ function PinkFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 14 }:
       {/* User logo */}
       {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 26, maxWidth: 90, objectFit: 'contain', objectPosition: 'left', pointerEvents: 'none' }} />}
       {/* Content */}
-      <div style={{ position: 'absolute', left: 32, top: 0, bottom: 0, right: 112, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
+      <div style={{ position: 'absolute', left: 32, top: 0, bottom: 0, right: 185, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0, overflow: 'hidden' }}>
         {card.company && <p style={{ fontSize: 18, color: '#BE185D', fontWeight: 700, letterSpacing: '0.15em', margin: '0 0 8px' }}>{card.company}</p>}
         <h2 style={{ fontSize: 26, fontWeight: 900, color: '#831843', margin: '0 0 4px', lineHeight: 1.1, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
         {card.title && <p style={{ fontSize: 18, color: '#EC4899', fontWeight: 600, margin: '0 0 18px' }}>{card.title}</p>}
         <div style={{ width: 36, height: 2, background: 'linear-gradient(90deg, #EC4899, #F9A8D4)', borderRadius: 2, marginBottom: 16 }} />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7, overflow: 'hidden' }}>
           {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#9D174D', fontSize: 19 }}><span style={{ color: '#EC4899' }}><IconMail /></span>{card.email}</div>}
           {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#9D174D', fontSize: 19 }}><span style={{ color: '#EC4899' }}><IconPhone /></span>{card.phone}</div>}
           {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#9D174D', fontSize: 19 }}><span style={{ color: '#EC4899' }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
-          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#9D174D', fontSize: 19 }}><span style={{ color: '#EC4899' }}><IconLocation /></span>{card.address}</div>}
+          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#9D174D', fontSize: 19, overflow: 'hidden' }}><span style={{ color: '#EC4899', flexShrink: 0 }}><IconLocation /></span><span style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-all', lineHeight: 1.35 } as React.CSSProperties}>{card.address}</span></div>}
         </div>
       </div>
       {qrUrl && (
@@ -942,17 +944,17 @@ function CenteredFront({ card, qrUrl, fontFamily, logoUrl, logoX = 32, logoY = 1
       {/* ロゴ */}
       {logoUrl && <img src={logoUrl} alt="logo" style={{ position: 'absolute', top: logoY, left: logoX, maxHeight: 24, maxWidth: 80, objectFit: 'contain', objectPosition: 'left', filter: isDark ? 'brightness(0) invert(1)' : undefined, opacity: 0.85, pointerEvents: 'none' }} />}
       {/* センター本文 */}
-      <div style={{ position: 'absolute', left: 28, right: 112, top: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+      <div style={{ position: 'absolute', left: 28, right: 185, top: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', overflow: 'hidden' }}>
         {card.company && <p style={{ fontSize: 18, color: textCompany, fontWeight: 700, letterSpacing: '0.18em', margin: '0 0 14px' }}>{card.company}</p>}
         <h2 style={{ fontSize: 28, fontWeight: 900, color: textName, margin: '0 0 7px', lineHeight: 1.05, letterSpacing: '-0.02em' }}>{card.full_name}</h2>
         {card.title && <p style={{ fontSize: 18, color: accent, fontWeight: 600, margin: '0 0 18px' }}>{card.title}</p>}
         <div style={{ width: 50, height: 1, background: `linear-gradient(90deg, transparent, ${accent}, transparent)`, marginBottom: 16 }} />
         {/* 連絡先：縦並び（中央揃え） */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', overflow: 'hidden' }}>
           {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: textContact, fontSize: 19 }}><span style={{ color: accent }}><IconMail /></span>{card.email}</div>}
           {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: textContact, fontSize: 19 }}><span style={{ color: accent }}><IconPhone /></span>{card.phone}</div>}
           {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: textContact, fontSize: 19 }}><span style={{ color: accent }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
-          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: textContact, fontSize: 19 }}><span style={{ color: accent }}><IconLocation /></span>{card.address}</div>}
+          {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: textContact, fontSize: 19, overflow: 'hidden' }}><span style={{ color: accent, flexShrink: 0 }}><IconLocation /></span><span style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-all', lineHeight: 1.35 } as React.CSSProperties}>{card.address}</span></div>}
         </div>
       </div>
       {/* QR + ブランド — 右下 */}
@@ -1003,11 +1005,11 @@ function SplitFront({ card, qrUrl, fontFamily, logoUrl, logoX = SPLIT_X + 18, lo
         <div>
           {card.company && <p style={{ fontSize: 18, color: accent, fontWeight: 700, letterSpacing: '0.15em', margin: '0 0 10px' }}>{card.company}</p>}
           <div style={{ width: 22, height: 2.5, background: accent, borderRadius: 2, marginBottom: 14 }} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 7, overflow: 'hidden' }}>
             {card.email && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: rightSecondary, fontSize: 19 }}><span style={{ color: accent }}><IconMail /></span>{card.email}</div>}
             {card.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: rightSecondary, fontSize: 19 }}><span style={{ color: accent }}><IconPhone /></span>{card.phone}</div>}
             {card.website && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: rightSecondary, fontSize: 19 }}><span style={{ color: accent }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}</div>}
-            {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: rightSecondary, fontSize: 19 }}><span style={{ color: accent }}><IconLocation /></span>{card.address}</div>}
+            {card.address && <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: rightSecondary, fontSize: 19, overflow: 'hidden' }}><span style={{ color: accent, flexShrink: 0 }}><IconLocation /></span><span style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-all', lineHeight: 1.35 } as React.CSSProperties}>{card.address}</span></div>}
           </div>
         </div>
         {qrUrl && (
@@ -1105,20 +1107,25 @@ function PulseFront({ card, qrUrl, fontFamily, logoUrl, logoX = 238, logoY = 13,
           </svg>
         </div>
         {/* 連絡先 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7, overflow: 'hidden' }}>
           {card.email && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: 'rgba(255,255,255,0.5)', fontSize: 17 }}>
-              <span style={{ color: accent, opacity: 0.9 }}><IconMail /></span>{card.email}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: 'rgba(255,255,255,0.5)', fontSize: 17, overflow: 'hidden' }}>
+              <span style={{ color: accent, opacity: 0.9, flexShrink: 0 }}><IconMail /></span><span style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{card.email}</span>
             </div>
           )}
           {card.phone && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: 'rgba(255,255,255,0.5)', fontSize: 17 }}>
-              <span style={{ color: accent, opacity: 0.9 }}><IconPhone /></span>{card.phone}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: 'rgba(255,255,255,0.5)', fontSize: 17, overflow: 'hidden' }}>
+              <span style={{ color: accent, opacity: 0.9, flexShrink: 0 }}><IconPhone /></span><span style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{card.phone}</span>
             </div>
           )}
           {card.website && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: 'rgba(255,255,255,0.5)', fontSize: 17 }}>
-              <span style={{ color: accent, opacity: 0.9 }}><IconGlobe /></span>{card.website.replace(/https?:\/\//, '')}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: 'rgba(255,255,255,0.5)', fontSize: 17, overflow: 'hidden' }}>
+              <span style={{ color: accent, opacity: 0.9, flexShrink: 0 }}><IconGlobe /></span><span style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{card.website.replace(/https?:\/\//, '')}</span>
+            </div>
+          )}
+          {card.address && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: 'rgba(255,255,255,0.5)', fontSize: 17, overflow: 'hidden' }}>
+              <span style={{ color: accent, opacity: 0.9, flexShrink: 0 }}><IconLocation /></span><span style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-all', lineHeight: 1.35 } as React.CSSProperties}>{card.address}</span>
             </div>
           )}
         </div>

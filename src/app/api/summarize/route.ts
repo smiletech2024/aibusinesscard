@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
 
     // ── 熱い客スコア判定 ─────────────────────────────────────────────
     const score = parseInt(String(summaryData.compatibility_score ?? '0'), 10)
-    const isHotLead = !isNaN(score) && score >= 75
+    const isHotLead = !isNaN(score) && score >= 80
 
     // ── オーナーへメール通知 ──────────────────────────────────────────
     if (ownerUserId && RESEND_API_KEY) {

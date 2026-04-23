@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { CREDIT_PACKAGES } from '@/lib/credits'
-import { getPlanByPriceId, PLANS, type PlanId } from '@/lib/plans'
+import { getPlanByPriceId, PLANS, type PlanId, getPriceIdByPlan } from '@/lib/plans'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2026-03-25.dahlia',
@@ -102,7 +102,55 @@ export async function POST(req: NextRequest) {
       console.log(`✅ Token purchase: user=${user_id} +${tokensNum}`)
     }
 
-    // subscription mode → customer.subscription.created が後続で来るので何もしない
+    // ── subscription mode: checkout完了時点で即時トークン付与 ──
+    // customer.subscription.created が来れば上書きされるが setSubBalance は冪等なので二重付与なし
+    if (session.mode === 'subscription') {
+      const { user_id, plan_id } = session.metadata ?? {}
+      if (user_id && plan_id) {
+        const planId = plan_id as PlanId
+        const plan   = PLANS[planId]
+        if (plan && plan.monthlyTokens > 0) {
+          // 重複チェック: すでに同じ session で付与済みか
+          const { data: dupTx } = await admin
+            .from('credit_transactions')
+            .select('id')
+            .eq('user_id', user_id)
+            .eq('description', `${plan.name}プラン 月次トークン付与（初回checkout）`)
+            .maybeSingle()
+
+          if (!dupTx) {
+            const stripeSubId = typeof session.subscription === 'string'
+              ? session.subscription
+              : (session.subscription as { id?: string } | null)?.id
+
+            if (stripeSubId) {
+              await admin.from('user_subscriptions').upsert({
+                user_id,
+                plan:                   planId,
+                stripe_customer_id:     typeof session.customer === 'string' ? session.customer : (session.customer as { id?: string } | null)?.id,
+                stripe_subscription_id: stripeSubId,
+                stripe_price_id:        getPriceIdByPlan(planId) ?? '',
+                status:                 'active',
+                current_period_start:   new Date().toISOString(),
+              }, { onConflict: 'user_id' })
+            }
+
+            await upsertCredits(admin, user_id, {
+              setSubBalance: plan.monthlyTokens,
+              subResetAt:    new Date().toISOString(),
+            })
+            await admin.from('credit_transactions').insert({
+              user_id,
+              amount:      plan.monthlyTokens,
+              type:        'bonus',
+              description: `${plan.name}プラン 月次トークン付与（初回checkout）`,
+            })
+            console.log(`✅ Subscription checkout grant: user=${user_id} plan=${planId} +${plan.monthlyTokens}`)
+          }
+        }
+      }
+    }
+
     return NextResponse.json({ received: true })
   }
 
@@ -119,7 +167,8 @@ export async function POST(req: NextRequest) {
     const priceId  = sub.items.data[0]?.price?.id
     if (!userId || !priceId) return NextResponse.json({ received: true })
 
-    const planId   = getPlanByPriceId(priceId) ?? 'free'
+    // price IDで引けない場合はサブスクメタデータの plan_id を使う（環境変数未設定対策）
+    const planId   = getPlanByPriceId(priceId) ?? (sub.metadata?.plan_id as PlanId | undefined) ?? 'free'
     const plan     = PLANS[planId]
     const periodStart = new Date((sub as unknown as { current_period_start: number }).current_period_start * 1000).toISOString()
     const periodEnd   = new Date((sub as unknown as { current_period_end: number }).current_period_end   * 1000).toISOString()

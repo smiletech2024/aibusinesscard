@@ -23,11 +23,7 @@ const summaryItems = [
       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
     </svg>
   )},
-  { key: 'compatibility_score', label: '相性評価', color: '#34D399', border: '#34D399', icon: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-    </svg>
-  )},
+  // compatibility_score は数値なのでスコアバーで別途表示
   { key: 'unresolved_points', label: '未解決の論点', color: '#E8C547', border: '#E8C547', icon: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" />
@@ -39,6 +35,61 @@ const summaryItems = [
     </svg>
   )},
 ]
+
+function FollowUpCard({ message, ownerName }: { message: string; ownerName: string }) {
+  const [copied, setCopied] = useState(false)
+  const copy = async () => {
+    await navigator.clipboard.writeText(message)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+  return (
+    <div
+      className="p-4 rounded-xl"
+      style={{
+        background: '#0F0E20',
+        border: '1px solid rgba(52,211,153,0.25)',
+        borderLeft: '3px solid #34D399',
+      }}
+    >
+      <div className="flex items-start gap-3">
+        <div
+          className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+          style={{ background: 'rgba(52,211,153,0.12)', color: '#34D399' }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <p className="text-xs font-bold" style={{ color: '#34D399' }}>
+              💬 そのままコピペできるフォローアップ文
+            </p>
+            <button
+              onClick={copy}
+              style={{
+                padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+                background: copied ? 'rgba(52,211,153,0.2)' : 'rgba(52,211,153,0.1)',
+                color: copied ? '#34D399' : '#6EE7B7',
+                border: `1px solid ${copied ? 'rgba(52,211,153,0.4)' : 'rgba(52,211,153,0.2)'}`,
+                cursor: 'pointer', flexShrink: 0, transition: 'all 0.2s',
+              }}
+            >
+              {copied ? '✓ コピー済み' : 'コピー'}
+            </button>
+          </div>
+          <p className="text-sm leading-relaxed" style={{ color: '#A08068', whiteSpace: 'pre-wrap' }}>
+            {message}
+          </p>
+          <p className="text-xs mt-2" style={{ color: '#4A3020' }}>
+            ↑ {ownerName}さんがそのまま顧客に送れる文章です
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function SummaryPage() {
   const params = useParams()
@@ -171,49 +222,115 @@ export default function SummaryPage() {
                 </div>
               )
             })}
-            {/* BANT分析 */}
+            {/* BANT分析 + フォローアップメッセージ */}
             {(() => {
               try {
                 const raw = summary.raw_summary ? JSON.parse(summary.raw_summary.match(/\{[\s\S]*\}/)?.[0] || '{}') : {}
                 const bant = raw.bant
-                if (!bant) return null
+                const followUp = raw.follow_up_message as string | undefined
+                const hotScore = raw.hot_score as string | undefined
+                const score = parseInt(String(summary.compatibility_score ?? '0'), 10)
                 return (
-                  <div
-                    className="p-4 rounded-xl"
-                    style={{
-                      background: '#0F0E20',
-                      border: '1px solid rgba(242,103,34,0.1)',
-                      borderLeft: '3px solid #F59E0B',
-                      borderLeftColor: '#F59E0B',
-                    }}
-                  >
-                    <div className="flex items-start gap-3">
+                  <>
+                    {/* 相性スコア可視化 */}
+                    {!isNaN(score) && score > 0 && (
                       <div
-                        className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                        style={{ background: '#F59E0B18', color: '#F59E0B' }}
+                        className="p-4 rounded-xl"
+                        style={{
+                          background: '#0F0E20',
+                          border: `1px solid ${score >= 80 ? 'rgba(245,158,11,0.3)' : score >= 60 ? 'rgba(242,103,34,0.2)' : 'rgba(156,163,175,0.15)'}`,
+                          borderLeft: `3px solid ${score >= 80 ? '#F59E0B' : score >= 60 ? '#F26722' : '#6B7280'}`,
+                        }}
                       >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
-                        </svg>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold mb-2" style={{ color: '#F59E0B' }}>BANT分析</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          {[
-                            { label: '予算 (Budget)', value: bant.budget },
-                            { label: '決裁権 (Authority)', value: bant.authority },
-                            { label: 'ニーズ (Need)', value: bant.need },
-                            { label: '時期 (Timeline)', value: bant.timeline },
-                          ].map(({ label, value }) => value && (
-                            <div key={label}>
-                              <p className="text-xs font-bold mb-0.5" style={{ color: '#6B4030' }}>{label}</p>
-                              <p className="text-sm" style={{ color: '#A08068' }}>{value}</p>
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                            style={{ background: score >= 80 ? '#F59E0B18' : '#F2672218', color: score >= 80 ? '#F59E0B' : '#F26722' }}
+                          >
+                            <span style={{ fontSize: 14 }}>{score >= 80 ? '🔥' : score >= 60 ? '🌡' : '❄️'}</span>
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <p className="text-xs font-bold" style={{ color: score >= 80 ? '#F59E0B' : score >= 60 ? '#F26722' : '#6B7280' }}>
+                                相性スコア
+                              </p>
+                              <span className="font-black text-2xl" style={{ color: score >= 80 ? '#F59E0B' : score >= 60 ? '#F26722' : '#9CA3AF', lineHeight: 1 }}>
+                                {score}
+                              </span>
+                              <span className="text-xs" style={{ color: '#6B4030' }}>/ 100</span>
+                              <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: score >= 80 ? 'rgba(245,158,11,0.15)' : 'rgba(156,163,175,0.1)', color: score >= 80 ? '#F59E0B' : '#9CA3AF' }}>
+                                {score >= 80 ? '熱い見込み客' : score >= 60 ? '普通' : '情報収集段階'}
+                              </span>
                             </div>
-                          ))}
+                            {/* スコアバー */}
+                            <div className="w-full rounded-full overflow-hidden" style={{ height: 6, background: 'rgba(255,255,255,0.08)' }}>
+                              <div
+                                style={{
+                                  height: '100%',
+                                  width: `${score}%`,
+                                  borderRadius: 9999,
+                                  background: score >= 80
+                                    ? 'linear-gradient(90deg,#F59E0B,#FCD34D)'
+                                    : score >= 60
+                                    ? 'linear-gradient(90deg,#F26722,#F59340)'
+                                    : 'linear-gradient(90deg,#6B7280,#9CA3AF)',
+                                  transition: 'width 0.8s ease',
+                                }}
+                              />
+                            </div>
+                            {hotScore && (
+                              <p className="text-xs mt-1.5" style={{ color: '#6B4030' }}>{hotScore}</p>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    )}
+
+                    {/* BANT分析 */}
+                    {bant && (
+                      <div
+                        className="p-4 rounded-xl"
+                        style={{
+                          background: '#0F0E20',
+                          border: '1px solid rgba(242,103,34,0.1)',
+                          borderLeft: '3px solid #F59E0B',
+                          borderLeftColor: '#F59E0B',
+                        }}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div
+                            className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                            style={{ background: '#F59E0B18', color: '#F59E0B' }}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+                            </svg>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-bold mb-2" style={{ color: '#F59E0B' }}>BANT分析</p>
+                            <div className="grid grid-cols-2 gap-2">
+                              {[
+                                { label: '予算 (Budget)', value: bant.budget },
+                                { label: '決裁権 (Authority)', value: bant.authority },
+                                { label: 'ニーズ (Need)', value: bant.need },
+                                { label: '時期 (Timeline)', value: bant.timeline },
+                              ].map(({ label, value }) => value && (
+                                <div key={label}>
+                                  <p className="text-xs font-bold mb-0.5" style={{ color: '#6B4030' }}>{label}</p>
+                                  <p className="text-sm" style={{ color: '#A08068' }}>{value}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* フォローアップメッセージ */}
+                    {followUp && (
+                      <FollowUpCard message={followUp} ownerName={ownerName} />
+                    )}
+                  </>
                 )
               } catch { return null }
             })()}
