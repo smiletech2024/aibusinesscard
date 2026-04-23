@@ -365,9 +365,11 @@ export default function AgentPage() {
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
                     <div style={{
-                      width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg,#E8601C,#C4883A)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0,
-                    }}>🤖</div>
+                      width: 52, height: 52, borderRadius: 12, overflow: 'hidden', flexShrink: 0,
+                      background: '#F0E4D0',
+                    }}>
+                      <img src="/interviewer.png" alt="AI" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
+                    </div>
                     <div>
                       <div style={{ fontSize: 15, fontWeight: 800, color: '#2C1806' }}>AIエージェントを実行</div>
                       <div style={{ fontSize: 11, color: '#B88860', marginTop: 2 }}>
@@ -765,10 +767,12 @@ export default function AgentPage() {
               <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
                 {msg.role === 'assistant' && (
                   <div style={{
-                    width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg,#E8601C,#C4883A)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14,
+                    width: 36, height: 36, borderRadius: 10, overflow: 'hidden',
                     flexShrink: 0, marginRight: 8, alignSelf: 'flex-end',
-                  }}>🤖</div>
+                    background: '#F0E4D0',
+                  }}>
+                    <img src="/interviewer.png" alt="AI" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
+                  </div>
                 )}
                 <div style={{
                   maxWidth: '75%', padding: '10px 14px', borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
@@ -788,7 +792,9 @@ export default function AgentPage() {
             {/* タイピング中 */}
             {aiTyping && (
               <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg,#E8601C,#C4883A)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>🤖</div>
+                <div style={{ width: 36, height: 36, borderRadius: 10, overflow: 'hidden', background: '#F0E4D0', flexShrink: 0 }}>
+                  <img src="/interviewer.png" alt="AI" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
+                </div>
                 <div style={{ background: 'white', padding: '10px 16px', borderRadius: '16px 16px 16px 4px', boxShadow: '0 2px 8px rgba(44,24,6,0.08)', display: 'flex', gap: 4, alignItems: 'center' }}>
                   {[0, 1, 2].map(j => (
                     <span key={j} style={{
